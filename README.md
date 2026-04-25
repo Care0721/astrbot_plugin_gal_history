@@ -1,14 +1,142 @@
-# astrbot-plugin-helloworld
+```markdown
+# Gal 历史今日 - AstrBot 插件
 
-AstrBot 插件模板 / A template plugin for AstrBot plugin feature
+每日自动播报“历史上的今天”发售的 Galgame，集成 **VNDB**、**Bangumi** 和 **批评空间** 三大数据源，情怀与数据并存。
 
-> [!NOTE]
-> This repo is just a template of [AstrBot](https://github.com/AstrBotDevs/AstrBot) Plugin.
-> 
-> [AstrBot](https://github.com/AstrBotDevs/AstrBot) is an agentic assistant for both personal and group conversations. It can be deployed across dozens of mainstream instant messaging platforms, including QQ, Telegram, Feishu, DingTalk, Slack, LINE, Discord, Matrix, etc. In addition, it provides a reliable and extensible conversational AI infrastructure for individuals, developers, and teams. Whether you need a personal AI companion, an intelligent customer support agent, an automation assistant, or an enterprise knowledge base, AstrBot enables you to quickly build AI applications directly within your existing messaging workflows.
+---
 
-# Supports
+## 功能特性
 
-- [AstrBot Repo](https://github.com/AstrBotDevs/AstrBot)
-- [AstrBot Plugin Development Docs (Chinese)](https://docs.astrbot.app/dev/star/plugin-new.html)
-- [AstrBot Plugin Development Docs (English)](https://docs.astrbot.app/en/dev/star/plugin-new.html)
+- **多数据源融合**  
+  优先使用 VNDB 官方 API，辅以 Bangumi 中文数据和批评空间（需自行安装第三方库），信息全面。
+
+- **每日自动播报**  
+  可配置推送时间与目标群聊，机器人每天准时发送“今日 Galgame 发售纪念日”卡片。
+
+- **手动查询**  
+  支持 `/gal历史` 查询今天或指定日期（如 `2月14`）发售过的作品。
+
+- **网页可视化管理**  
+  所有配置项均可在 AstrBot 管理面板中直接修改，无需手动编辑配置文件。
+
+- **智能图片展示**  
+  自动获取并发送游戏封面（优先 Bangumi，其次 VNDB），支持自定义代理。
+
+---
+
+## 安装
+
+1. **下载插件**  
+   将 `gal_history_today` 文件夹放入 AstrBot 的 `plugins/` 目录下。
+
+2. **安装依赖**  
+   在机器人所在环境中执行：
+   ```bash
+   pip install aiohttp beautifulsoup4
+```
+
+如果你希望启用批评空间数据源（非官方，稳定性不保证），还需安装：
+
+```bash
+   pip install sqlforerogamer
+```
+
+1. 重启机器人
+      插件会自动加载并启动每日播报任务（需在配置中设置目标群聊）。
+
+---
+
+配置项
+
+所有配置均在 AstrBot 网页管理面板的 插件管理 → Gal历史今日 中完成。
+
+配置项 类型 默认值 说明
+target_groups 列表 (string) [] 每日自动推送的群聊 ID 列表
+push_time 字符串 "08:00" 每日播报时间，格式 HH:MM
+enable_bangumi 布尔 true 是否启用 Bangumi 数据补充（中文评分与简介）
+enable_erogamescape 布尔 false 是否尝试接入批评空间（需提前安装库，风险自负）
+max_results 整数 5 每次播报最多展示的作品数量
+proxy 字符串 "" HTTP 代理地址，例如 http://127.0.0.1:7890，留空则不使用代理
+
+---
+
+指令使用
+
+指令 别名 功能
+/gal历史 galhistory 今天发售 查询今天的发售纪念日
+/gal历史 日期 同上 查询指定日期（支持 2月14 或 02-14）
+
+示例
+
+```
+/gal历史
+/gal历史 2月14
+/gal历史 07-29
+```
+
+---
+
+数据源说明
+
+1. VNDB（主数据源）
+
+使用官方 kana API，根据发售日期精确获取游戏列表，并补充 VN 详情及评分。覆盖范围广，数据可靠。
+
+2. Bangumi（中文社区补充）
+
+通过 Bangumi 的非官方搜索 API，根据游戏标题匹配获得中文评分、简介和封面。
+可在配置中关闭。
+
+3. 批评空间（备选 / 仅供学习）
+
+依赖第三方库 sqlforerogamer，因其反爬严格，本插件仅做标记性尝试，不保证数据获取成功，且仅建议在充分了解风险后启用。
+
+---
+
+插件工作流
+
+1. 用户发送指令或到达定时时间
+2. 向 VNDB 查询当年及过去 20 年同月同日发售的 Galgame
+3. 为结果补充 VNDB 评分、封面
+4. 若 Bangumi 开启，进一步补充中文评分与简介
+5. 若批评空间开启且库可用，标记“已尝试获取”
+6. 构建图文消息，发送给用户或目标群聊
+
+---
+
+依赖库
+
+· aiohttp – 异步 HTTP 请求（AstrBot 内置）
+· beautifulsoup4 – HTML 解析（可选，用于清理描述文字）
+· sqlforerogamer – 非官方批评空间库（可选、风险自负）
+· asyncio / re / datetime – Python 标准库
+
+---
+
+注意事项
+
+· 批评空间 没有公开 API，反爬机制严格。启用该功能可能会造成 IP 封禁，请自行承担后果。
+· 每日播报任务使用内部循环检测时间，无需额外 cron 设置。
+· 若未配置 target_groups，机器人只会响应手动指令，不会自动推送。
+· 所有第三方 API 调用均遵守其合理使用政策，请勿高频滥用。
+
+---
+
+效果预览
+
+📅 今日 Galgame 发售纪念日 (07-29)
+
+1. 《千恋＊万花》
+   🏢 Yuzusoft | ⭐ VNDB: 8.2/10 | 🔵 Bangumi: 8.1
+   📖 在一个名为“穗织”的温泉街……（封面图片）
+   ...
+
+---
+
+本项目仅供学习交流使用，请遵守各数据源的服务条款。
+
+---
+
+愿你每天都能遇见属于自己的神作。
+
+```
