@@ -1,0 +1,32 @@
+{
+  "target_groups": {
+    "type": "list",
+    "default": [],
+    "description": "每日自动推送的群聊 ID 列表"
+  },
+  "push_time": {
+    "type": "string",
+    "default": "08:00",
+    "description": "每日播报时间 (HH:MM)"
+  },
+  "enable_bangumi": {
+    "type": "boolean",
+    "default": true,
+    "description": "启用 Bangumi 数据补充"
+  },
+  "enable_erogamescape": {
+    "type": "boolean",
+    "default": false,
+    "description": "尝试批评空间 (需自行安装 sqlforerogamer 库)"
+  },
+  "max_results": {
+    "type": "integer",
+    "default": 5,
+    "description": "每次最多展示的作品数量"
+  },
+  "proxy": {
+    "type": "string",
+    "default": "",
+    "description": "HTTP 代理地址 (例如 http://127.0.0.1:7890)"
+  }
+}
