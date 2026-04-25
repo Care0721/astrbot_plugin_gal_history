@@ -5,9 +5,6 @@ import json
 import aiohttp
 from datetime import datetime
 
-# ========== 正确导入：只使用你已有的 astrbot ==========
-from astrbot import Plugin, on_command, CommandContext
-from astrbot import MessageChain, Plain, Image
 
 # ========== 配置加载 ==========
 def load_config(plugin):
