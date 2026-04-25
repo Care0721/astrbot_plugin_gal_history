@@ -1,51 +1,69 @@
 import asyncio
 import re
+import os
+import json
 import aiohttp
 from datetime import datetime
 from typing import List, Optional
 
-from astrbot.api.plugin import Plugin, on_command, CommandContext
-from astrbot.api.message import MessageChain, Plain, Image
-from astrbot.api.scheduler import scheduled
-from astrbot.api.plugin_config import PluginConfig, ConfigItem
+# ---------- 兼容多种导入方式 ----------
+try:
+    # 标准 astrbot-api 路径
+    from astrbot.api.plugin import Plugin, on_command, CommandContext
+    from astrbot.api.message import MessageChain, Plain, Image
+    from astrbot.api.scheduler import scheduled
+    HAS_API = True
+except ImportError:
+    try:
+        # 部分旧版本路径
+        from astrbot import Plugin, on_command, CommandContext
+        from astrbot import MessageChain, Plain, Image
+        from astrbot import scheduled
+        HAS_API = False
+    except ImportError:
+        raise ImportError("无法导入 AstrBot 依赖，请确认已安装 astrbot 或 astrbot-api")
 
-# ---------- 配置定义（会映射到网页面板） ----------
-class GalHistoryConfig(PluginConfig):
-    target_groups: List[str] = ConfigItem(default=[], desc="每日自动推送的群聊ID列表")
-    push_time: str = ConfigItem(default="08:00", desc="每日播报时间 (HH:MM)")
-    enable_bangumi: bool = ConfigItem(default=True, desc="启用Bangumi数据补充")
-    enable_erogamescape: bool = ConfigItem(default=False, desc="尝试批评空间(需安装库)")
-    max_results: int = ConfigItem(default=5, desc="每次播报最多展示的作品数")
-    proxy: str = ConfigItem(default="", desc="HTTP代理地址，留空则不使用")
+# ---------- 配置加载工具 ----------
+def load_config_from_schema(plugin_instance):
+    """根据 _conf_schema.json 自动从框架获取配置字典"""
+    config_path = os.path.join(os.path.dirname(__file__), "_conf_schema.json")
+    if not os.path.exists(config_path):
+        return {}
+    with open(config_path, "r", encoding="utf-8") as f:
+        schema = json.load(f)
 
-# ---------- 主插件类 ----------
+    # AstrBot 通常会将所有配置合并后放在 plugin.config (如果框架支持)
+    # 作为保底，我们直接将 schema 中的 default 值作为初始配置
+    config = {}
+    for key, desc in schema.items():
+        config[key] = desc.get("default", None)
+    # 如果框架提供了 get_plugin_config 方法，则用框架值覆盖
+    if hasattr(plugin_instance.context, "get_plugin_config"):
+        saved = plugin_instance.context.get_plugin_config()
+        config.update(saved)
+    return config
+
+
 class GalHistoryToday(Plugin):
-    config: GalHistoryConfig
-
-    def __init__(self, context, config: GalHistoryConfig):
+    # 如果用高级 API，可以定义 Config 类；但为了兼容，我们一律使用字典
+    def __init__(self, context):
         super().__init__(context)
-        self.config = config
+        # 从 _conf_schema.json 读取默认值，并应用框架保存的配置
+        self.config = load_config_from_schema(self)
+
         self.session: Optional[aiohttp.ClientSession] = None
+        self.proxy = self.config.get("proxy") or None
+        self.connector = None
 
-        # 初始化代理设置
-        connector = None
-        if self.config.proxy:
-            connector = aiohttp.TCPConnector(force_close=True)
-            self.proxy = self.config.proxy
-        else:
-            self.proxy = None
-
-        self.connector = connector
-
-        # 尝试加载非官方的批评空间库
+        # 批评空间库检测
         self.erogamescape_available = False
-        if self.config.enable_erogamescape:
+        if self.config.get("enable_erogamescape"):
             try:
                 import sqlforerogamer
                 self.erogamescape_available = True
                 self.context.logger.info("批评空间第三方库已加载。")
             except ImportError:
-                self.context.logger.warning("未安装sqlforerogamer，批评空间功能不可用。")
+                self.context.logger.warning("缺少 sqlforerogamer，批评空间功能不可用。")
 
     async def _get_session(self) -> aiohttp.ClientSession:
         if self.session is None or self.session.closed:
@@ -53,27 +71,16 @@ class GalHistoryToday(Plugin):
                 "User-Agent": "AstrBot_GalHistory/2.0",
                 "Content-Type": "application/json"
             }
-            self.session = aiohttp.ClientSession(
-                headers=headers,
-                connector=self.connector
-            )
+            self.session = aiohttp.ClientSession(headers=headers, connector=self.connector)
         return self.session
 
-    # ------- VNDB API -------
+    # ---------- VNDB ----------
     async def _fetch_vndb_releases(self, date_mm_dd: str) -> List[dict]:
-        """
-        从VNDB获取指定 MM-DD 发售的游戏列表
-        注意：VNDB的released字段格式为YYYY-MM-DD，需构造完整日期
-        这里简单处理：用当前年份拼接，也可用 '*' 通配但API不支持
-        更稳健的做法是查询所有年份当日，但我们只需播报，就查询当前年份即可
-        如果想要所有年份，可以发送多个请求，这里简化
-        """
         today = datetime.now()
-        # 用当年拼接日期，也能获取往年今日但VNDB是按年度存储的，
-        # 如果想获取历史所有年份，需要循环1970-now，这里只展示近20年示例
-        years = range(today.year - 20, today.year + 1)
+        years = range(today.year - 20, today.year + 1)  # 往前查 20 年
         all_releases = []
         session = await self._get_session()
+        max_results = int(self.config.get("max_results", 5))
 
         for year in years:
             full_date = f"{year}-{date_mm_dd}"
@@ -83,89 +90,78 @@ class GalHistoryToday(Plugin):
                 "page": 1
             }
             try:
-                async with session.post("https://api.vndb.org/kana/release", json=payload) as resp:
+                async with session.post(
+                    "https://api.vndb.org/kana/release",
+                    json=payload
+                ) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        results = data.get("results", [])
-                        all_releases.extend(results)
+                        all_releases.extend(data.get("results", []))
             except Exception as e:
-                self.context.logger.error(f"VNDB请求 {full_date} 失败: {e}")
-                continue
+                self.context.logger.error(f"VNDB 查询 {full_date} 失败: {e}")
 
-        # 去重 (可能同一作品不同版本)
-        seen_ids = set()
+        # 去重
+        seen = set()
         unique = []
         for r in all_releases:
-            vid = r.get("id")
-            if vid not in seen_ids:
-                seen_ids.add(vid)
+            rid = r.get("id")
+            if rid not in seen:
+                seen.add(rid)
                 unique.append(r)
-        return unique[:self.config.max_results]
+        return unique[:max_results]
 
     async def _enrich_vndb_details(self, releases: List[dict]) -> List[dict]:
-        """补充VNDB的VN详情（评分、封面）"""
         session = await self._get_session()
         for rel in releases:
             vn_id = rel.get("vn_id")
             if not vn_id:
                 continue
             try:
-                async with session.post("https://api.vndb.org/kana/vn", json={
-                    "filters": ["id", "=", vn_id],
-                    "results": 1
-                }) as resp:
+                async with session.post(
+                    "https://api.vndb.org/kana/vn",
+                    json={"filters": ["id", "=", vn_id], "results": 1}
+                ) as resp:
                     if resp.status == 200:
                         data = await resp.json()
                         if data.get("results"):
                             rel["vndb_details"] = data["results"][0]
             except Exception as e:
-                self.context.logger.error(f"获取VNDB详情失败 vn{vn_id}: {e}")
+                self.context.logger.error(f"VNDB 详情获取失败 vn{vn_id}: {e}")
         return releases
 
-    # ------- Bangumi API -------
+    # ---------- Bangumi ----------
     async def _enrich_bangumi(self, releases: List[dict]) -> List[dict]:
-        if not self.config.enable_bangumi:
+        if not self.config.get("enable_bangumi", True):
             return releases
         session = await self._get_session()
         for rel in releases:
             title = rel.get("title", "")
             if not title:
                 continue
-            # 用日文原名搜索，可能更好的匹配
-            # Bangumi搜索API：https://api.bgm.tv/search/subject/{关键词}?type=6&responseGroup=large
-            # 其中type=6代表游戏
             url = f"https://api.bgm.tv/search/subject/{title}?type=6&responseGroup=large"
             try:
                 async with session.get(url) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        items = data.get("list", [])
-                        if items:
-                            # 简单取第一个，后续可做更精细的标题匹配
-                            rel["bangumi_details"] = items[0]
+                        if data.get("list"):
+                            rel["bangumi_details"] = data["list"][0]
             except Exception as e:
-                self.context.logger.error(f"Bangumi搜索失败 [{title}]: {e}")
+                self.context.logger.error(f"Bangumi 搜索失败 [{title}]: {e}")
         return releases
 
-    # ------- 批评空间 (非官方) -------
+    # ---------- 批评空间 ----------
     async def _enrich_erogamescape(self, releases: List[dict]) -> List[dict]:
-        if not (self.config.enable_erogamescape and self.erogamescape_available):
+        if not (self.config.get("enable_erogamescape") and self.erogamescape_available):
             return releases
-        import sqlforerogamer
         for rel in releases:
-            title = rel.get("title", "")
-            if not title:
-                continue
-            # 这里仅做标记，实际解析可能需要深入爬虫，由于版权和稳定性，只展示尝试标记
-            rel["erogamescape_attempted"] = True
-            # 可以记录日志但不做实际请求，避免被封
+            rel["erogamescape_attempted"] = True   # 仅标记，实际不做请求
         return releases
 
-    # ------- 消息构建 -------
+    # ---------- 消息构建 ----------
     def _build_message(self, releases: List[dict], date_str: str) -> MessageChain:
         chain = [Plain(f"📅 今日 Galgame 发售纪念日 ({date_str})\n")]
         if not releases:
-            chain.append(Plain("今天没有记录到知名作品发售。"))
+            chain.append(Plain("今天没有记录到知名作品发售，换个日期试试吧~"))
             return MessageChain(chain)
 
         for idx, rel in enumerate(releases, 1):
@@ -173,108 +169,85 @@ class GalHistoryToday(Plugin):
             publisher = rel.get("publisher", "未知发行商")
             text = f"\n{idx}. 《{title}》\n   🏢 {publisher}"
 
-            # VNDB评分
             vndb = rel.get("vndb_details", {})
             if vndb.get("rating"):
                 text += f" | ⭐ VNDB: {vndb['rating']}/10"
 
-            # Bangumi评分
             bgm = rel.get("bangumi_details", {})
+            img_url = None
             if bgm:
-                bgm_rating = bgm.get("rating", {})
-                if bgm_rating.get("score"):
-                    text += f" | 🔵 Bangumi: {bgm_rating['score']}"
-                # 简介
-                summary = bgm.get("summary", "")
-                if summary:
-                    clean_summary = re.sub(r'<[^>]+>', '', summary).strip()[:100]
-                    text += f"\n   📖 {clean_summary}..."
+                if bgm.get("rating", {}).get("score"):
+                    text += f" | 🔵 Bangumi: {bgm['rating']['score']}"
+                if bgm.get("summary"):
+                    clean = re.sub(r'<[^>]+>', '', bgm["summary"]).strip()[:120]
+                    text += f"\n   📖 {clean}..."
+                img_url = bgm.get("images", {}).get("small")
+            if not img_url:
+                img_url = vndb.get("image", {}).get("url")
 
-            # 批评空间标记
             if rel.get("erogamescape_attempted"):
                 text += "\n   📊 批评空间: 数据已收录"
 
             chain.append(Plain(text))
 
-            # 图片（优先Bangumi）
-            img_url = None
-            if bgm and bgm.get("images", {}).get("small"):
-                img_url = bgm["images"]["small"]
-            elif vndb.get("image", {}).get("url"):
-                img_url = vndb["image"]["url"]
+            # 附加图片
             if img_url:
                 try:
                     chain.append(Image.from_url(img_url))
-                except:
+                except Exception:
                     pass
-
         return MessageChain(chain)
 
-    # ------- 核心指令 -------
+    # ---------- 用户指令 ----------
     @on_command("gal历史", aliases=["galhistory", "今天发售"])
     async def show_gal_history(self, ctx: CommandContext):
-        # 解析日期参数
         args = ctx.message.split()
-        today = datetime.now()
-        target_mmdd = today.strftime("-%m-%d")[1:]  # "MM-DD"
+        target_mmdd = datetime.now().strftime("%m-%d")
         if len(args) > 1:
             date_str = args[1]
-            if "月" in date_str:
-                try:
-                    m, d = date_str.replace("月", "-").replace("日", "").split("-")
-                    target_mmdd = f"{int(m):02d}-{int(d):02d}"
-                except:
-                    await ctx.send(MessageChain([Plain("日期格式错误，示例: /gal历史 2月14")]))
-                    return
-            else:
-                # 支持 MM-DD
-                target_mmdd = date_str.strip()
+            try:
+                if "月" in date_str:
+                    month, day = date_str.replace("月", "-").replace("日", "").split("-")
+                    target_mmdd = f"{int(month):02d}-{int(day):02d}"
+                else:
+                    target_mmdd = date_str.strip()
+            except Exception:
+                await ctx.send(MessageChain([Plain("日期格式错误，示例：/gal历史 2月14")]))
+                return
 
         await ctx.send(MessageChain([Plain(f"🔎 正在查询 {target_mmdd} 发售的 Galgame ...")]))
-
         releases = await self._fetch_vndb_releases(target_mmdd)
         releases = await self._enrich_vndb_details(releases)
         releases = await self._enrich_bangumi(releases)
         releases = await self._enrich_erogamescape(releases)
+        await ctx.send(self._build_message(releases, target_mmdd))
 
-        msg = self._build_message(releases, target_mmdd)
-        await ctx.send(msg)
-
-    # ------- 定时自动播报 -------
-    @scheduled("cron", args=["0", "0", "*", "*", "*"])  # 占位，实际用自定义调度器
-    async def daily_push(self):
-        """
-        每日定时任务，在 config.push_time 配置的时间点触发。
-        由于AstrBot的scheduled装饰器可能不支持动态时间，我们用简单循环检测。
-        """
-        # 解析时间
-        hour, minute = map(int, self.config.push_time.split(":"))
+    # ---------- 每日自动播报 ----------
+    async def _daily_push_task(self):
+        hour, minute = map(int, self.config.get("push_time", "08:00").split(":"))
         while True:
             now = datetime.now()
             if now.hour == hour and now.minute == minute:
-                # 执行播报
                 mmdd = now.strftime("%m-%d")
                 releases = await self._fetch_vndb_releases(mmdd)
                 releases = await self._enrich_vndb_details(releases)
                 releases = await self._enrich_bangumi(releases)
                 releases = await self._enrich_erogamescape(releases)
                 msg = self._build_message(releases, mmdd)
-                for group_id in self.config.target_groups:
+                for gid in self.config.get("target_groups", []):
                     try:
-                        await self.context.send_group_msg(group_id, msg)
+                        await self.context.send_group_msg(gid, msg)
                     except Exception as e:
-                        self.context.logger.error(f"每日推送群 {group_id} 失败: {e}")
-                # 休眠60秒避免同一分钟多次触发
-                await asyncio.sleep(60)
+                        self.context.logger.error(f"群 {gid} 推送失败: {e}")
+                await asyncio.sleep(60)   # 防止同一分钟重复推送
             else:
-                # 每30秒检查一次
-                await asyncio.sleep(30)
+                await asyncio.sleep(30)   # 每 30 秒检查一次时间
 
     async def on_load(self):
-        """插件加载时启动每日播报任务"""
-        if self.config.target_groups:
-            asyncio.create_task(self.daily_push())
-            self.context.logger.info(f"每日 Gal 纪念日播报已启动，时间 {self.config.push_time}")
+        """插件加载时自动启动播报任务"""
+        if self.config.get("target_groups"):
+            asyncio.create_task(self._daily_push_task())
+            self.context.logger.info(f"每日 Gal 纪念日报时已启动，推送时间 {self.config.get('push_time')}")
 
     async def on_unload(self):
         if self.session and not self.session.closed:
