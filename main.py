@@ -5,16 +5,11 @@ import json
 import aiohttp
 from datetime import datetime
 
-# ========== 兼容导入（只用你已有的 AstrBot） ==========
-try:
-    from astrbot import Plugin, on_command, CommandContext
-    from astrbot import MessageChain, Plain, Image
-except ImportError:
-    from astrbot.core.plugin import Plugin
-    from astrbot.core.plugin import on_command, CommandContext
-    from astrbot.core.message import MessageChain, Plain, Image
+# ========== 正确导入：只使用你已有的 astrbot ==========
+from astrbot import Plugin, on_command, CommandContext
+from astrbot import MessageChain, Plain, Image
 
-# ========== 从 _conf_schema.json 加载配置 ==========
+# ========== 配置加载 ==========
 def load_config(plugin):
     path = os.path.join(os.path.dirname(__file__), "_conf_schema.json")
     if not os.path.exists(path):
@@ -24,7 +19,7 @@ def load_config(plugin):
     config = {}
     for key, attrs in schema.items():
         config[key] = attrs.get("default")
-    # 如果框架保存过配置，优先使用框架内的
+    # 如果网页保存过配置，则覆盖默认值
     try:
         saved = plugin.context.get_plugin_config()
         config.update(saved)
@@ -37,7 +32,6 @@ class GalHistoryToday(Plugin):
     def __init__(self, context):
         super().__init__(context)
         self.config = load_config(self)
-
         self.session = None
         self.proxy = self.config.get("proxy", "") or None
         self.erogamescape_available = False
@@ -54,7 +48,7 @@ class GalHistoryToday(Plugin):
             self.session = aiohttp.ClientSession(headers=headers)
         return self.session
 
-    # ---------- VNDB 查询 ----------
+    # ---------- VNDB ----------
     async def _fetch_vndb_releases(self, mmdd: str):
         today = datetime.now()
         years = range(today.year - 20, today.year + 1)
@@ -69,7 +63,6 @@ class GalHistoryToday(Plugin):
                         all_releases.extend(data.get("results", []))
             except:
                 continue
-        # 去重
         seen = set()
         unique = []
         for r in all_releases:
@@ -96,7 +89,7 @@ class GalHistoryToday(Plugin):
                 pass
         return releases
 
-    # ---------- Bangumi 补充 ----------
+    # ---------- Bangumi ----------
     async def _enrich_bangumi(self, releases):
         if not self.config.get("enable_bangumi", True):
             return releases
@@ -115,14 +108,14 @@ class GalHistoryToday(Plugin):
                 pass
         return releases
 
-    # ---------- 批评空间标记 ----------
+    # ---------- 批评空间 ----------
     async def _enrich_erogamescape(self, releases):
         if self.config.get("enable_erogamescape") and self.erogamescape_available:
             for r in releases:
                 r["erogamescape_attempted"] = True
         return releases
 
-    # ---------- 构造消息 ----------
+    # ---------- 构建消息 ----------
     def _build_msg(self, releases, date_str):
         msg = MessageChain([Plain(f"📅 今日 Galgame 发售纪念日 ({date_str})\n")])
         if not releases:
@@ -161,7 +154,7 @@ class GalHistoryToday(Plugin):
                     pass
         return msg
 
-    # ---------- 用户指令 ----------
+    # ---------- 指令 ----------
     @on_command("gal历史", aliases=["galhistory", "今天发售"])
     async def gal_history(self, ctx: CommandContext):
         args = ctx.message.split()
