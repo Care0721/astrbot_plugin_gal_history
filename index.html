@@ -1,943 +1,1821 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"
-    />
-    <title>Gal坊 · 佐久真纺</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NekoGalgame - 琉璃资源库</title>
     <style>
-      :root {
-        --bg-deep: #0a0a14;
-        --bg-surface: #12122a;
-        --bg-card: rgba(18, 18, 42, 0.85);
-        --bg-modal: #1a1a30;
-        --border-neon: #b300ff;
-        --border-cyan: #00e5ff;
-        --text-primary: #e0e0ff;
-        --text-secondary: #b0b0d0;
-        --text-accent: #ff66ff;
-        --neon-glow: 0 0 12px #b300ff, 0 0 25px #7a00ff;
-        --cyan-glow: 0 0 10px #00e5ff, 0 0 20px #00b8d4;
-        --tag-bg: rgba(0, 0, 0, 0.5);
-        --tag-border: #b300ff;
-        --tag-text: #00e5ff;
-        --shadow-card: 0 8px 32px rgba(179, 0, 255, 0.25);
-        --transition: 0.25s cubic-bezier(0.2, 0.9, 0.4, 1);
-        --noise-opacity: 0.06;
-      }
-      [data-theme="light"] {
-        --bg-deep: #110022;
-        --bg-surface: #2a1a40;
-        --bg-card: rgba(30, 20, 50, 0.9);
-        --bg-modal: #251840;
-        --border-neon: #ff66ff;
-        --border-cyan: #00ffff;
-        --text-primary: #f5e6ff;
-        --text-secondary: #d0c0e0;
-        --text-accent: #ff99ff;
-        --neon-glow: 0 0 16px #ff66ff, 0 0 30px #cc00ff;
-        --cyan-glow: 0 0 14px #00ffff, 0 0 25px #0099ff;
-        --tag-bg: rgba(0, 0, 0, 0.7);
-        --tag-border: #ff66ff;
-        --tag-text: #00ffff;
-        --shadow-card: 0 8px 32px rgba(255, 0, 255, 0.3);
-      }
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-        background: var(--bg-deep);
-        background-image: repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 2px,
-          rgba(255, 255, 255, 0.03) 2px,
-          rgba(255, 255, 255, 0.03) 4px
-        );
-        background-attachment: fixed;
-        min-height: 100vh;
-        color: var(--text-primary);
-        padding: 0 16px 30px;
-        position: relative;
-        transition: background 0.3s, color 0.3s;
-        overflow-x: hidden;
-      }
-      body::after {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
-        pointer-events: none;
-        z-index: 9999;
-        opacity: var(--noise-opacity);
-      }
-      .container {
-        max-width: 1250px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 1;
-      }
-      .theme-toggle {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: var(--bg-card);
-        border: 1px solid var(--border-neon);
-        color: var(--text-accent);
-        font-size: 1.4rem;
-        cursor: pointer;
-        z-index: 100;
-        backdrop-filter: blur(10px);
-        box-shadow: var(--neon-glow);
-        transition: all var(--transition);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .theme-toggle:hover {
-        box-shadow: 0 0 30px var(--border-neon);
-        transform: rotate(30deg);
-      }
-      .site-header {
-        text-align: center;
-        padding: 2.5rem 1rem 1.8rem;
-      }
-      .logo {
-        font-size: 3.2rem;
-        font-weight: 800;
-        letter-spacing: 6px;
-        background: linear-gradient(135deg, #b300ff00, #00e5ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: var(--neon-glow);
-        display: inline-block;
-        filter: drop-shadow(0 0 10px #00ffb7);
-      }
-      .logo i {
-        margin-right: 8px;
-        font-size: 2.8rem;
-        vertical-align: middle;
-      }
-      .subtitle {
-        font-size: 1rem;
-        letter-spacing: 4px;
-        color: var(--text-secondary);
-        margin-top: 0.5rem;
-        text-transform: uppercase;
-        text-shadow: 0 0 8px var(--border-neon);
-      }
-      .nav-tags {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.8rem;
-        margin: 1.8rem 0 2.2rem;
-      }
-      .tag {
-        background: var(--tag-bg);
-        backdrop-filter: blur(8px);
-        padding: 0.5rem 1.5rem;
-        border-radius: 30px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--tag-text);
-        cursor: pointer;
-        border: 1px solid var(--tag-border);
-        transition: all var(--transition);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        box-shadow: 0 0 10px rgba(179, 0, 255, 0.3);
-      }
-      .tag:hover,
-      .tag.active {
-        background: var(--border-neon);
-        color: #fff;
-        border-color: var(--border-neon);
-        box-shadow: 0 0 25px var(--border-neon);
-        transform: translateY(-2px);
-      }
-      .games-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1.8rem;
-        margin: 1rem 0 2rem;
-      }
-      .game-card {
-        background: var(--bg-card);
-        backdrop-filter: blur(12px);
-        border-radius: 18px;
-        overflow: hidden;
-        border: 1px solid rgba(179, 0, 255, 0.3);
-        box-shadow: var(--shadow-card);
-        transition: all var(--transition);
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-      }
-      .game-card:hover {
-        transform: translateY(-8px);
-        border-color: var(--border-cyan);
-        box-shadow: 0 0 35px rgba(0, 229, 255, 0.4);
-      }
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-card: rgba(18, 16, 28, 0.75);
+            --bg-glass: rgba(20, 18, 35, 0.6);
+            --neon-purple: #b347ea;
+            --neon-pink: #ff2d78;
+            --neon-cyan: #00e5ff;
+            --neon-blue: #5b6af0;
+            --text-primary: #e0dce8;
+            --text-secondary: #a09bb5;
+            --border-glow: rgba(179, 71, 234, 0.4);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --shadow-neon: 0 0 20px rgba(179, 71, 234, 0.35), 0 0 50px rgba(179, 71, 234, 0.12);
+            --shadow-pink: 0 0 18px rgba(255, 45, 120, 0.4), 0 0 40px rgba(255, 45, 120, 0.15);
+            --font-main: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+        body {
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+        }
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        #bootScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #06060b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-family: var(--font-mono);
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+            pointer-events: all;
+        }
+        #bootScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        #bootScreen .boot-container {
+            background: rgba(10, 8, 20, 0.9);
+            border: 1px solid rgba(179, 71, 234, 0.5);
+            border-radius: 12px;
+            padding: 30px 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 0 40px rgba(179, 71, 234, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        #bootScreen .boot-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.04) 2px, rgba(0, 0, 0, 0.04) 4px);
+            pointer-events: none;
+            z-index: 2;
+            border-radius: 12px;
+        }
+        #bootScreen .boot-header {
+            color: var(--neon-cyan);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #bootScreen .boot-header .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+            animation: bootDotPulse 1s infinite;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+        @keyframes bootDotPulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+        #bootScreen .boot-line {
+            color: #7ecf8a;
+            font-size: 0.78rem;
+            margin: 4px 0;
+            opacity: 0;
+            animation: bootLineAppear 0.25s forwards;
+            text-shadow: 0 0 4px rgba(126, 207, 138, 0.4);
+        }
+        #bootScreen .boot-line:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        #bootScreen .boot-line:nth-child(3) {
+            animation-delay: 0.45s;
+        }
+        #bootScreen .boot-line:nth-child(4) {
+            animation-delay: 0.7s;
+        }
+        #bootScreen .boot-line:nth-child(5) {
+            animation-delay: 0.95s;
+        }
+        #bootScreen .boot-line:nth-child(6) {
+            animation-delay: 1.2s;
+            color: #f0c060;
+            text-shadow: 0 0 6px rgba(240, 192, 96, 0.5);
+        }
+        #bootScreen .boot-line:nth-child(7) {
+            animation-delay: 1.5s;
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px rgba(255, 45, 120, 0.6);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        @keyframes bootLineAppear {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        #bootScreen .boot-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background: var(--neon-cyan);
+            margin-left: 2px;
+            animation: bootCursorBlink 0.7s infinite;
+            vertical-align: middle;
+            box-shadow: 0 0 6px var(--neon-cyan);
+        }
+        @keyframes bootCursorBlink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
 
-      /* 卡片图片区域 */
-      .card-img {
-        width: 100%;
-        aspect-ratio: 16/10;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        color: rgba(255, 255, 255, 0.7);
-        position: relative;
-        overflow: hidden;
-      }
-      .card-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-      /* 保留原有的渐变背景占位 */
-      .card-img.placeholder-1 {
-        background: linear-gradient(135deg, #1a0033, #33006600);
-      }
-      .card-img.placeholder-2 {
-        background: linear-gradient(135deg, #0d1b2a, #1b3a4b);
-      }
-      .card-img.placeholder-3 {
-        background: linear-gradient(135deg, #1a0a2e, #2d1b4e);
-      }
-      .card-img.placeholder-4 {
-        background: linear-gradient(135deg, #0f1a2e, #1c2f4a);
-      }
-      .card-img.placeholder-5 {
-        background: linear-gradient(135deg, #1a2a1a, #2e4a2e);
-      }
-      .card-img.placeholder-6 {
-        background: linear-gradient(135deg, #2a1a1a, #4a2e2e);
-      }
-      .card-img i {
-        font-size: 4rem;
-        filter: drop-shadow(0 0 12px var(--border-neon));
-        opacity: 0.9;
-      }
+        #appContainer {
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.6s ease 0.3s;
+        }
+        #appContainer.visible {
+            opacity: 1;
+        }
 
-      .card-info {
-        padding: 1.2rem 1rem 1.4rem;
-      }
-      .game-title {
-        font-size: 1.2rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        color: var(--text-primary);
-      }
-      .badge {
-        background: var(--border-neon);
-        color: #000;
-        font-size: 0.65rem;
-        padding: 0.2rem 0.7rem;
-        border-radius: 20px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-      }
-      .game-meta {
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        margin-top: 0.3rem;
-      }
-      .game-desc {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        margin-top: 0.5rem;
-        opacity: 0.9;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
+        .nav-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 8, 22, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: all var(--transition-smooth);
+        }
+        .nav-bar.scrolled {
+            box-shadow: 0 4px 35px rgba(179, 71, 234, 0.2);
+            border-bottom-color: rgba(179, 71, 234, 0.35);
+        }
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+            transition: all var(--transition-fast);
+        }
+        .nav-logo:hover {
+            filter: brightness(1.3);
+            transform: scale(1.03);
+        }
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            list-style: none;
+        }
+        .nav-links li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all var(--transition-fast);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            color: #fff;
+            background: rgba(179, 71, 234, 0.2);
+            box-shadow: 0 0 15px rgba(179, 71, 234, 0.3);
+        }
+        .nav-links li a.active {
+            border: 1px solid rgba(179, 71, 234, 0.45);
+            box-shadow: 0 0 20px rgba(179, 71, 234, 0.4);
+        }
+        .nav-search {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 25px;
+            padding: 7px 16px;
+            transition: all var(--transition-smooth);
+            max-width: 220px;
+        }
+        .nav-search:focus-within {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 18px rgba(179, 71, 234, 0.35);
+            background: rgba(255, 255, 255, 0.07);
+        }
+        .nav-search input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            outline: none;
+            font-size: 0.85rem;
+            width: 140px;
+            font-family: var(--font-main);
+        }
+        .nav-search input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .nav-search .search-icon {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+        .nav-search .search-icon:hover {
+            color: var(--neon-cyan);
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            z-index: 110;
+        }
+        .hamburger span {
+            width: 26px;
+            height: 2.5px;
+            background: #fff;
+            border-radius: 2px;
+            transition: all var(--transition-fast);
+        }
+        .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
 
-      .detail-panel {
-        display: none;
-        background: var(--bg-card);
-        backdrop-filter: blur(20px);
-        border-radius: 24px;
-        padding: 2rem;
-        margin: 1rem 0 2rem;
-        border: 1px solid var(--border-neon);
-        box-shadow: var(--neon-glow);
-        animation: fadeSlide 0.3s ease;
-      }
-      .detail-panel.active {
-        display: block;
-      }
-      @keyframes fadeSlide {
-        from {
-          opacity: 0;
-          transform: translateY(16px);
+        .main-content {
+            padding: 20px 24px 40px;
+            max-width: 1300px;
+            margin: 0 auto;
+            min-height: 70vh;
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+        .main-content.glitching {
+            animation: glitchContent 0.35s ease;
         }
-      }
-      .back-btn {
-        background: transparent;
-        border: 1px solid var(--border-cyan);
-        color: var(--text-accent);
-        padding: 0.5rem 1.5rem;
-        border-radius: 30px;
-        font-weight: 600;
-        cursor: pointer;
-        margin-bottom: 1.5rem;
-        transition: all var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-      .back-btn:hover {
-        background: var(--border-cyan);
-        color: #000;
-        box-shadow: var(--cyan-glow);
-      }
-      .detail-content {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
-      }
-      .detail-cover {
-        flex: 0 0 250px;
-        height: 200px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 4rem;
-        color: white;
-        box-shadow: var(--neon-glow);
-        overflow: hidden;
-      }
-      .detail-cover img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-      .detail-info {
-        flex: 1;
-        min-width: 260px;
-      }
-      .detail-title {
-        font-size: 2.2rem;
-        font-weight: 800;
-        color: var(--text-primary);
-        text-shadow: 0 0 15px var(--border-neon);
-        margin-bottom: 0.5rem;
-      }
-      .detail-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin: 1rem 0;
-      }
-      .detail-tags span {
-        background: rgba(179, 0, 255, 0.2);
-        border: 1px solid var(--border-neon);
-        color: var(--text-accent);
-        padding: 0.2rem 1rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 500;
-      }
-      .platform-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--border-cyan);
-        margin: 1.2rem 0 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        border-bottom: 1px dashed var(--border-neon);
-        padding-bottom: 0.3rem;
-      }
-      .download-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.8rem;
-        margin-bottom: 0.6rem;
-      }
-      .download-btn {
-        background: linear-gradient(135deg, #ff000000, #ff009500);
-        color: white;
-        border: none;
-        padding: 0.6rem 1.5rem;
-        border-radius: 30px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 4px 15px rgba(179, 0, 255, 0.4);
-        transition: all var(--transition);
-        text-decoration: none;
-      }
-      .download-btn:hover {
-        box-shadow: 0 0 25px var(--border-neon);
-        transform: scale(1.03);
-      }
-      .download-btn.secondary {
-        background: transparent;
-        border: 1.5px solid var(--border-cyan);
-        color: var(--border-cyan);
-        box-shadow: none;
-      }
-      .download-btn.secondary:hover {
-        background: var(--border-cyan);
-        color: #000;
-      }
-      .modal-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(8px);
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-      }
-      .modal-overlay.active {
-        display: flex;
-      }
-      .modal-box {
-        background: var(--bg-modal);
-        border: 1px solid var(--border-neon);
-        border-radius: 28px;
-        padding: 2rem 2rem 1.8rem;
-        max-width: 420px;
-        width: 90%;
-        box-shadow: var(--neon-glow);
-        text-align: center;
-        color: var(--text-primary);
-      }
-      .modal-box h3 {
-        color: var(--text-accent);
-        margin-bottom: 1rem;
-        font-size: 1.4rem;
-      }
-      .modal-box p {
-        color: var(--text-secondary);
-        line-height: 1.6;
-        margin-bottom: 1.8rem;
-      }
-      .modal-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-      }
-      .modal-btn {
-        padding: 0.6rem 1.8rem;
-        border-radius: 30px;
-        font-weight: 600;
-        cursor: pointer;
-        border: none;
-        transition: all var(--transition);
-      }
-      .modal-btn.confirm {
-        background: linear-gradient(135deg, #b300ff, #ff00ff);
-        color: white;
-        box-shadow: 0 4px 15px rgba(179, 0, 255, 0.5);
-      }
-      .modal-btn.confirm:hover {
-        box-shadow: 0 0 25px #ff00ff;
-      }
-      .modal-btn.cancel {
-        background: transparent;
-        border: 1px solid var(--text-secondary);
-        color: var(--text-secondary);
-      }
-      .modal-btn.cancel:hover {
-        background: var(--text-secondary);
-        color: #000;
-      }
-      .footer-note {
-        text-align: center;
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        margin-top: 2.5rem;
-        letter-spacing: 2px;
-        opacity: 0.7;
-      }
-      @media (max-width: 600px) {
-        .logo {
-          font-size: 2.4rem;
+        @keyframes glitchContent {
+            0% {
+                transform: translate(0);
+                filter: none;
+            }
+            10% {
+                transform: translate(-6px, 3px);
+                filter: hue-rotate(20deg) brightness(1.3);
+            }
+            20% {
+                transform: translate(5px, -2px);
+                filter: hue-rotate(-15deg) brightness(0.8);
+            }
+            30% {
+                transform: translate(-3px, -4px);
+                filter: hue-rotate(10deg);
+            }
+            40% {
+                transform: translate(4px, 2px);
+                filter: none;
+            }
+            50% {
+                transform: translate(-2px, 1px);
+                filter: brightness(1.1);
+            }
+            60% {
+                transform: translate(0);
+                filter: none;
+            }
+            100% {
+                transform: translate(0);
+                filter: none;
+            }
         }
-        .detail-content {
-          flex-direction: column;
+
+        .banner-section {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: var(--shadow-neon);
+            background: #0d0b1a;
         }
-        .detail-cover {
-          flex: 0 0 160px;
-          width: 100%;
+        .banner-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.7s ease;
+            display: flex;
+            align-items: flex-end;
+            padding: 30px 36px;
+            cursor: pointer;
         }
-      }
+        .banner-slide.active {
+            opacity: 1;
+            z-index: 2;
+        }
+        .banner-slide .banner-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.4) saturate(1.2);
+        }
+        .banner-slide .banner-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(0deg, rgba(10, 8, 20, 0.95) 15%, rgba(10, 8, 20, 0.3) 60%, rgba(10, 8, 20, 0.05) 100%);
+        }
+        .banner-info {
+            position: relative;
+            z-index: 3;
+            max-width: 600px;
+        }
+        .banner-info .banner-tag {
+            display: inline-block;
+            background: var(--neon-pink);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            box-shadow: var(--shadow-pink);
+            text-transform: uppercase;
+        }
+        .banner-info h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            color: #fff;
+        }
+        .banner-info p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .banner-dots {
+            position: absolute;
+            bottom: 16px;
+            right: 30px;
+            z-index: 4;
+            display: flex;
+            gap: 8px;
+        }
+        .banner-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .banner-dots span.active {
+            background: var(--neon-pink);
+            box-shadow: 0 0 12px var(--neon-pink);
+        }
+        .banner-arrow {
+            position: absolute;
+            top: 50%;
+            z-index: 5;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(6px);
+        }
+        .banner-arrow:hover {
+            background: rgba(179, 71, 234, 0.4);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 20px rgba(179, 71, 234, 0.5);
+        }
+        .banner-arrow.left {
+            left: 16px;
+        }
+        .banner-arrow.right {
+            right: 16px;
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--neon-purple), var(--neon-pink));
+            border-radius: 2px;
+            box-shadow: 0 0 12px rgba(179, 71, 234, 0.6);
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .game-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid var(--border-subtle);
+            transition: all var(--transition-smooth);
+            position: relative;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-neon);
+            z-index: 5;
+        }
+        .game-card .card-cover {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            display: block;
+            background: linear-gradient(135deg, #1a1535, #251840);
+            transition: all var(--transition-smooth);
+        }
+        .game-card:hover .card-cover {
+            filter: brightness(1.15) saturate(1.1);
+        }
+        .game-card .card-body {
+            padding: 12px 14px;
+            position: relative;
+        }
+        .game-card .card-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .game-card .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .card-tag {
+            font-size: 0.68rem;
+            padding: 3px 9px;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .tag-platform-pc {
+            background: rgba(91, 106, 240, 0.25);
+            color: #8fa4ff;
+            border: 1px solid rgba(91, 106, 240, 0.35);
+        }
+        .tag-platform-android {
+            background: rgba(0, 229, 255, 0.15);
+            color: #5eeeff;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+        }
+        .tag-chinese {
+            background: rgba(126, 207, 138, 0.2);
+            color: #8ff0a0;
+            border: 1px solid rgba(126, 207, 138, 0.3);
+        }
+        .tag-sub {
+            background: rgba(255, 45, 120, 0.18);
+            color: #ff6b98;
+            border: 1px solid rgba(255, 45, 120, 0.3);
+            font-size: 0.62rem;
+        }
+        .game-card .card-glow {
+            position: absolute;
+            inset: -2px;
+            border-radius: var(--radius-md);
+            opacity: 0;
+            pointer-events: none;
+            background: transparent;
+            box-shadow: 0 0 30px rgba(179, 71, 234, 0.5), 0 0 15px rgba(255, 45, 120, 0.3);
+            transition: opacity var(--transition-smooth);
+            z-index: -1;
+        }
+        .game-card:hover .card-glow {
+            opacity: 1;
+        }
+
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        .filter-group-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            margin-right: 4px;
+            white-space: nowrap;
+        }
+        .filter-btn {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            font-family: var(--font-main);
+        }
+        .filter-btn:hover {
+            border-color: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(179, 71, 234, 0.3);
+        }
+        .filter-btn.active {
+            background: rgba(179, 71, 234, 0.25);
+            border-color: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 16px rgba(179, 71, 234, 0.45);
+            font-weight: 600;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-smooth);
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-dialog {
+            background: rgba(18, 16, 30, 0.9);
+            border: 1px solid rgba(179, 71, 234, 0.45);
+            border-radius: var(--radius-lg);
+            max-width: 900px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(179, 71, 234, 0.35), 0 0 100px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from {
+                transform: translateY(30px) scale(0.94);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        .modal-close {
+            position: sticky;
+            top: 0;
+            float: right;
+            z-index: 10;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(8px);
+        }
+        .modal-close:hover {
+            background: rgba(255, 45, 120, 0.4);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 45, 120, 0.5);
+        }
+        .modal-body {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .modal-cover-wrap {
+            flex: 0 0 220px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 0 25px rgba(179, 71, 234, 0.25);
+        }
+        .modal-cover-wrap img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            background: linear-gradient(135deg, #1a1535, #251840);
+        }
+        .modal-info {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-info h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        .modal-tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .modal-tag {
+            font-size: 0.72rem;
+            padding: 5px 12px;
+            border-radius: 14px;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+        .modal-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+        }
+        .preview-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .preview-row img {
+            width: 100px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .preview-row img:hover {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 15px rgba(179, 71, 234, 0.5);
+            transform: scale(1.05);
+        }
+        .modal-dl-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .btn-dl {
+            padding: 10px 18px;
+            border-radius: 25px;
+            border: 1px solid var(--neon-purple);
+            background: rgba(179, 71, 234, 0.2);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all var(--transition-fast);
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-main);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-dl:hover {
+            background: rgba(179, 71, 234, 0.45);
+            box-shadow: 0 0 25px rgba(179, 71, 234, 0.6);
+            border-color: #d06fff;
+            transform: translateY(-2px);
+        }
+        .btn-dl.neon-pink {
+            border-color: var(--neon-pink);
+            background: rgba(255, 45, 120, 0.2);
+        }
+        .btn-dl.neon-pink:hover {
+            background: rgba(255, 45, 120, 0.45);
+            box-shadow: 0 0 25px rgba(255, 45, 120, 0.6);
+            border-color: #ff6b98;
+        }
+        .btn-dl.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: line-through;
+        }
+        .btn-dl.pending {
+            border-style: dashed;
+            border-color: rgba(255, 193, 7, 0.5);
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+        .like-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .like-btn {
+            background: rgba(255, 75, 110, 0.2);
+            border: 1px solid var(--neon-pink);
+            color: #ff6b98;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-fast);
+        }
+        .like-btn.liked {
+            background: rgba(255, 45, 120, 0.5);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 45, 120, 0.5);
+        }
+        .like-count {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .comment-section {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 16px;
+        }
+        .comment-section h3 {
+            font-size: 1rem;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+        .comment-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        .comment-item .c-user {
+            font-weight: 700;
+            color: var(--neon-cyan);
+            margin-bottom: 3px;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .comment-item .c-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+        .comment-item .c-text {
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .comment-input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .comment-input-row .input-group {
+            display: flex;
+            gap: 8px;
+        }
+        .comment-input-row input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 10px 16px;
+            color: #fff;
+            outline: none;
+            font-family: var(--font-main);
+            font-size: 0.85rem;
+            transition: all var(--transition-fast);
+        }
+        .comment-input-row input:focus {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 12px rgba(179, 71, 234, 0.3);
+        }
+        .comment-input-row button {
+            padding: 10px 18px;
+            border-radius: 20px;
+            border: 1px solid var(--neon-purple);
+            background: rgba(179, 71, 234, 0.3);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all var(--transition-fast);
+            font-family: var(--font-main);
+            white-space: nowrap;
+        }
+        .comment-input-row button:hover {
+            background: rgba(179, 71, 234, 0.55);
+            box-shadow: 0 0 18px rgba(179, 71, 234, 0.5);
+        }
+
+        .btn-back-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 150;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 1px solid rgba(179, 71, 234, 0.5);
+            background: rgba(20, 16, 35, 0.7);
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all var(--transition-smooth);
+            opacity: 0;
+            visibility: hidden;
+            box-shadow: 0 0 20px rgba(179, 71, 234, 0.3);
+        }
+        .btn-back-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .btn-back-top:hover {
+            background: rgba(179, 71, 234, 0.4);
+            box-shadow: 0 0 30px rgba(179, 71, 234, 0.6);
+            transform: translateY(-3px);
+            border-color: var(--neon-purple);
+        }
+
+        .online-timer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 30px;
+            padding: 15px;
+            border-top: 1px solid var(--border-subtle);
+            letter-spacing: 0.5px;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9998;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.015) 2px, rgba(0, 0, 0, 0.015) 4px);
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: rgba(10, 8, 22, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 16px;
+                gap: 4px;
+                border-bottom: 1px solid var(--border-subtle);
+                transform: translateY(-120%);
+                transition: transform var(--transition-smooth);
+                z-index: 105;
+            }
+            .nav-links.open {
+                transform: translateY(0);
+            }
+            .hamburger {
+                display: flex;
+            }
+            .nav-search {
+                max-width: 160px;
+            }
+            .nav-search input {
+                width: 100px;
+            }
+            .banner-section {
+                height: 220px;
+            }
+            .banner-info h2 {
+                font-size: 1.3rem;
+            }
+            .banner-info p {
+                font-size: 0.75rem;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            .game-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+            .modal-body {
+                flex-direction: column;
+                align-items: center;
+            }
+            .modal-cover-wrap {
+                flex: 0 0 auto;
+                max-width: 200px;
+            }
+            .modal-dialog {
+                padding: 16px;
+                max-height: 90vh;
+            }
+            .banner-slide {
+                padding: 20px;
+            }
+            .banner-arrow {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .game-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .banner-section {
+                height: 180px;
+                border-radius: var(--radius-md);
+            }
+            .banner-info h2 {
+                font-size: 1.1rem;
+            }
+            .nav-search {
+                max-width: 120px;
+                padding: 6px 10px;
+            }
+            .nav-search input {
+                width: 70px;
+                font-size: 0.75rem;
+            }
+            .section-title {
+                font-size: 1.1rem;
+            }
+            .filter-btn {
+                padding: 5px 10px;
+                font-size: 0.7rem;
+            }
+        }
     </style>
-  </head>
-  <body>
-    <button class="theme-toggle" id="themeToggle" title="切换电波模式">
-      <i class="fas fa-moon"></i>
-    </button>
-    <div class="container">
-      <header class="site-header">
-        <div class="logo"><i class="fas fa-broadcast-tower"></i> Gal坊</div>
-        <div class="subtitle">⊱ 全AI生成 ⊰</div>
-      </header>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
 
-      <div class="nav-tags">
-        <span class="tag active">全部</span>
-        <span class="tag">纯爱</span>
-        <span class="tag">悬疑</span>
-        <span class="tag">治愈</span>
-        <span class="tag">奇幻</span>
-        <span class="tag">校园</span>
-      </div>
-
-      <div id="gamesView" class="games-grid"></div>
-
-      <div id="detailPanel" class="detail-panel">
-        <button class="back-btn" id="backBtn">
-          <i class="fas fa-arrow-left"></i> 返回作品列表
-        </button>
-        <div class="detail-content" id="detailContent"></div>
-      </div>
-
-      <div class="footer-note">✦ Gal坊 · 佐久真诗 ✦</div>
-    </div>
-
-    <div class="modal-overlay" id="downloadModal">
-      <div class="modal-box">
-        <h3><i class="fas fa-skull"></i> 下載協議</h3>
-        <p id="modalNote">
-          請確保已安裝對應網盤客戶端，資源僅供學習交流，請於24小時內刪除。
-        </p>
-        <div class="modal-actions">
-          <button class="modal-btn cancel" id="modalCancel">取消</button>
-          <button class="modal-btn confirm" id="modalConfirm">契約執行</button>
+    <div id="bootScreen">
+        <div class="boot-container">
+            <div class="boot-header"><span class="dot"></span> NEKO_SYSTEM v3.7 · 资源库初始化</div>
+            <div class="boot-line">> 正在加载资源库索引...</div>
+            <div class="boot-line">> 校验数据库完整性... OK</div>
+            <div class="boot-line">> 加载霓虹渲染引擎... OK</div>
+            <div class="boot-line">> 初始化粒子网络... OK</div>
+            <div class="boot-line">> 正在加载资源库...</div>
+            <div class="boot-line">> 琉璃资源库已就绪 <span class="boot-cursor"></span></div>
         </div>
-      </div>
     </div>
+
+    <div id="appContainer">
+        <nav class="nav-bar" id="navBar">
+            <div class="nav-logo" onclick="navigateTo('home')">🐾 NekoGalgame</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a onclick="navigateTo('home')" data-page="home" class="active">🏠 首页</a></li>
+                <li><a onclick="navigateTo('category')" data-page="category">📂 分类浏览</a></li>
+            </ul>
+            <div class="nav-search" id="navSearchBox">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="搜索游戏..." oninput="handleSearch(this.value)">
+            </div>
+            <div class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </nav>
+
+        <div class="main-content" id="mainContent">
+            <div id="homeView">
+                <div class="banner-section" id="bannerSection">
+                    <div class="banner-arrow left" onclick="changeBanner(-1)">◀</div>
+                    <div class="banner-arrow right" onclick="changeBanner(1)">▶</div>
+                    <div class="banner-dots" id="bannerDots"></div>
+                </div>
+                <div class="section-title">🔥 精选推荐</div>
+                <div class="game-grid" id="featuredGrid"></div>
+                <div class="online-timer" id="onlineTimer">⏱️ 在线时长 00:00:00</div>
+            </div>
+            <div id="categoryView" style="display:none;">
+                <div class="section-title">📂 全部作品</div>
+                <div class="filter-section" id="filterSection">
+                    <span class="filter-group-label">平台:</span>
+                    <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">全部</button>
+                    <button class="filter-btn" data-filter="PC" onclick="setFilter('PC', this)">💻 PC</button>
+                    <button class="filter-btn" data-filter="Android" onclick="setFilter('Android', this)">📱 安卓</button>
+                    <button class="filter-btn" data-filter="krkr" onclick="setFilter('krkr', this)">📱 krkr</button>
+                    <button class="filter-btn" data-filter="Ty" onclick="setFilter('Ty', this)">📱 Ty</button>
+                    <button class="filter-btn" data-filter="ONS" onclick="setFilter('ONS', this)">📱 ONS</button>
+                    <button class="filter-btn" data-filter="android_direct" onclick="setFilter('android_direct', this)">📱 安卓直装</button>
+                    <span class="filter-group-label" style="margin-left:8px;">汉化:</span>
+                    <button class="filter-btn" data-filter="chinese" onclick="setFilter('chinese', this)">✅ 汉化</button>
+                </div>
+                <div class="game-grid" id="categoryGrid"></div>
+                <div id="noResults" style="display:none; text-align:center; padding:40px; color:var(--text-secondary);">
+                    😿 没有找到匹配的游戏，试试其他筛选条件吧~
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal-dialog" id="modalDialog" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModalDirect()">✕</button>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="like-section" id="likeSection"></div>
+            <div class="comment-section" id="commentSection"></div>
+        </div>
+    </div>
+
+    <button class="btn-back-top" id="btnBackTop" onclick="scrollToTop()" title="返回顶部">⬆</button>
 
     <script>
-      (function () {
-        // ========== 游戏数据（内置，可自由增删改） ==========
-        const games = [
-          {
+        // ==================== 游戏数据库 ====================
+        const gamesData = [{
             id: 1,
-            title: "千恋＊万花",
-            category: "纯爱",
-            badge: "和風戀愛",
-            meta: "💖 純愛 · ⭐ 9.4",
-            desc: "在溫泉旅館展開的奇幻戀愛故事，與神明少女共譜夏日戀曲。",
-            // 图片路径（留空则使用渐变+图标占位）
-            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/00/0-19073.jpg", // 例如："images/qianlian.jpg"
-            detailImage: "", // 例如："images/qianlian_big.jpg"
-            coverClass: "placeholder-1",
-            icon: "fa-hot-tub-person",
-            detailCover: "linear-gradient(135deg, #1a0033, #330066)",
-            detailIcon: "fa-heart",
-            detailTitle: "千恋＊万花",
-            detailDesc:
-              "舞臺是和風溫泉街。主人公因緣巧合與四位少女相遇，逐漸揭開土地隱藏的秘密。溫暖、感動與歡笑交織的純愛物語。",
-            tags: ["純愛", "和風", "治癒", "溫馨"],
-            androidDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/wpwtv",
-                note: "无解压密码请在切换语言的时候，先在开始界面选中 Simplified Chinese ，然后在进游戏之后再使用右下角三条杠系统菜单里面的语言选项进行语种切换，否则直接在开始界面切换语言为繁体中文（城彩学园汉化对应槽位）再启动游戏会导致游戏崩溃！！！",
-              },
+            title: '苍之彼方的四重奏',
+            cover: 'https://placehold.co/300x400/1a1535/e0dce8?text=苍之彼方',
+            previewImages: [
+                'https://placehold.co/300x225/1a1535/e0dce8?text=截图1',
+                'https://placehold.co/300x225/251840/e0dce8?text=截图2',
+                'https://placehold.co/300x225/1a1040/e0dce8?text=截图3'
             ],
-            pcDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/6X8Hp",
-                note: "PC版解壓即玩",
-              },
+            tags: ['纯爱', '校园', '青春'],
+            platforms: [
+                { type: 'PC' },
+                { type: 'Android', sub: 'krkr' },
+                { type: 'Android', sub: 'android_direct' }
             ],
-          },
-          {
-            id: 2,
-            title: "RIDDLE JOKER",
-            category: "悬疑",
-            badge: "校園超能",
-            meta: "🔮 奇幻 · ⭐ 9.2",
-            desc: "擁有超能力的少年潛入學院，守護秘密的同時面對心動日常。",
-            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/42/79742.jpg",
-            detailImage: "",
-            coverClass: "placeholder-2",
-            icon: "fa-mask",
-            detailCover: "linear-gradient(135deg, #0d1b2a, #1b3a4b)",
-            detailIcon: "fa-theater-masks",
-            detailTitle: "RIDDLE JOKER",
-            detailDesc:
-              "現代社會存在「星幽能力」。主角兄妹為了守護彼此，潛入研究超能力的學院。日常與非日常交織的青春懸疑劇。",
-            tags: ["校園", "奇幻", "懸疑", "戀愛喜劇"],
-            androidDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/mlrUx",
-                note: "手机ban",
-              },
-            ],
-            pcDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/6X8Hp",
-                note: "PC免安裝版",
-              },
-            ],
-          },
-          {
-            id: 3,
-            title: "星空列車與白的旅行",
-            category: "治愈",
-            badge: "治癒催淚",
-            meta: "🌌 治癒 · ⭐ 9.5",
-            desc: "乘坐列車穿越星空，與少女一同尋找記憶的感人旅程。",
-            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/17/92117.jpg",
-            detailImage: "",
-            coverClass: "placeholder-3",
-            icon: "fa-train",
-            detailCover: "linear-gradient(135deg, #1a0a2e, #2d1b4e)",
-            detailIcon: "fa-cloud-moon",
-            detailTitle: "星空列車與白的旅行",
-            detailDesc:
-              "醒來時身處夜空列車。與神秘少女「白」相遇，在星光之旅中找回失落記憶與重要之物。",
-            tags: ["治癒", "催淚", "奇幻", "短篇"],
-            androidDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/Rnrh7",
-                note: "无",
-              },
-            ],
-            pcDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/gNqiL",
-                note: "无",
-              },
-            ],
-          },
-          {
-            id: 4,
-            title: "ATRI -My Dear Moments-",
-            category: "奇幻",
-            badge: "科幻戀愛",
-            meta: "🤖 科幻 · ⭐ 9.3",
-            desc: "在沉沒的世界裏，與機器人少女共同度過有限時光。",
-            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/41/87041.jpg",
-            detailImage: "",
-            coverClass: "placeholder-4",
-            icon: "fa-robot",
-            detailCover: "linear-gradient(135deg, #0f1a2e, #1c2f4a)",
-            detailIcon: "fa-android",
-            detailTitle: "ATRI -My Dear Moments-",
-            detailDesc:
-              "海平面上升，陸地被淹沒的未來。少年與機器人少女ATRI相遇，尋找希望與愛的定義。",
-            tags: ["科幻", "戀愛", "治癒", "未來"],
-            androidDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/YaRUa",
-                note: "解压码touchgal",
-              },
-            ],
-            pcDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/Vosd",
-                note: "解压码touchgal",
-              },
-            ],
-          },
-          {
-            id: 5,
-            title: "櫻之詩",
-            category: "校园",
-            badge: "藝術群像",
-            meta: "🎨 文藝 · ⭐ 9.1",
-            desc: "在櫻花飄落的季節，追尋藝術與美的青春群像劇。",
-            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/63/79663.jpg",
-            detailImage: "",
-            coverClass: "placeholder-5",
-            icon: "fa-palette",
-            detailCover: "linear-gradient(135deg, #1a2a1a, #2e4a2e)",
-            detailIcon: "fa-feather",
-            detailTitle: "櫻之詩",
-            detailDesc:
-              "以美術為題材的青春故事。主人公與夥伴探討藝術、人生與情感，交織出細膩群像劇。",
-            tags: ["文藝", "青春", "群像", "哲學"],
-            androidDownloads: [
-              {
-                text: "touchgal",
-                Link: "https://pan.touchgal.net/s/eoXhx",
-                note: "解压码touchgal",
-              },
-            ],
-            pcDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/Jkxha",
-                note: "PC漢化硬盤版，解压码touchgal",
-              },
-            ],
-          },
-          {
-            id: 6,
-            title: "Summer Pockets REFLECTION BLUE",
-            category: "校园",
-            badge: "夏日回憶",
-            meta: "☀️ 催淚 · ⭐ 9.6",
-            desc: "在夏日小島上，與夥伴們創造永難忘懷的暑假回憶。",
-            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/28/85428.jpg",
-            detailImage: "",
-            coverClass: "placeholder-6",
-            icon: "fa-umbrella-beach",
-            detailCover: "linear-gradient(135deg, #2a1a1a, #4a2e2e)",
-            detailIcon: "fa-sun",
-            detailTitle: "Summer Pockets REFLECTION BLUE",
-            detailDesc:
-              "唯有那份眩目　未曾忘却。”“无论何时我都会记得夏天的蓝……。”主人公鹰原羽依里为了整理过世祖母的遗物，利用暑假独自一人来到鸟白岛。在下了一天中只有几趟的客船后，少年与一名少女相遇了。在海风中摆弄头发的少女，只是远远的，远远的，眺望着那海与天的蔚蓝境界线 ，一动不动。回过神来时，少女已经消失，让羽依里不禁怀疑自己是不是看了幻觉，怀着复杂的心情，少年向着祖母的家迈开脚步。在那里见到的女性乃是亲戚的叔母，接着立刻就开始帮忙起遗物的整理来。在整理祖母遗物的过程中，逐渐回忆起儿时记忆的羽依里，并且在初次接触的【海岛生活里】，慢慢的从困惑转而变得适应。那是在喧闹的都市居住时，体会不到的自然生活，那是我们忘却在童年，令人怀念而又眷恋的，淳朴岁月。与眺望大海的少女相遇。与寻找不可思议蝴蝶的少女相遇。与寻找回忆与海盗船的少女相遇。与住在宁静灯塔中的少女相遇。——以及慢慢，和狙击手的风纪委员相熟。开始，同热爱着胸部的会长相约。学会，与迷途的炒饭小丫头相亲。偶然，跟追逐鬼的野营少女相识。还有在这座岛上得到的，独一无二的，欢乐热闹的新的同伴们——啊，啊，要是这样的暑假，能够永远这么继续下去，就好了。 此时，少年不禁，这样想到。",
-            tags: ["夏日", "治癒", "催淚", "Key社"],
-            androidDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/md9Ux",
-                note: "解压码touchgal",
-              },
-            ],
-            pcDownloads: [
-              {
-                text: "touchgal",
-                link: "https://pan.touchgal.net/s/B8wpiw",
-                note: "解压码touchgal",
-              },
-            ],
-          },
-        ];
-
-        // ---------- DOM 元素 ----------
-        const gamesView = document.getElementById("gamesView");
-        const detailPanel = document.getElementById("detailPanel");
-        const detailContent = document.getElementById("detailContent");
-        const backBtn = document.getElementById("backBtn");
-        const themeToggle = document.getElementById("themeToggle");
-        const modalOverlay = document.getElementById("downloadModal");
-        const modalNote = document.getElementById("modalNote");
-        const modalConfirm = document.getElementById("modalConfirm");
-        const modalCancel = document.getElementById("modalCancel");
-
-        let pendingDownloadLink = "";
-
-        // ---------- 主题切换 ----------
-        function applyTheme(theme) {
-          document.documentElement.setAttribute("data-theme", theme);
-          localStorage.setItem("gal-theme", theme);
-          themeToggle.innerHTML =
-            theme === "dark"
-              ? '<i class="fas fa-sun"></i>'
-              : '<i class="fas fa-moon"></i>';
-        }
-        const savedTheme = localStorage.getItem("gal-theme") || "dark";
-        applyTheme(savedTheme);
-        themeToggle.addEventListener("click", () => {
-          const current = document.documentElement.getAttribute("data-theme");
-          applyTheme(current === "dark" ? "light" : "dark");
-        });
-
-        // ---------- 渲染卡片 (支持图片) ----------
-        function renderCards(gamesArray) {
-          gamesView.innerHTML = "";
-          if (gamesArray.length === 0) {
-            gamesView.innerHTML =
-              '<p style="grid-column:1/-1;text-align:center;color:var(--text-secondary);">⛧ 該類別暫無作品 ⛧</p>';
-            return;
-          }
-          gamesArray.forEach((game) => {
-            const card = document.createElement("div");
-            card.className = "game-card";
-
-            // 图片或占位符
-            const imgHtml = game.image
-              ? `<div class="card-img"><img src="${game.image}" alt="${game.title}"></div>`
-              : `<div class="card-img ${game.coverClass}"><i class="fas ${game.icon}"></i></div>`;
-
-            card.innerHTML = `
-                        ${imgHtml}
-                        <div class="card-info">
-                            <div class="game-title">${game.title}<span class="badge">${game.badge}</span></div>
-                            <div class="game-meta">${game.meta}</div>
-                            <div class="game-desc">${game.desc}</div>
-                        </div>
-                    `;
-            card.addEventListener("click", () => {
-              window.history.pushState(
-                { gameId: game.id },
-                "",
-                `?game=${game.id}`
-              );
-              showDetail(game.id);
-            });
-            gamesView.appendChild(card);
-          });
-        }
-
-        // ---------- 显示详情 (支持图片) ----------
-        function showDetail(gameId) {
-          const game = games.find((g) => g.id === gameId);
-          if (!game) return;
-
-          // 详情封面：优先图片，否则渐变
-          const coverHtml = game.detailImage
-            ? `<div class="detail-cover"><img src="${game.detailImage}" alt="${game.detailTitle}"></div>`
-            : `<div class="detail-cover" style="background:${game.detailCover};"><i class="fas ${game.detailIcon}" style="font-size:4rem; text-shadow:0 0 15px #fff;"></i></div>`;
-
-          const buildSection = (arr, platform) => {
-            if (!arr || arr.length === 0) return "";
-            let html = `<div class="platform-title"><i class="fas fa-${
-              platform === "安卓" ? "mobile-alt" : "laptop"
-            }"></i> ${platform}区</div><div class="download-buttons">`;
-            arr.forEach((d) => {
-              html += `<button class="download-btn secondary" data-link="${d.link}" data-note="${d.note}"><i class="fas fa-download"></i> ${d.text}</button>`;
-            });
-            html += "</div>";
-            return html;
-          };
-
-          detailContent.innerHTML = `
-                    ${coverHtml}
-                    <div class="detail-info">
-                        <div class="detail-title">${game.detailTitle}</div>
-                        <p style="color:var(--text-secondary); line-height:1.7; margin:0.6rem 0 1rem;">${
-                          game.detailDesc
-                        }</p>
-                        <div class="detail-tags">${game.tags
-                          .map((t) => `<span># ${t}</span>`)
-                          .join("")}</div>
-                        ${buildSection(game.androidDownloads, "安卓")}
-                        ${buildSection(game.pcDownloads, "PC")}
-                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:1rem;"><i class="fas fa-info-circle"></i> 點擊按鈕將彈出下載協議</p>
-                    </div>
-                `;
-
-          // 绑定下载按钮
-          document
-            .querySelectorAll(".download-btn[data-link]")
-            .forEach((btn) => {
-              btn.addEventListener("click", function (e) {
-                e.preventDefault();
-                const link = this.dataset.link;
-                if (link === "#") {
-                  alert("鏈接尚未填寫。");
-                  return;
-                }
-                pendingDownloadLink = link;
-                modalNote.textContent = this.dataset.note;
-                modalOverlay.classList.add("active");
-              });
-            });
-
-          gamesView.style.display = "none";
-          detailPanel.classList.add("active");
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-
-        // ---------- 返回列表 ----------
-        backBtn.addEventListener("click", () => {
-          detailPanel.classList.remove("active");
-          gamesView.style.display = "";
-          window.history.pushState({}, "", window.location.pathname);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        });
-
-        // ---------- 下载弹窗 ----------
-        modalConfirm.addEventListener("click", () => {
-          if (pendingDownloadLink) window.open(pendingDownloadLink, "_blank");
-          pendingDownloadLink = "";
-          modalOverlay.classList.remove("active");
-        });
-        modalCancel.addEventListener("click", () => {
-          pendingDownloadLink = "";
-          modalOverlay.classList.remove("active");
-        });
-        modalOverlay.addEventListener("click", (e) => {
-          if (e.target === modalOverlay) {
-            pendingDownloadLink = "";
-            modalOverlay.classList.remove("active");
-          }
-        });
-
-        // ---------- 标签筛选 ----------
-        document.querySelectorAll(".tag").forEach((tag) => {
-          tag.addEventListener("click", function () {
-            document
-              .querySelectorAll(".tag")
-              .forEach((t) => t.classList.remove("active"));
-            this.classList.add("active");
-            const category = this.textContent.trim();
-            const filtered =
-              category === "全部"
-                ? games
-                : games.filter((g) => g.category === category);
-            renderCards(filtered);
-            if (detailPanel.classList.contains("active")) {
-              detailPanel.classList.remove("active");
-              gamesView.style.display = "";
-              window.history.pushState({}, "", window.location.pathname);
+            isChinese: true,
+            description: '在蔚蓝的天空下，少年少女们追逐着飞行梦想。这是一部关于青春、友情与恋爱的校园物语。',
+            featured: true,
+            bannerBg: 'https://placehold.co/1200x400/1a1040/b347ea?text=Aokana',
+            downloads: {
+                PC: 'https://example.com/dl/aokana-pc',
+                krkr: 'https://example.com/dl/aokana-krkr',
+                Ty: null,
+                ONS: null,
+                android_direct: 'https://example.com/dl/aokana-direct'
             }
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          });
+        }, {
+            id: 2,
+            title: '樱之诗',
+            cover: 'https://placehold.co/300x400/201830/e0dce8?text=樱之诗',
+            previewImages: [
+                'https://placehold.co/300x225/201830/e0dce8?text=预览1',
+                'https://placehold.co/300x225/2a1050/e0dce8?text=预览2',
+                'https://placehold.co/300x225/1a1535/e0dce8?text=预览3'
+            ],
+            tags: ['剧情', '哲学', '艺术'],
+            platforms: [{ type: 'PC' }],
+            isChinese: true,
+            description: '艺术与哲学交织的旷世之作。在樱花飘落的季节，探寻美的本质与生命的意义。',
+            featured: true,
+            bannerBg: 'https://placehold.co/1200x400/2a1050/ff2d78?text=Sakura+Poem',
+            downloads: { PC: 'https://example.com/dl/sakura-pc', krkr: null, Ty: null, ONS: null, android_direct: null }
+        }, {
+            id: 3,
+            title: '千恋万花',
+            cover: 'https://placehold.co/300x400/251535/e0dce8?text=千恋万花',
+            previewImages: [
+                'https://placehold.co/300x225/251535/e0dce8?text=截图1',
+                'https://placehold.co/300x225/1a0530/e0dce8?text=截图2',
+                'https://placehold.co/300x225/301545/e0dce8?text=截图3'
+            ],
+            tags: ['纯爱', '和风', '奇幻'],
+            platforms: [{ type: 'Android', sub: 'krkr' }, { type: 'Android', sub: 'Ty' }],
+            isChinese: true,
+            description: '在充满日式风情的温泉旅馆中，邂逅美丽的少女们。',
+            featured: false,
+            bannerBg: null,
+            downloads: { PC: null, krkr: 'https://example.com/dl/senren-krkr', Ty: 'https://example.com/dl/senren-ty',
+                ONS: null, android_direct: null }
+        }, {
+            id: 4,
+            title: '爱因斯坦携爱敬上',
+            cover: 'https://placehold.co/300x400/1c1835/e0dce8?text=爱因斯坦',
+            previewImages: [
+                'https://placehold.co/300x225/1c1835/e0dce8?text=预览1',
+                'https://placehold.co/300x225/231938/e0dce8?text=预览2',
+                'https://placehold.co/300x225/152030/e0dce8?text=预览3'
+            ],
+            tags: ['科幻', '恋爱', '悬疑'],
+            platforms: [{ type: 'PC' }],
+            isChinese: true,
+            description: '天才科学家与恋爱的奇妙结合。',
+            featured: false,
+            bannerBg: null,
+            downloads: { PC: null, krkr: null, Ty: null, ONS: null, android_direct: null }
+        }];
+
+        // 初始化下载对象（兼容缺失字段）
+        gamesData.forEach(g => {
+            if (!g.downloads) g.downloads = { PC: null, krkr: null, Ty: null, ONS: null, android_direct: null };
+            if (!g.previewImages) g.previewImages = [];
         });
 
-        // ---------- 路由恢复 ----------
-        const params = new URLSearchParams(window.location.search);
-        const initialGameId = params.get("game");
-        if (initialGameId) {
-          showDetail(Number(initialGameId));
-        } else {
-          renderCards(games);
+        // ==================== 本地存储管理 ====================
+        function getLikeCount(gameId) {
+            return parseInt(localStorage.getItem(`like_${gameId}`) || '0');
         }
-        window.addEventListener("popstate", (e) => {
-          if (e.state && e.state.gameId) {
-            showDetail(e.state.gameId);
-          } else {
-            detailPanel.classList.remove("active");
-            gamesView.style.display = "";
-            renderCards(games);
-          }
+        function setLikeCount(gameId, count) {
+            localStorage.setItem(`like_${gameId}`, count);
+        }
+        function isLikedByUser(gameId) {
+            return localStorage.getItem(`userLiked_${gameId}`) === 'true';
+        }
+        function setUserLiked(gameId, liked) {
+            localStorage.setItem(`userLiked_${gameId}`, liked ? 'true' : 'false');
+        }
+        function getComments(gameId) {
+            return JSON.parse(localStorage.getItem(`comments_${gameId}`) || '[]');
+        }
+        function saveComments(gameId, comments) {
+            localStorage.setItem(`comments_${gameId}`, JSON.stringify(comments));
+        }
+        function addComment(gameId, name, text) {
+            const comments = getComments(gameId);
+            comments.unshift({ name, text, time: Date.now() });
+            if (comments.length > 200) comments.pop(); // 限制数量
+            saveComments(gameId, comments);
+            return comments;
+        }
+
+        // ==================== 全局状态 ====================
+        let currentPage = 'home';
+        let currentFilter = 'all';
+        let currentBannerIndex = 0;
+        let bannerInterval = null;
+        let onlineSeconds = 0;
+        let onlineTimerInterval = null;
+
+        // ==================== 工具函数 ====================
+        function getPlatformLabel(platform) {
+            if (platform.type === 'PC') return { text: 'PC', cls: 'tag-platform-pc' };
+            if (platform.sub === 'krkr') return { text: '安卓·krkr', cls: 'tag-platform-android' };
+            if (platform.sub === 'Ty') return { text: '安卓·Ty', cls: 'tag-platform-android' };
+            if (platform.sub === 'ONS') return { text: '安卓·ONS', cls: 'tag-platform-android' };
+            if (platform.sub === 'android_direct') return { text: '安卓直装', cls: 'tag-platform-android' };
+            return { text: '安卓', cls: 'tag-platform-android' };
+        }
+        function getTagsHTML(game) {
+            let html = '';
+            game.platforms?.forEach(p => {
+                const pl = getPlatformLabel(p);
+                html += `<span class="card-tag ${pl.cls}">${pl.text}</span>`;
+            });
+            if (game.isChinese) html += '<span class="card-tag tag-chinese">汉化</span>';
+            game.tags?.slice(0, 3).forEach(t => {
+                html +=
+                    `<span class="card-tag" style="background:rgba(255,255,255,0.06);color:#bbb;border:1px solid rgba(255,255,255,0.12);">${t}</span>`;
+            });
+            return html;
+        }
+        function createGameCard(game) {
+            return `
+                <div class="game-card" onclick="openGameDetail(${game.id})">
+                    <div class="card-glow"></div>
+                    <img class="card-cover" src="${game.cover}" alt="${game.title}" loading="lazy" onerror="this.src='https://placehold.co/300x400/1a1535/b347ea?text=${encodeURIComponent(game.title.substring(0,4))}'">
+                    <div class="card-body">
+                        <div class="card-title">${game.title}</div>
+                        <div class="card-tags">${getTagsHTML(game)}</div>
+                    </div>
+                </div>`;
+        }
+
+        // ==================== 路由与刷新保持 ====================
+        function setHash(hash) {
+            window.location.hash = hash;
+        }
+        function getHash() {
+            return window.location.hash.slice(1); // 去掉#
+        }
+        function handleRouteChange() {
+            const hash = getHash();
+            if (hash.startsWith('detail/')) {
+                const gameId = parseInt(hash.split('/')[1]);
+                if (!isNaN(gameId)) {
+                    // 恢复详情页
+                    navigateTo('home', true); // 静默切换到首页作为底层
+                    openGameDetail(gameId);
+                }
+            } else if (hash === 'category') {
+                navigateTo('category', true);
+            } else {
+                navigateTo('home', true);
+            }
+        }
+        window.addEventListener('hashchange', handleRouteChange);
+
+        // 初始加载时根据hash显示
+        function initialRoute() {
+            const hash = getHash();
+            if (hash.startsWith('detail/')) {
+                const gameId = parseInt(hash.split('/')[1]);
+                if (!isNaN(gameId)) {
+                    navigateTo('home', true);
+                    setTimeout(() => openGameDetail(gameId), 100);
+                }
+            } else if (hash === 'category') {
+                navigateTo('category', true);
+            } else {
+                navigateTo('home', true);
+            }
+        }
+
+        // ==================== 启动动画与粒子 ====================
+        function initBootSequence() {
+            const bootScreen = document.getElementById('bootScreen');
+            const appContainer = document.getElementById('appContainer');
+            setTimeout(() => {
+                bootScreen.classList.add('hidden');
+                appContainer.classList.add('visible');
+                initParticles();
+                initialRoute(); // 根据hash加载页面
+                startBannerAutoplay();
+                startOnlineTimer();
+                setTimeout(() => {
+                    if (bootScreen.parentNode) bootScreen.parentNode.removeChild(bootScreen);
+                }, 800);
+            }, 2200);
+        }
+
+        function initParticles() {
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const isMobile = window.innerWidth < 768;
+            const particleCount = isMobile ? 35 : 80;
+
+            function resize() { canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight; }
+            resize();
+            window.addEventListener('resize', () => { resize();
+                initParticlesArray(); });
+
+            function initParticlesArray() {
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * 0.6,
+                        vy: (Math.random() - 0.5) * 0.6,
+                        radius: Math.random() * 2.2 + 0.6,
+                        alpha: Math.random() * 0.5 + 0.2,
+                        color: Math.random() < 0.5 ? '179,71,234' : '255,45,120',
+                    });
+                }
+            }
+            initParticlesArray();
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${p.color},${p.alpha * 0.15})`;
+                    ctx.fill();
+                });
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(179,71,234,${0.08 * (1 - dist / 120)})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        function startOnlineTimer() {
+            const timerEl = document.getElementById('onlineTimer');
+            if (!timerEl) return;
+            onlineTimerInterval = setInterval(() => {
+                onlineSeconds++;
+                const h = Math.floor(onlineSeconds / 3600);
+                const m = Math.floor((onlineSeconds % 3600) / 60);
+                const s = onlineSeconds % 60;
+                timerEl.textContent =
+                    `⏱️ 已在线 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            }, 1000);
+        }
+
+        // ==================== 页面导航 ====================
+        function navigateTo(page, silent = false) {
+            if (!silent) triggerGlitch();
+            currentPage = page;
+            document.getElementById('homeView').style.display = page === 'home' ? 'block' : 'none';
+            document.getElementById('categoryView').style.display = page === 'category' ? 'block' : 'none';
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            const targetLink = document.querySelector(`.nav-links a[data-page="${page}"]`);
+            if (targetLink) targetLink.classList.add('active');
+            document.getElementById('navLinks').classList.remove('open');
+            document.getElementById('hamburgerBtn').classList.remove('open');
+            if (page === 'home') renderHome();
+            if (page === 'category') renderCategory();
+            if (!silent) {
+                setHash(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function triggerGlitch() {
+            const main = document.getElementById('mainContent');
+            main.classList.remove('glitching');
+            void main.offsetWidth;
+            main.classList.add('glitching');
+            setTimeout(() => main.classList.remove('glitching'), 400);
+        }
+
+        // ==================== 首页 ====================
+        function renderHome() {
+            renderBanner();
+            renderFeatured();
+        }
+        function renderBanner() {
+            const bannerSection = document.getElementById('bannerSection');
+            const featured = gamesData.filter(g => g.featured);
+            if (featured.length === 0) {
+                bannerSection.innerHTML =
+                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-secondary);">暂无推荐</div>';
+                return;
+            }
+            currentBannerIndex = Math.min(currentBannerIndex, featured.length - 1);
+            let slidesHTML = '';
+            featured.forEach((game, i) => {
+                const bg = game.bannerBg || game.cover;
+                slidesHTML += `
+                    <div class="banner-slide ${i === currentBannerIndex ? 'active' : ''}" onclick="openGameDetail(${game.id})">
+                        <div class="banner-bg" style="background-image:url('${bg}');"></div>
+                        <div class="banner-overlay"></div>
+                        <div class="banner-info">
+                            <span class="banner-tag">🔥 推荐</span>
+                            <h2>${game.title}</h2>
+                            <p>${game.description.substring(0, 60)}...</p>
+                        </div>
+                    </div>`;
+            });
+            let dotsHTML = '';
+            featured.forEach((_, i) => dotsHTML +=
+                `<span class="${i === currentBannerIndex ? 'active' : ''}" onclick="goToBanner(${i})"></span>`);
+            bannerSection.innerHTML = `
+                <div class="banner-arrow left" onclick="changeBanner(-1)">◀</div>
+                <div class="banner-arrow right" onclick="changeBanner(1)">▶</div>
+                <div class="banner-dots" id="bannerDots">${dotsHTML}</div>
+                ${slidesHTML}`;
+        }
+        function changeBanner(dir) {
+            const featured = gamesData.filter(g => g.featured);
+            if (featured.length === 0) return;
+            currentBannerIndex = (currentBannerIndex + dir + featured.length) % featured.length;
+            updateBannerDisplay(featured);
+            resetBannerAutoplay();
+        }
+        function goToBanner(index) {
+            const featured = gamesData.filter(g => g.featured);
+            if (featured.length === 0) return;
+            currentBannerIndex = index;
+            updateBannerDisplay(featured);
+            resetBannerAutoplay();
+        }
+        function updateBannerDisplay(featured) {
+            document.querySelectorAll('.banner-slide').forEach((s, i) => s.classList.toggle('active', i ===
+                currentBannerIndex));
+            document.querySelectorAll('#bannerDots span').forEach((d, i) => d.classList.toggle('active', i ===
+                currentBannerIndex));
+        }
+        function startBannerAutoplay() { bannerInterval = setInterval(() => changeBanner(1), 5000); }
+
+        function resetBannerAutoplay() { clearInterval(bannerInterval);
+            startBannerAutoplay(); }
+
+        function renderFeatured() {
+            const grid = document.getElementById('featuredGrid');
+            const featured = gamesData.filter(g => g.featured);
+            const display = featured.length >= 8 ? featured : [...featured, ...gamesData.filter(g => !g.featured)].slice(0,
+            8);
+            grid.innerHTML = display.map(g => createGameCard(g)).join('');
+        }
+
+        // ==================== 分类页 ====================
+        function renderCategory() {
+            const grid = document.getElementById('categoryGrid');
+            const noRes = document.getElementById('noResults');
+            let filtered = gamesData;
+            if (currentFilter === 'PC') filtered = gamesData.filter(g => g.platforms?.some(p => p.type === 'PC'));
+            else if (currentFilter === 'Android') filtered = gamesData.filter(g => g.platforms?.some(p => p.type ===
+                'Android'));
+            else if (currentFilter === 'krkr') filtered = gamesData.filter(g => g.platforms?.some(p => p.sub === 'krkr'));
+            else if (currentFilter === 'Ty') filtered = gamesData.filter(g => g.platforms?.some(p => p.sub === 'Ty'));
+            else if (currentFilter === 'ONS') filtered = gamesData.filter(g => g.platforms?.some(p => p.sub === 'ONS'));
+            else if (currentFilter === 'android_direct') filtered = gamesData.filter(g => g.platforms?.some(p => p.sub ===
+                'android_direct'));
+            else if (currentFilter === 'chinese') filtered = gamesData.filter(g => g.isChinese);
+            if (filtered.length === 0) { grid.innerHTML = '';
+                noRes.style.display = 'block'; } else { noRes.style.display = 'none';
+                grid.innerHTML = filtered.map(g => createGameCard(g)).join(''); }
+        }
+        function setFilter(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('#filterSection .filter-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            triggerGlitch();
+            renderCategory();
+        }
+
+        function handleSearch(query) {
+            if (!query.trim()) {
+                if (currentPage === 'home') renderHome();
+                if (currentPage === 'category') renderCategory();
+                return;
+            }
+            const q = query.toLowerCase();
+            const results = gamesData.filter(g =>
+                g.title.toLowerCase().includes(q) ||
+                g.tags.some(t => t.toLowerCase().includes(q)) ||
+                (g.platforms && g.platforms.some(p => p.type.toLowerCase().includes(q) || (p.sub && p.sub.toLowerCase()
+                    .includes(q)))) ||
+                g.description.toLowerCase().includes(q)
+            );
+            document.getElementById('homeView').style.display = 'block';
+            document.getElementById('categoryView').style.display = 'none';
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.querySelector('.nav-links a[data-page="home"]')?.classList.add('active');
+            currentPage = 'home';
+            document.getElementById('bannerSection').style.display = 'none';
+            const grid = document.getElementById('featuredGrid');
+            grid.innerHTML = results.length ? results.map(g => createGameCard(g)).join('') :
+                '<div style="grid-column:1/-1;text-align:center;padding:40px;">😿 没有找到相关游戏</div>';
+        }
+
+        // ==================== 游戏详情（含预览图、点赞、评论） ====================
+        function openGameDetail(gameId) {
+            const game = gamesData.find(g => g.id === gameId);
+            if (!game) return;
+            const modal = document.getElementById('modalOverlay');
+            const body = document.getElementById('modalBody');
+            const likeSection = document.getElementById('likeSection');
+            const commentSection = document.getElementById('commentSection');
+
+            const platformList = ['PC', 'krkr', 'Ty', 'ONS', 'android_direct'];
+            const names = { PC: '💻 PC版', krkr: '📱 krkr', Ty: '📱 Tyranor', ONS: '📱 ONS', android_direct: '📱 安卓直装' };
+            const keys = { PC: 'PC', krkr: 'krkr', Ty: 'Ty', ONS: 'ONS', android_direct: 'android_direct' };
+
+            let dlButtons = '';
+            platformList.forEach(key => {
+                const hasPlatform = game.platforms?.some(p => {
+                    if (key === 'PC') return p.type === 'PC';
+                    if (key === 'android_direct') return p.sub === 'android_direct';
+                    return p.sub === key;
+                });
+                const url = game.downloads?.[keys[key]];
+                let cls = 'btn-dl';
+                let text = names[key];
+                let onclick = '';
+                let disabled = false;
+                if (!hasPlatform) { cls += ' disabled';
+                    text += ' (暂无资源)';
+                    disabled = true; } else if (url) { text += ' (点击下载)';
+                    onclick = `simulateDownload('${key}','${game.title}','${url}')`; } else { cls += ' pending';
+                    text += ' (链接待添加)'; }
+                dlButtons +=
+                    `<button class="${cls}" ${onclick ? `onclick="${onclick}"` : ''} ${disabled ? 'disabled' : ''}>${text}</button>`;
+            });
+
+            // 预览图
+            let previewHTML = '';
+            if (game.previewImages && game.previewImages.length > 0) {
+                previewHTML = '<div class="preview-row">' + game.previewImages.map(url =>
+                    `<img src="${url}" alt="预览" onerror="this.style.display='none'" loading="lazy">`).join('') +
+                    '</div>';
+            }
+
+            body.innerHTML = `
+                <div class="modal-cover-wrap">
+                    <img src="${game.cover}" alt="${game.title}" onerror="this.src='https://placehold.co/300x400/1a1535/b347ea?text=${encodeURIComponent(game.title.substring(0,4))}'">
+                </div>
+                <div class="modal-info">
+                    <h2>${game.title}</h2>
+                    <div class="modal-tags-row">${getModalTagsHTML(game)}</div>
+                    <div class="modal-description">${game.description}</div>
+                    ${previewHTML}
+                    <div class="modal-dl-section">${dlButtons}</div>
+                </div>`;
+
+            // 点赞区
+            const likeCount = getLikeCount(gameId);
+            const liked = isLikedByUser(gameId);
+            likeSection.innerHTML = `
+                <button class="like-btn ${liked ? 'liked' : ''}" onclick="toggleLike(${gameId})">❤️ ${liked ? '已赞' : '点赞'}</button>
+                <span class="like-count">${likeCount} 人点赞</span>`;
+
+            // 评论区（加载已有评论）
+            const comments = getComments(gameId);
+            let commentsHTML = comments.map(c => `
+                <div class="comment-item">
+                    <div class="c-user">${escapeHtml(c.name)} <span class="c-time">${new Date(c.time).toLocaleString()}</span></div>
+                    <div class="c-text">${escapeHtml(c.text)}</div>
+                </div>`).join('');
+            commentSection.innerHTML = `
+                <h3>💬 玩家评论 (${comments.length})</h3>
+                <div id="commentsList">${commentsHTML || '<div style="color:var(--text-secondary);">暂无评论，来第一个评论吧~</div>'}</div>
+                <div class="comment-input-row">
+                    <input type="text" id="commentName" placeholder="你的名字">
+                    <input type="text" id="commentText" placeholder="写下你的评论...">
+                    <button onclick="submitComment(${gameId})">发送 ✨</button>
+                </div>`;
+
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            setHash(`detail/${gameId}`);
+        }
+
+        function getModalTagsHTML(game) {
+            let html = '';
+            game.platforms?.forEach(p => {
+                const pl = getPlatformLabel(p);
+                html +=
+                    `<span class="modal-tag" style="background:rgba(91,106,240,0.2);color:#8fa4ff;">${pl.text}</span>`;
+            });
+            if (game.isChinese) html +=
+                '<span class="modal-tag" style="background:rgba(126,207,138,0.2);color:#8ff0a0;">✅ 汉化</span>';
+            game.tags?.forEach(t => html +=
+                '<span class="modal-tag" style="background:rgba(255,255,255,0.04);color:#ccc;">' + t + '</span>');
+            return html;
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function toggleLike(gameId) {
+            const liked = isLikedByUser(gameId);
+            const count = getLikeCount(gameId);
+            if (liked) {
+                setUserLiked(gameId, false);
+                setLikeCount(gameId, Math.max(0, count - 1));
+            } else {
+                setUserLiked(gameId, true);
+                setLikeCount(gameId, count + 1);
+            }
+            // 刷新点赞区
+            const newCount = getLikeCount(gameId);
+            const newLiked = isLikedByUser(gameId);
+            document.querySelector('.like-btn').className = `like-btn ${newLiked ? 'liked' : ''}`;
+            document.querySelector('.like-btn').innerHTML = `❤️ ${newLiked ? '已赞' : '点赞'}`;
+            document.querySelector('.like-count').textContent = `${newCount} 人点赞`;
+        }
+
+        function submitComment(gameId) {
+            const nameInput = document.getElementById('commentName');
+            const textInput = document.getElementById('commentText');
+            const name = nameInput.value.trim();
+            const text = textInput.value.trim();
+            if (!name || !text) return;
+            const comments = addComment(gameId, name, text);
+            const list = document.getElementById('commentsList');
+            const commentsHTML = comments.map(c => `
+                <div class="comment-item">
+                    <div class="c-user">${escapeHtml(c.name)} <span class="c-time">${new Date(c.time).toLocaleString()}</span></div>
+                    <div class="c-text">${escapeHtml(c.text)}</div>
+                </div>`).join('');
+            list.innerHTML = commentsHTML;
+            textInput.value = '';
+            // 更新评论数
+            document.querySelector('.comment-section h3').textContent = `💬 玩家评论 (${comments.length})`;
+        }
+
+        function simulateDownload(platform, title, url) {
+            const messages = {
+                PC: '请使用电脑浏览器打开下载链接，推荐使用IDM加速。',
+                krkr: '请将游戏文件放入手机存储的krkr模拟器对应目录。',
+                Ty: '使用Tyranor模拟器打开游戏。',
+                ONS: '将游戏文件夹放入ONS模拟器的游戏目录。',
+                android_direct: '安卓直装版，下载后直接安装APK即可。'
+            };
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;
+                background:rgba(20,16,35,0.95);border:1px solid var(--neon-purple);
+                color:#fff;padding:16px 28px;border-radius:20px;font-weight:500;
+                box-shadow:0 0 30px rgba(179,71,234,0.7);backdrop-filter:blur(12px);
+                animation:toastIn 0.4s ease, toastOut 0.4s ease 2.5s forwards;
+                max-width:90vw;text-align:center;
+            `;
+            toast.innerHTML = `
+                <div style="margin-bottom:6px;">📥 正在跳转下载「${title}」</div>
+                <div style="font-size:0.8rem;color:#ccc;">${messages[platform]}</div>
+                <div style="font-size:0.75rem;margin-top:6px;color:var(--neon-cyan);">资源来源：NekoGalgame琉璃资源库</div>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+            if (url && url.startsWith('http')) window.open(url, '_blank');
+        }
+
+        function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+
+        function closeModalDirect() {
+            document.getElementById('modalOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+            setHash('home'); // 返回首页hash
+        }
+
+        // ==================== 其他 ====================
+        function toggleMobileMenu() {
+            document.getElementById('navLinks').classList.toggle('open');
+            document.getElementById('hamburgerBtn').classList.toggle('open');
+        }
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        function handleScroll() {
+            const btn = document.getElementById('btnBackTop');
+            const nav = document.getElementById('navBar');
+            btn.classList.toggle('visible', window.scrollY > 400);
+            nav.classList.toggle('scrolled', window.scrollY > 40);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('scroll', handleScroll);
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && document.getElementById('modalOverlay').classList.contains('open'))
+                    closeModalDirect();
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+            });
+            initBootSequence();
         });
-      })();
+
+        // 全局暴露
+        window.navigateTo = navigateTo;
+        window.changeBanner = changeBanner;
+        window.goToBanner = goToBanner;
+        window.openGameDetail = openGameDetail;
+        window.closeModal = closeModal;
+        window.closeModalDirect = closeModalDirect;
+        window.setFilter = setFilter;
+        window.handleSearch = handleSearch;
+        window.toggleMobileMenu = toggleMobileMenu;
+        window.scrollToTop = scrollToTop;
+        window.simulateDownload = simulateDownload;
+        window.toggleLike = toggleLike;
+        window.submitComment = submitComment;
     </script>
-  </body>
+</body>
 </html>
