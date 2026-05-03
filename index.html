@@ -3,308 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galfang</title>
+    <title>Galfang · 佐久真诗</title>
     <style>
+        /* ========== 主题变量 ========== */
         :root {
-            --bg-deep: #0a0a0f;
-            --bg-card: rgba(18, 16, 28, 0.8);
-            --bg-glass: rgba(20, 18, 35, 0.6);
-            --neon-purple: #b347ea;
-            --neon-pink: #ff2d78;
-            --neon-cyan: #00e5ff;
-            --text-primary: #e0dce8;
-            --text-secondary: #a09bb5;
-            --border-glow: rgba(179, 71, 234, 0.5);
-            --border-subtle: rgba(255, 255, 255, 0.08);
-            --shadow-neon: 0 0 25px rgba(179, 71, 234, 0.4), 0 0 60px rgba(179, 71, 234, 0.15);
-            --shadow-pink: 0 0 20px rgba(255, 45, 120, 0.45);
-            --font-main: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            --radius-lg: 18px;
-            --radius-md: 12px;
+            --bg: #f5f7fa;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-nav: rgba(255, 255, 255, 0.7);
+            --bg-modal: rgba(255, 255, 255, 0.95);
+            --text: #1a2233;
+            --text-light: #5e6e82;
+            --border: rgba(30, 40, 60, 0.08);
+            --primary: #4b8bb4;
+            --primary-light: #6ba5cc;
+            --accent-pink: #d47b8c;
+            --accent-green: #6ba589;
+            --shadow: 0 8px 24px rgba(30, 40, 60, 0.08);
+            --shadow-hover: 0 12px 30px rgba(75, 139, 180, 0.2);
+            --radius: 14px;
             --radius-sm: 8px;
             --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
+            --font: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
         }
-        /* 浅色主题变量 */
-        body.light-theme {
-            --bg-deep: #f5f2fa;
-            --bg-card: rgba(255, 255, 255, 0.9);
-            --bg-glass: rgba(255, 255, 255, 0.7);
-            --neon-purple: #9b4dca;
-            --neon-pink: #e63964;
-            --neon-cyan: #0fa3a8;
-            --text-primary: #2a2035;
-            --text-secondary: #5e5570;
-            --border-glow: rgba(155, 77, 202, 0.5);
-            --border-subtle: rgba(100, 80, 130, 0.15);
-            --shadow-neon: 0 0 20px rgba(155, 77, 202, 0.25);
-            --shadow-pink: 0 0 15px rgba(230, 57, 100, 0.3);
+
+        /* 深色主题 */
+        body.dark {
+            --bg: #0e1118;
+            --bg-card: rgba(22, 26, 35, 0.85);
+            --bg-nav: rgba(14, 17, 24, 0.7);
+            --bg-modal: rgba(22, 26, 35, 0.95);
+            --text: #e1e6ee;
+            --text-light: #8a94a6;
+            --border: rgba(255, 255, 255, 0.06);
+            --primary: #6ba5cc;
+            --primary-light: #8abfe0;
+            --accent-pink: #e09eaa;
+            --accent-green: #7eb99a;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 30px rgba(107, 165, 204, 0.25);
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
         html { scroll-behavior:smooth; font-size:16px; }
         body {
-            background: var(--bg-deep);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            line-height:1.6;
-            transition: background 0.5s, color 0.5s;
+            background: var(--bg); color: var(--text);
+            font-family: var(--font); min-height: 100vh;
+            overflow-x: hidden; line-height: 1.6;
+            transition: background 0.4s, color 0.4s;
         }
+
+        /* 粒子画布 */
         #particleCanvas {
-            position:fixed; top:0; left:0; width:100%; height:100%;
-            z-index:0; pointer-events:none;
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            z-index:0; pointer-events:none; opacity: 0.6;
         }
+
         /* 启动屏 */
         #bootScreen {
-            position:fixed; inset:0; z-index:9999; background:#06060b;
-            display:flex; align-items:center; justify-content:center;
-            flex-direction:column; font-family:monospace;
+            position: fixed; inset:0; z-index:9999;
+            background: #0e1118;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; font-family: monospace;
             transition: opacity 0.7s, visibility 0.7s;
         }
         #bootScreen.hidden { opacity:0; visibility:hidden; pointer-events:none; }
-        .boot-container {
-            background:rgba(10,8,20,0.9); border:1px solid #b347ea;
-            border-radius:12px; padding:30px 40px; max-width:600px; width:90%;
-            box-shadow:0 0 40px rgba(179,71,234,0.4);
-            position:relative; overflow:hidden;
+        .boot-box {
+            background: rgba(14,17,24,0.9); border: 1px solid #4b8bb4;
+            border-radius: 12px; padding: 30px 40px; max-width: 500px; width: 90%;
+            box-shadow: 0 0 40px rgba(75,139,180,0.3);
+            color: #b4cde0;
         }
         .boot-line {
-            color:#7ecf8a; font-size:0.8rem; margin:4px 0;
-            opacity:0; animation:bootIn 0.25s forwards;
+            font-size: 0.8rem; margin: 5px 0;
+            opacity: 0; animation: bootIn 0.25s forwards;
         }
-        .boot-line:nth-child(2){animation-delay:.2s}
-        .boot-line:nth-child(3){animation-delay:.45s}
-        .boot-line:nth-child(4){animation-delay:.7s}
-        .boot-line:nth-child(5){animation-delay:.95s}
-        .boot-line:nth-child(6){animation-delay:1.2s;color:#f0c060}
-        .boot-line:nth-child(7){animation-delay:1.5s;color:#ff2d78}
-        @keyframes bootIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+        .boot-line:nth-child(2) { animation-delay: 0.2s; }
+        .boot-line:nth-child(3) { animation-delay: 0.45s; }
+        .boot-line:nth-child(4) { animation-delay: 0.7s; }
+        .boot-line:nth-child(5) { animation-delay: 0.95s; }
+        .boot-line:nth-child(6) { animation-delay: 1.2s; color: #e09eaa; }
+        .boot-line:nth-child(7) { animation-delay: 1.5s; color: #6ba589; }
+        @keyframes bootIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
 
-        #appContainer { position:relative; z-index:1; opacity:0; transition: opacity 0.6s 0.3s; }
+        #appContainer { position: relative; z-index:1; opacity:0; transition: opacity 0.5s 0.2s; }
         #appContainer.visible { opacity:1; }
 
         /* 导航栏 */
         .nav-bar {
-            position:sticky; top:0; z-index:100;
-            background:rgba(10,8,22,0.7); backdrop-filter:blur(20px);
-            border-bottom:1px solid var(--border-subtle);
-            padding:0 24px; height:60px;
-            display:flex; align-items:center; justify-content:space-between;
-            box-shadow:0 4px 30px rgba(0,0,0,0.5);
-            transition:all 0.3s;
-        }
-        body.light-theme .nav-bar {
-            background:rgba(255,255,255,0.7);
-            box-shadow:0 4px 20px rgba(0,0,0,0.08);
+            position: sticky; top:0; z-index:100;
+            background: var(--bg-nav); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 62px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: var(--shadow);
         }
         .nav-logo {
-            font-size:1.5rem; font-weight:900; cursor:pointer;
-            background:linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-            white-space:nowrap; transition:0.2s;
+            font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px;
+            cursor: pointer; color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--accent-pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            transition: 0.2s;
         }
-        .nav-logo:hover { filter:brightness(1.2); transform:scale(1.03); }
-        .nav-links { display:flex; gap:8px; list-style:none; }
+        .nav-logo:hover { filter: brightness(1.15); transform: scale(1.02); }
+        .nav-links { display: flex; gap: 4px; list-style: none; }
         .nav-links button {
-            background:transparent; border:none; color:var(--text-secondary);
-            padding:8px 16px; border-radius:20px; font-size:0.9rem;
-            cursor:pointer; transition:all var(--transition);
+            background: transparent; border: none; color: var(--text-light);
+            padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;
+            cursor: pointer; transition: all var(--transition);
         }
         .nav-links button:hover, .nav-links button.active {
-            color:#fff; background:rgba(179,71,234,0.25);
-            box-shadow:0 0 15px rgba(179,71,234,0.4);
+            color: var(--primary); background: rgba(75,139,180,0.12);
         }
-        .nav-actions { display:flex; align-items:center; gap:12px; }
+        .nav-actions { display: flex; align-items: center; gap: 12px; }
         .theme-btn {
-            background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle);
-            color:var(--text-primary); width:38px; height:38px;
-            border-radius:50%; cursor:pointer; font-size:1.2rem;
-            display:flex; align-items:center; justify-content:center;
-            transition:all var(--transition);
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text); width: 38px; height: 38px;
+            border-radius: 12px; cursor: pointer; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: all var(--transition);
         }
-        .theme-btn:hover { border-color:var(--neon-purple); box-shadow:0 0 12px rgba(179,71,234,0.4); }
+        .theme-btn:hover { border-color: var(--primary); background: rgba(75,139,180,0.1); }
         .search-box {
-            display:flex; align-items:center; background:rgba(255,255,255,0.04);
-            border:1px solid var(--border-subtle); border-radius:25px;
-            padding:6px 16px; transition:all var(--transition);
+            display: flex; align-items: center; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 24px;
+            padding: 6px 14px; transition: all var(--transition);
         }
-        .search-box:focus-within {
-            border-color:var(--neon-purple); box-shadow:0 0 15px rgba(179,71,234,0.3);
-            background:rgba(255,255,255,0.07);
-        }
+        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(75,139,180,0.12); }
         .search-box input {
-            background:transparent; border:none; color:var(--text-primary);
-            outline:none; font-size:0.85rem; width:140px;
+            background: transparent; border: none; color: var(--text);
+            outline: none; font-size: 0.85rem; width: 130px;
         }
-        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
-        .hamburger span { width:26px; height:2.5px; background:var(--text-primary); border-radius:2px; }
+        .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; }
+        .hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; }
 
-        .main-content { padding:20px 24px 40px; max-width:1300px; margin:0 auto; }
-        .glitch-effect { animation: glitch 0.35s ease; }
+        /* 主内容 */
+        .main-content { padding: 20px 24px 40px; max-width: 1300px; margin: 0 auto; }
+        .glitch-effect { animation: glitch 0.3s ease; }
         @keyframes glitch {
-            0%{transform:translate(0)} 20%{transform:translate(-5px,2px); filter:hue-rotate(15deg)}
-            40%{transform:translate(5px,-2px)} 60%{transform:translate(-3px,-3px)}
-            80%{transform:translate(3px,3px)} 100%{transform:translate(0)}
+            0%{ transform:translate(0); } 20%{ transform:translate(-4px,2px); filter:hue-rotate(10deg); }
+            40%{ transform:translate(4px,-2px); } 60%{ transform:translate(-2px,-2px); }
+            80%{ transform:translate(2px,2px); } 100%{ transform:translate(0); }
         }
 
+        /* 轮播Banner */
         .banner-section {
-            position:relative; height:280px; border-radius:var(--radius-lg);
-            overflow:hidden; margin-bottom:24px; border:1px solid var(--border-subtle);
-            box-shadow:var(--shadow-neon); background:#0d0b1a;
+            position: relative; height: 240px; border-radius: var(--radius);
+            overflow: hidden; margin-bottom: 24px; border: 1px solid var(--border);
+            box-shadow: var(--shadow); background: var(--bg-card);
         }
         .banner-bg {
-            position:absolute; inset:0; background-size:cover;
-            background-position:center; filter:brightness(0.45);
-            transition:0.7s;
+            position: absolute; inset: 0; background-size: cover;
+            background-position: center; filter: brightness(0.55);
+            transition: 0.7s;
         }
         .banner-info {
-            position:absolute; bottom:30px; left:30px; z-index:2;
-            color:#fff; text-shadow:0 0 20px rgba(0,0,0,0.6);
+            position: absolute; bottom: 28px; left: 28px; z-index: 2;
+            color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
-        .banner-info h2 { font-size:2rem; }
-        .banner-dots { position:absolute; bottom:16px; right:24px; display:flex; gap:8px; }
+        .banner-info h2 { font-size: 1.8rem; }
+        .banner-dots { position: absolute; bottom: 16px; right: 24px; display: flex; gap: 8px; }
         .banner-dots span {
-            width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.4);
-            cursor:pointer; transition:0.2s;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.2s;
         }
-        .banner-dots span.active { background:var(--neon-pink); box-shadow:0 0 10px var(--neon-pink); }
+        .banner-dots span.active { background: var(--accent-pink); box-shadow: 0 0 8px var(--accent-pink); }
 
+        /* 卡片网格 */
         .game-grid {
-            display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
-            gap:20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
         }
         .game-card {
-            background:var(--bg-card); border-radius:var(--radius-md);
-            overflow:hidden; cursor:pointer; border:1px solid var(--border-subtle);
-            transition:all 0.3s cubic-bezier(0.2,0,0,1);
-            backdrop-filter:blur(10px); position:relative;
+            background: var(--bg-card); border-radius: var(--radius);
+            overflow: hidden; cursor: pointer; border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            backdrop-filter: blur(8px); position: relative;
         }
         .game-card:hover {
-            transform:translateY(-8px); border-color:var(--border-glow);
-            box-shadow:var(--shadow-neon); z-index:5;
+            transform: translateY(-6px); border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
         }
         .card-cover {
-            width:100%; aspect-ratio:3/4; object-fit:cover;
-            background:linear-gradient(135deg, #1a1535, #251840);
-            transition:0.3s;
+            width: 100%; aspect-ratio: 3/4; object-fit: cover;
+            transition: 0.3s;
         }
-        .game-card:hover .card-cover { filter:brightness(1.15); }
-        .card-body { padding:12px; }
-        .card-title { font-weight:700; font-size:0.95rem; margin-bottom:6px; }
-        .card-tags { display:flex; flex-wrap:wrap; gap:4px; }
+        .game-card:hover .card-cover { filter: brightness(1.1); }
+        .card-body { padding: 12px; }
+        .card-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+        .card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
         .tag {
-            font-size:0.68rem; padding:2px 8px; border-radius:8px;
-            background:rgba(179,71,234,0.2); color:#c084f5;
-            white-space:nowrap;
+            font-size: 0.7rem; padding: 2px 8px; border-radius: 6px;
+            background: rgba(75,139,180,0.12); color: var(--primary);
+            white-space: nowrap;
         }
-        body.light-theme .tag { background:rgba(155,77,202,0.15); color:#7c3aed; }
+        .tag.hot { background: rgba(212,123,140,0.12); color: var(--accent-pink); }
 
-        .filter-section { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 24px; }
+        /* 分类筛选 */
+        .filter-section { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
         .filter-btn {
-            padding:6px 16px; border-radius:20px; border:1px solid var(--border-subtle);
-            background:rgba(255,255,255,0.03); color:var(--text-secondary);
-            cursor:pointer; font-size:0.8rem; transition:all var(--transition);
+            padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border);
+            background: var(--bg-card); color: var(--text-light);
+            cursor: pointer; font-size: 0.8rem; transition: all var(--transition);
         }
         .filter-btn.active, .filter-btn:hover {
-            background:rgba(179,71,234,0.25); color:#fff;
-            border-color:var(--neon-purple); box-shadow:0 0 12px rgba(179,71,234,0.4);
+            background: rgba(75,139,180,0.15); color: var(--primary);
+            border-color: var(--primary);
         }
 
         /* 模态框 */
         .modal-overlay {
-            position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.75);
-            backdrop-filter:blur(10px); display:flex; align-items:center;
-            justify-content:center; opacity:0; visibility:hidden;
-            transition:0.25s;
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: 0.25s;
         }
-        .modal-overlay.open { opacity:1; visibility:visible; }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
         .modal-dialog {
-            background:rgba(18,16,30,0.9); border:1px solid var(--neon-purple);
-            border-radius:var(--radius-lg); padding:28px;
-            max-width:850px; width:100%; max-height:85vh; overflow-y:auto;
-            box-shadow:0 0 50px rgba(179,71,234,0.4);
-            backdrop-filter:blur(20px); animation:modalIn 0.3s;
+            background: var(--bg-modal); border-radius: var(--radius);
+            padding: 28px; max-width: 850px; width: 90%; max-height: 85vh;
+            overflow-y: auto; border: 1px solid var(--border);
+            box-shadow: var(--shadow-hover);
+            animation: modalIn 0.3s ease;
         }
-        body.light-theme .modal-dialog {
-            background:rgba(255,255,255,0.9);
-            backdrop-filter:blur(30px);
-        }
-        @keyframes modalIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes modalIn { from { opacity:0; transform: translateY(20px) scale(0.98); } to { opacity:1; transform: translateY(0) scale(1); } }
         .modal-close {
-            position:sticky; top:0; float:right; width:36px; height:36px;
-            border-radius:50%; border:1px solid var(--border-subtle);
-            background:rgba(0,0,0,0.5); color:#fff; cursor:pointer;
-            display:flex; align-items:center; justify-content:center;
+            position: sticky; top: 0; float: right; width: 36px; height: 36px;
+            border-radius: 50%; border: 1px solid var(--border);
+            background: var(--bg-card); color: var(--text);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all var(--transition);
         }
-        .modal-body { display:flex; gap:20px; flex-wrap:wrap; }
-        .modal-cover img { width:200px; aspect-ratio:3/4; object-fit:cover; border-radius:var(--radius-sm); }
-        .modal-info { flex:1; min-width:250px; }
-        .modal-info h2 { font-size:1.5rem; margin-bottom:10px; }
-        .modal-desc { color:var(--text-secondary); line-height:1.7; margin:12px 0; }
-        .preview-row { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
-        .preview-row img { width:80px; height:60px; object-fit:cover; border-radius:6px; border:1px solid var(--border-subtle); }
-        .dl-btns { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+        .modal-close:hover { background: var(--accent-pink); color: #fff; border-color: var(--accent-pink); }
+        .modal-body { display: flex; gap: 24px; flex-wrap: wrap; }
+        .modal-cover img { width: 200px; aspect-ratio: 3/4; object-fit: cover; border-radius: var(--radius-sm); }
+        .modal-info { flex: 1; min-width: 250px; }
+        .modal-info h2 { font-size: 1.5rem; margin-bottom: 8px; }
+        .modal-desc { color: var(--text-light); line-height: 1.7; margin: 12px 0; }
+        .preview-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+        .preview-row img { width: 90px; height: 66px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+        .dl-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
         .dl-btn {
-            padding:8px 18px; border-radius:25px; border:1px solid var(--neon-purple);
-            background:rgba(179,71,234,0.15); color:#fff; cursor:pointer;
-            font-weight:600; font-size:0.85rem; transition:all var(--transition);
+            padding: 8px 18px; border-radius: 24px; border: 1px solid var(--primary);
+            background: rgba(75,139,180,0.1); color: var(--primary);
+            cursor: pointer; font-weight: 600; font-size: 0.85rem;
+            transition: all var(--transition);
         }
-        .dl-btn:hover { background:rgba(179,71,234,0.4); box-shadow:0 0 20px rgba(179,71,234,0.5); transform:translateY(-2px); }
-        .dl-btn.disabled { opacity:0.4; pointer-events:none; }
+        .dl-btn:hover { background: var(--primary); color: #fff; transform: scale(1.02); }
+        .dl-btn.disabled { opacity: 0.4; pointer-events: none; }
         .like-btn {
-            padding:6px 18px; border-radius:20px; border:1px solid var(--neon-pink);
-            background:rgba(255,45,120,0.15); color:#ff6b98; cursor:pointer;
-            font-weight:600; transition:all var(--transition);
+            padding: 6px 16px; border-radius: 20px; border: 1px solid var(--accent-pink);
+            background: rgba(212,123,140,0.1); color: var(--accent-pink);
+            cursor: pointer; font-weight: 600; transition: all var(--transition);
         }
-        .like-btn.liked { background:rgba(255,45,120,0.4); color:#fff; box-shadow:0 0 15px rgba(255,45,120,0.4); }
+        .like-btn.liked { background: var(--accent-pink); color: #fff; transform: scale(1.05); }
         .comment-item {
-            background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle);
-            border-radius:8px; padding:10px; margin-bottom:8px;
+            background: rgba(75,139,180,0.04); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px; margin-bottom: 8px;
         }
 
-        @media (max-width:768px) {
-            .nav-links { position:fixed; top:60px; left:0; right:0; background:rgba(10,8,22,0.95); backdrop-filter:blur(20px); flex-direction:column; padding:16px; display:none; }
-            .nav-links.open { display:flex; }
-            .hamburger { display:flex; }
-            .search-box input { width:100px; }
-            .banner-section { height:200px; }
-            .game-grid { grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); }
-            .modal-body { flex-direction:column; }
-            .modal-cover img { max-width:180px; }
+        /* 返回顶部 */
+        .back-top {
+            position: fixed; bottom: 24px; right: 24px; z-index: 150;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--primary); color: #fff; border: none;
+            cursor: pointer; box-shadow: var(--shadow);
+            display: flex; align-items: center; justify-content: center;
+            transition: all var(--transition);
+        }
+        .back-top:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed; top:62px; left:0; right:0;
+                background: var(--bg-nav); backdrop-filter: blur(20px);
+                flex-direction: column; padding: 16px; display: none;
+            }
+            .nav-links.open { display: flex; }
+            .hamburger { display: flex; }
+            .search-box input { width: 90px; }
+            .banner-section { height: 180px; }
+            .game-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+            .modal-body { flex-direction: column; }
+            .modal-cover img { max-width: 160px; }
         }
     </style>
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
 
-    <!-- 启动画面 -->
+    <!-- 启动加载动画 -->
     <div id="bootScreen">
-        <div class="boot-container">
-            <div style="color:var(--neon-cyan); margin-bottom:12px;">◆ NEKO_SYSTEM v3.7</div>
-            <div class="boot-line">> 加载资源库索引...</div>
+        <div class="boot-box">
+            <div style="font-size:0.9rem; margin-bottom:12px; letter-spacing:2px;"> G A L F A N G · 初 始 化</div>
+            <div class="boot-line">> 加载资源索引...</div>
             <div class="boot-line">> 校验数据库完整性... OK</div>
-            <div class="boot-line">> 启动霓虹渲染引擎... OK</div>
-            <div class="boot-line">> 粒子网络初始化... OK</div>
+            <div class="boot-line">> 启动渲染引擎... OK</div>
+            <div class="boot-line">> 连接粒子网络...</div>
             <div class="boot-line">> 正在加载资源库...</div>
-            <div class="boot-line">> 佐久真诗已就绪 ▮</div>
+            <div class="boot-line">> 柊白亚已就绪</div>
         </div>
     </div>
 
-    <!-- 主界面 -->
+    <!-- 主应用 -->
     <div id="appContainer">
         <nav class="nav-bar">
-            <div class="nav-logo" onclick="navigateTo('home')">🐾 NekoGalgame</div>
+            <div class="nav-logo" onclick="navigateTo('home')">Galfang</div>
             <ul class="nav-links" id="navLinks">
-                <li><button onclick="navigateTo('home')" data-page="home" class="active">🏠 首页</button></li>
-                <li><button onclick="navigateTo('category')" data-page="category">📂 分类</button></li>
+                <li><button onclick="navigateTo('home')" data-page="home" class="active">首页</button></li>
+                <li><button onclick="navigateTo('category')" data-page="category">分类浏览</button></li>
             </ul>
             <div class="nav-actions">
                 <div class="search-box">
-                    <span>🔍</span>
-                    <input type="text" id="searchInput" placeholder="搜索游戏..." oninput="handleSearch(this.value)">
+                    <span style="margin-right:4px;">&#9906;</span>
+                    <input type="text" id="searchInput" placeholder="搜索..." oninput="handleSearch(this.value)">
                 </div>
-                <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌓</button>
+                <button class="theme-btn" id="themeToggle" onclick="toggleTheme()" title="切换主题">&#9789;</button>
                 <div class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">
                     <span></span><span></span><span></span>
                 </div>
@@ -314,13 +328,13 @@
         <div class="main-content" id="mainContent">
             <div id="homeView">
                 <div class="banner-section" id="bannerSection"></div>
-                <div class="home-tags" id="homeTagCloud" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;"></div>
-                <h2 class="section-title" style="color:var(--text-primary);">🔥 精选推荐</h2>
+                <div id="homeTagCloud" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;"></div>
+                <h2 style="margin-bottom:18px; font-weight:700;">&#9733; 精选推荐</h2>
                 <div class="game-grid" id="featuredGrid"></div>
-                <div style="text-align:center;margin-top:30px;color:var(--text-secondary);" id="onlineTimer">⏱️ 在线 00:00:00</div>
+                <div style="text-align:center; margin-top:30px; color:var(--text-light);" id="onlineTimer">在线 00:00:00</div>
             </div>
             <div id="categoryView" style="display:none;">
-                <h2 style="color:var(--text-primary);margin-bottom:16px;">📂 全部作品</h2>
+                <h2 style="margin-bottom:16px;">&#9776; 全部作品</h2>
                 <div class="filter-section" id="filterSection"></div>
                 <div class="game-grid" id="categoryGrid"></div>
             </div>
@@ -330,12 +344,14 @@
     <!-- 详情弹窗 -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
         <div class="modal-dialog" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeModal()">✕</button>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
             <div class="modal-body" id="modalBody"></div>
-            <div class="like-section" id="likeSection" style="margin:16px 0;"></div>
-            <div class="comment-section" id="commentSection"></div>
+            <div id="likeSection" style="margin:16px 0;"></div>
+            <div id="commentSection"></div>
         </div>
     </div>
+
+    <button class="back-top" id="backTop" onclick="scrollToTop()" title="返回顶部">&#8593;</button>
 
     <script>
         const API_BASE = 'https://galgame-api.fanggal.workers.dev';
@@ -344,29 +360,26 @@
             if (!id) { id = 'u_' + Date.now() + Math.random().toString(36).slice(2,9); localStorage.setItem('gl_userId', id); }
             return id;
         })();
-        const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','猎奇','悬疑','青春','校园','恋爱','战斗','Key社','催泪'];
+        const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','猎奇','悬疑','青春','校园','恋爱','战斗','后宫','催泪'];
 
         let gamesData = [];
         let currentPage = 'home';
         let currentFilter = 'all';
-        let bannerIndex = 0;
-        let bannerTimer;
-        let onlineSeconds = 0;
+        let bannerIndex = 0, bannerTimer, onlineSec = 0;
 
-        // ============ 主题切换 ============
+        // 主题切换
         function toggleTheme() {
-            document.body.classList.toggle('light-theme');
-            const isLight = document.body.classList.contains('light-theme');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            document.getElementById('themeToggle').textContent = isLight ? '🌙' : '🌓';
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+            document.getElementById('themeToggle').innerHTML = document.body.classList.contains('dark') ? '&#9788;' : '&#9789;';
         }
         (function initTheme() {
-            const saved = localStorage.getItem('theme') || 'dark';
-            if (saved === 'light') document.body.classList.add('light-theme');
-            document.getElementById('themeToggle').textContent = saved === 'light' ? '🌙' : '🌓';
+            const saved = localStorage.getItem('theme') || 'light';
+            if (saved === 'dark') document.body.classList.add('dark');
+            document.getElementById('themeToggle').innerHTML = saved === 'dark' ? '&#9788;' : '&#9789;';
         })();
 
-        // ============ 数据加载 ============
+        // 数据加载
         async function fetchGames() {
             try { gamesData = await (await fetch(API_BASE + '/api/games')).json(); }
             catch { gamesData = []; }
@@ -376,23 +389,21 @@
             });
         }
 
-        // ============ 粒子背景 ============
+        // 粒子背景
         function initParticles() {
             const canvas = document.getElementById('particleCanvas');
             const ctx = canvas.getContext('2d');
             let particles = [];
             const count = window.innerWidth < 768 ? 40 : 80;
-            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
             resize(); window.addEventListener('resize', resize);
-            for (let i=0; i<count; i++) {
-                particles.push({
-                    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
-                    vx: (Math.random()-0.5)*0.7, vy: (Math.random()-0.5)*0.7,
-                    size: Math.random()*2.5+0.8,
-                    alpha: Math.random()*0.6+0.2,
-                    color: Math.random()<0.5 ? '179,71,234' : '255,45,120'
-                });
-            }
+            for (let i=0; i<count; i++) particles.push({
+                x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+                vx: (Math.random()-0.5)*0.6, vy: (Math.random()-0.5)*0.6,
+                size: Math.random()*2.5+0.6,
+                alpha: Math.random()*0.5+0.2,
+                color: Math.random()<0.5 ? '107,165,204' : '212,123,140'
+            });
             function draw() {
                 ctx.clearRect(0,0,canvas.width,canvas.height);
                 particles.forEach(p => {
@@ -403,7 +414,6 @@
                     ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
                     ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
                     ctx.fill();
-                    // 光晕
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.size*3, 0, Math.PI*2);
                     ctx.fillStyle = `rgba(${p.color},${p.alpha*0.1})`;
@@ -414,7 +424,7 @@
             draw();
         }
 
-        // ============ 路由与页面保持 ============
+        // 路由保持
         function updateHash(hash) { window.location.hash = hash; }
         function handleRoute() {
             const hash = window.location.hash.slice(1);
@@ -433,7 +443,7 @@
         function navigateTo(page, silent = false) {
             if (!silent) {
                 document.getElementById('mainContent').classList.add('glitch-effect');
-                setTimeout(() => document.getElementById('mainContent').classList.remove('glitch-effect'), 350);
+                setTimeout(() => document.getElementById('mainContent').classList.remove('glitch-effect'), 300);
             }
             currentPage = page;
             document.getElementById('homeView').style.display = page === 'home' ? 'block' : 'none';
@@ -446,7 +456,6 @@
             window.scrollTo({ top:0, behavior:'smooth' });
         }
 
-        // ============ 首页 ============
         function renderHome() {
             const featured = gamesData.filter(g => g.featured);
             const banner = document.getElementById('bannerSection');
@@ -455,32 +464,28 @@
                 banner.innerHTML = `
                     <div class="banner-bg" style="background-image:url('${game.bannerBg || game.cover}')"></div>
                     <div class="banner-info">
-                        <span style="background:var(--neon-pink);padding:4px 12px;border-radius:12px;font-size:0.75rem;">🔥 推荐</span>
+                        <span style="background:var(--accent-pink);padding:3px 12px;border-radius:12px;font-size:0.75rem;color:#fff;">推荐</span>
                         <h2>${game.title}</h2>
                         <p style="opacity:0.9;">${game.description?.slice(0,60) || ''}...</p>
                     </div>
                     <div class="banner-dots">${featured.map((_,i) => `<span class="${i===bannerIndex%featured.length?'active':''}" onclick="goToBanner(${i})"></span>`).join('')}</div>`;
-            } else banner.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);">暂无推荐</div>';
+            } else banner.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-light);">暂无推荐</div>';
 
             const grid = document.getElementById('featuredGrid');
             const display = featured.length >= 8 ? featured : [...featured, ...gamesData.filter(g=>!g.featured)].slice(0,8);
-            grid.innerHTML = display.length ? display.map(g => createCard(g)).join('') : '<div style="grid-column:1/-1;text-align:center;">还没有游戏，快去添加吧~</div>';
+            grid.innerHTML = display.length ? display.map(g => createCard(g)).join('') : '<div style="grid-column:1/-1;text-align:center;color:var(--text-light);">还没有游戏，去添加吧</div>';
 
-            document.getElementById('homeTagCloud').innerHTML = COMMON_TAGS.map(t => `<span class="tag" style="cursor:pointer;" onclick="goToTag('${t}')"># ${t}</span>`).join('');
+            document.getElementById('homeTagCloud').innerHTML = COMMON_TAGS.map(t => `<span class="tag" style="cursor:pointer;" onclick="goToTag('${t}')">${t}</span>`).join('');
 
             clearInterval(bannerTimer);
-            bannerTimer = setInterval(() => {
-                bannerIndex++;
-                renderHome();
-            }, 5000);
+            bannerTimer = setInterval(() => { bannerIndex++; renderHome(); }, 5000);
         }
-
         function goToBanner(idx) { bannerIndex = idx; renderHome(); }
 
         function createCard(game) {
             let tags = '';
             game.platforms?.forEach(p => tags += `<span class="tag">${p.type==='PC'?'PC':p.sub||'安卓'}</span>`);
-            if (game.isChinese) tags += '<span class="tag">汉化</span>';
+            if (game.isChinese) tags += '<span class="tag hot">汉化</span>';
             return `<div class="game-card" onclick="openGameDetail(${game.id})">
                 <img class="card-cover" src="${game.cover}" loading="lazy">
                 <div class="card-body"><div class="card-title">${game.title}</div><div class="card-tags">${tags}</div></div>
@@ -489,42 +494,42 @@
 
         function goToTag(tag) { currentFilter = tag; navigateTo('category'); }
 
-        // ============ 分类页 ============
         function renderCategory() {
             let filtered = gamesData;
-            const filter = currentFilter;
-            if (filter !== 'all') {
-                if (['PC','Android','krkr','Ty','ONS','android_direct'].includes(filter)) {
-                    filtered = gamesData.filter(g => g.platforms?.some(p => p.type===filter || p.sub===filter));
-                } else if (filter === 'chinese') filtered = gamesData.filter(g => g.isChinese);
-                else filtered = gamesData.filter(g => g.tags?.includes(filter));
+            const f = currentFilter;
+            if (f !== 'all') {
+                if (['PC','Android','krkr','Ty','ONS','android_direct'].includes(f)) {
+                    filtered = gamesData.filter(g => g.platforms?.some(p => p.type===f || p.sub===f));
+                } else if (f === 'chinese') filtered = gamesData.filter(g => g.isChinese);
+                else filtered = gamesData.filter(g => g.tags?.includes(f));
             }
             document.getElementById('categoryGrid').innerHTML = filtered.map(g => createCard(g)).join('');
             const filters = ['all','PC','Android','krkr','Ty','ONS','android_direct','chinese',...COMMON_TAGS];
-            document.getElementById('filterSection').innerHTML = filters.map(f => {
-                const label = f==='android_direct'?'安卓直装':f==='chinese'?'汉化':f;
-                return `<button class="filter-btn ${currentFilter===f?'active':''}" onclick="setFilter('${f}')">${label}</button>`;
+            document.getElementById('filterSection').innerHTML = filters.map(ft => {
+                const label = ft==='android_direct'?'安卓直装':ft==='chinese'?'汉化':ft;
+                return `<button class="filter-btn ${currentFilter===ft?'active':''}" onclick="setFilter('${ft}')">${label}</button>`;
             }).join('');
         }
         function setFilter(f) { currentFilter = f; renderCategory(); }
 
-        // ============ 游戏详情 ============
+        // 游戏详情
         async function openGameDetail(id) {
             const game = gamesData.find(g => g.id == id); if (!game) return;
             const modal = document.getElementById('modalOverlay');
-            const platformNames = { PC:'💻 PC版', krkr:'📱 krkr', Ty:'📱 Tyranor', ONS:'📱 ONS', android_direct:'📱 安卓直装' };
+            const platformNames = { PC:'PC版', krkr:'krkr', Ty:'Tyranor', ONS:'ONS', android_direct:'安卓直装' };
             const keys = ['PC','krkr','Ty','ONS','android_direct'];
             let dlHtml = '';
             keys.forEach(k => {
                 const has = game.platforms?.some(p => (k==='PC'?p.type==='PC':p.sub===k));
                 const dl = game.downloads?.[k] || {};
-                const url = dl.url; const src = dl.source||''; const ins = dl.instructions||'';
+                const url = dl.url; const src = dl.source||'';
                 let cls = 'dl-btn'; let txt = platformNames[k];
                 if (!has) { cls += ' disabled'; txt += ' (无)'; }
-                else if (url) { txt += ` | ${src}`; }
+                else if (url) { txt += src ? ` | ${src}` : ''; }
                 else { txt += ' (待添加)'; }
-                dlHtml += `<button class="${cls}" ${url?`data-url="${url}" data-title="${game.title}" data-source="${src}" data-instructions="${ins}" onclick="confirmDownload(this)"`:''}>${txt}</button>`;
+                dlHtml += `<button class="${cls}" ${url?`data-url="${url}" data-title="${game.title}" data-source="${src}" data-instructions="${dl.instructions||''}" onclick="confirmDownload(this)"`:''}>${txt}</button>`;
             });
+
             document.getElementById('modalBody').innerHTML = `
                 <div class="modal-cover"><img src="${game.cover}"></div>
                 <div class="modal-info">
@@ -537,17 +542,17 @@
             // 点赞
             const likeRes = await fetch(`${API_BASE}/api/likes/${id}?userId=${userId}`).then(r=>r.json());
             document.getElementById('likeSection').innerHTML = `
-                <button class="like-btn ${likeRes.liked?'liked':''}" onclick="toggleLike(${id})">❤️ ${likeRes.liked?'已赞':'点赞'}</button>
-                <span style="color:var(--text-secondary);">${likeRes.count} 人赞过</span>`;
+                <button class="like-btn ${likeRes.liked?'liked':''}" onclick="toggleLike(${id})">&#10084; ${likeRes.liked?'已赞':'点赞'}</button>
+                <span style="margin-left:8px;color:var(--text-light);">${likeRes.count} 人赞过</span>`;
             // 评论
             const comm = await fetch(`${API_BASE}/api/comments/${id}`).then(r=>r.json());
             document.getElementById('commentSection').innerHTML = `
-                <h3 style="color:var(--text-primary);">💬 评论 (${comm.length})</h3>
-                ${comm.map(c=>`<div class="comment-item"><b>${esc(c.name)}</b> <small>${new Date(c.time).toLocaleString()}</small><p>${esc(c.text)}</p></div>`).join('')}
+                <h3 style="margin-bottom:8px;">评论 (${comm.length})</h3>
+                ${comm.map(c=>`<div class="comment-item"><b>${esc(c.name)}</b> <small style="color:var(--text-light);">${new Date(c.time).toLocaleString()}</small><p>${esc(c.text)}</p></div>`).join('')}
                 <div style="display:flex;gap:8px;margin-top:12px;">
-                    <input id="cmName" placeholder="你的名字" style="flex:1;padding:8px;border-radius:20px;border:1px solid var(--border-subtle);background:var(--bg-glass);color:var(--text-primary);">
-                    <input id="cmText" placeholder="写下评论..." style="flex:2;padding:8px;border-radius:20px;border:1px solid var(--border-subtle);background:var(--bg-glass);color:var(--text-primary);">
-                    <button class="dl-btn" onclick="submitComment(${id})">发送 ✨</button>
+                    <input id="cmName" placeholder="名字" style="flex:1;padding:8px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);">
+                    <input id="cmText" placeholder="写下评论..." style="flex:2;padding:8px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);">
+                    <button class="dl-btn" onclick="submitComment(${id})">发送</button>
                 </div>`;
             modal.classList.add('open');
             updateHash(`detail/${id}`);
@@ -570,27 +575,26 @@
             updateHash('home');
         }
 
-        // 下载确认弹窗
+        // 下载确认
         function confirmDownload(btn) {
             const { url, title, source, instructions } = btn.dataset;
             const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;';
             overlay.innerHTML = `
-                <div style="background:var(--bg-card);border:1px solid var(--neon-purple);border-radius:var(--radius-lg);padding:24px;max-width:420px;width:90%;box-shadow:0 0 40px rgba(179,71,234,0.5);" onclick="event.stopPropagation()">
-                    <h3 style="color:var(--neon-purple);">📥 确认下载</h3>
+                <div style="background:var(--bg-modal);border:1px solid var(--primary);border-radius:var(--radius);padding:24px;max-width:420px;width:90%;box-shadow:0 0 30px rgba(75,139,180,0.3);" onclick="event.stopPropagation()">
+                    <h3 style="color:var(--primary);">确认下载</h3>
                     <p style="margin:8px 0;"><b>游戏：</b>${title}</p>
-                    <p style="margin:8px 0;"><b>来源：</b><span style="color:var(--neon-cyan);">${source||'未知'}</span></p>
-                    ${instructions ? `<div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin:8px 0;"><b>📝 使用说明：</b><br>${instructions}</div>` : ''}
+                    <p style="margin:8px 0;"><b>来源：</b><span style="color:var(--accent-green);">${source||'未知'}</span></p>
+                    ${instructions ? `<div style="background:rgba(75,139,180,0.08);padding:10px;border-radius:8px;margin:8px 0;"><b>说明：</b><br>${instructions}</div>` : ''}
                     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
-                        <button onclick="this.closest('div[style*='position:fixed']').remove()" style="padding:8px 20px;border-radius:20px;border:1px solid var(--border-subtle);background:transparent;color:var(--text-primary);cursor:pointer;">取消</button>
-                        <button onclick="window.open('${url}','_blank');this.closest('div[style*='position:fixed']').remove()" style="padding:8px 24px;border-radius:20px;border:none;background:var(--neon-purple);color:#fff;cursor:pointer;font-weight:600;">确认下载</button>
+                        <button onclick="this.closest('div[style*='position:fixed']').remove()" style="padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;">取消</button>
+                        <button onclick="window.open('${url}','_blank');this.closest('div[style*='position:fixed']').remove()" style="padding:8px 24px;border-radius:20px;border:none;background:var(--primary);color:#fff;cursor:pointer;font-weight:600;">确认下载</button>
                     </div>
                 </div>`;
             overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
             document.body.appendChild(overlay);
         }
 
-        // 搜索
         function handleSearch(q) {
             if (!q.trim()) { navigateTo('home'); return; }
             const results = gamesData.filter(g => g.title.includes(q) || g.tags?.some(t=>t.includes(q)));
@@ -599,16 +603,19 @@
             document.getElementById('featuredGrid').innerHTML = results.map(g => createCard(g)).join('') || '<p>未找到</p>';
         }
 
-        // 在线计时
         setInterval(() => {
-            onlineSeconds++;
-            const h = Math.floor(onlineSeconds/3600);
-            const m = Math.floor(onlineSeconds%3600/60);
-            const s = onlineSeconds%60;
-            document.getElementById('onlineTimer').textContent = `⏱️ 在线 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            onlineSec++;
+            const h = Math.floor(onlineSec/3600);
+            const m = Math.floor(onlineSec%3600/60);
+            const s = onlineSec%60;
+            document.getElementById('onlineTimer').textContent = `在线 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }, 1000);
 
-        // 初始化
+        window.onscroll = () => {
+            document.getElementById('backTop').style.display = window.scrollY > 400 ? 'flex' : 'none';
+        };
+        function scrollToTop() { window.scrollTo({top:0, behavior:'smooth'}); }
+
         window.addEventListener('load', async () => {
             await fetchGames();
             document.getElementById('bootScreen').classList.add('hidden');
