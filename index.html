@@ -3,257 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NekoGalgame - 琉璃资源库</title>
+    <title>Galfang</title>
     <style>
-        /* ========== 浅色主题（默认） ========== */
         :root {
-            --bg: #f5f2f9;
-            --bg-card: rgba(255, 255, 255, 0.85);
-            --bg-nav: rgba(255, 255, 255, 0.7);
-            --bg-modal: rgba(255, 255, 255, 0.95);
-            --text: #2d2535;
-            --text-secondary: #6b5e7a;
-            --border: rgba(100, 80, 130, 0.15);
+            --bg-deep: #0a0a0f;
+            --bg-card: rgba(18, 16, 28, 0.8);
+            --bg-glass: rgba(20, 18, 35, 0.6);
+            --neon-purple: #b347ea;
+            --neon-pink: #ff2d78;
+            --neon-cyan: #00e5ff;
+            --text-primary: #e0dce8;
+            --text-secondary: #a09bb5;
+            --border-glow: rgba(179, 71, 234, 0.5);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --shadow-neon: 0 0 25px rgba(179, 71, 234, 0.4), 0 0 60px rgba(179, 71, 234, 0.15);
+            --shadow-pink: 0 0 20px rgba(255, 45, 120, 0.45);
+            --font-main: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
+        }
+        /* 浅色主题变量 */
+        body.light-theme {
+            --bg-deep: #f5f2fa;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-glass: rgba(255, 255, 255, 0.7);
             --neon-purple: #9b4dca;
             --neon-pink: #e63964;
-            --neon-cyan: #0ba7b0;
-            --shadow: 0 8px 24px rgba(120, 80, 160, 0.12);
-            --shadow-hover: 0 12px 32px rgba(155, 77, 202, 0.25);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
-            --font: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --neon-cyan: #0fa3a8;
+            --text-primary: #2a2035;
+            --text-secondary: #5e5570;
+            --border-glow: rgba(155, 77, 202, 0.5);
+            --border-subtle: rgba(100, 80, 130, 0.15);
+            --shadow-neon: 0 0 20px rgba(155, 77, 202, 0.25);
+            --shadow-pink: 0 0 15px rgba(230, 57, 100, 0.3);
         }
 
-        /* ========== 黑夜主题 ========== */
-        body.dark {
-            --bg: #0f0c18;
-            --bg-card: rgba(25, 20, 40, 0.85);
-            --bg-nav: rgba(15, 12, 24, 0.7);
-            --bg-modal: rgba(22, 18, 35, 0.95);
-            --text: #e4dff0;
-            --text-secondary: #9b8eac;
-            --border: rgba(200, 180, 220, 0.1);
-            --neon-purple: #c165f5;
-            --neon-pink: #ff4d7a;
-            --neon-cyan: #3de0e8;
-            --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            --shadow-hover: 0 12px 32px rgba(193, 101, 245, 0.3);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; font-size: 16px; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; font-size:16px; }
         body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-main);
             min-height: 100vh;
             overflow-x: hidden;
-            line-height: 1.6;
-            transition: background 0.4s, color 0.4s;
+            line-height:1.6;
+            transition: background 0.5s, color 0.5s;
         }
-
-        /* 粒子画布 */
         #particleCanvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; pointer-events: none; opacity: 0.5;
+            position:fixed; top:0; left:0; width:100%; height:100%;
+            z-index:0; pointer-events:none;
         }
-        body.dark #particleCanvas { opacity: 0.8; }
-
         /* 启动屏 */
         #bootScreen {
-            position: fixed; inset: 0; z-index: 9999; background: #0f0c18;
-            display: flex; align-items: center; justify-content: center;
-            flex-direction: column; font-family: monospace;
+            position:fixed; inset:0; z-index:9999; background:#06060b;
+            display:flex; align-items:center; justify-content:center;
+            flex-direction:column; font-family:monospace;
             transition: opacity 0.7s, visibility 0.7s;
         }
-        #bootScreen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-        .boot-box {
-            background: rgba(10, 8, 20, 0.9); border: 1px solid #b347ea;
-            border-radius: 12px; padding: 30px 40px; max-width: 500px; width: 90%;
-            box-shadow: 0 0 40px rgba(179, 71, 234, 0.3);
+        #bootScreen.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+        .boot-container {
+            background:rgba(10,8,20,0.9); border:1px solid #b347ea;
+            border-radius:12px; padding:30px 40px; max-width:600px; width:90%;
+            box-shadow:0 0 40px rgba(179,71,234,0.4);
+            position:relative; overflow:hidden;
         }
         .boot-line {
-            color: #7ecf8a; font-size: 0.8rem; margin: 4px 0;
-            opacity: 0; animation: bootIn 0.25s forwards;
+            color:#7ecf8a; font-size:0.8rem; margin:4px 0;
+            opacity:0; animation:bootIn 0.25s forwards;
         }
-        .boot-line:nth-child(2) { animation-delay: 0.2s; }
-        .boot-line:nth-child(3) { animation-delay: 0.45s; }
-        .boot-line:nth-child(4) { animation-delay: 0.7s; }
-        .boot-line:nth-child(5) { animation-delay: 0.95s; }
-        .boot-line:nth-child(6) { animation-delay: 1.2s; color: #f0c060; }
-        .boot-line:nth-child(7) { animation-delay: 1.5s; color: #ff2d78; }
-        @keyframes bootIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .boot-line:nth-child(2){animation-delay:.2s}
+        .boot-line:nth-child(3){animation-delay:.45s}
+        .boot-line:nth-child(4){animation-delay:.7s}
+        .boot-line:nth-child(5){animation-delay:.95s}
+        .boot-line:nth-child(6){animation-delay:1.2s;color:#f0c060}
+        .boot-line:nth-child(7){animation-delay:1.5s;color:#ff2d78}
+        @keyframes bootIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
 
-        #appContainer { position: relative; z-index: 1; opacity: 0; transition: opacity 0.6s 0.3s; }
-        #appContainer.visible { opacity: 1; }
+        #appContainer { position:relative; z-index:1; opacity:0; transition: opacity 0.6s 0.3s; }
+        #appContainer.visible { opacity:1; }
 
         /* 导航栏 */
         .nav-bar {
-            position: sticky; top: 0; z-index: 100;
-            background: var(--bg-nav); backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-            padding: 0 24px; height: 60px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: var(--shadow); transition: background 0.4s;
+            position:sticky; top:0; z-index:100;
+            background:rgba(10,8,22,0.7); backdrop-filter:blur(20px);
+            border-bottom:1px solid var(--border-subtle);
+            padding:0 24px; height:60px;
+            display:flex; align-items:center; justify-content:space-between;
+            box-shadow:0 4px 30px rgba(0,0,0,0.5);
+            transition:all 0.3s;
+        }
+        body.light-theme .nav-bar {
+            background:rgba(255,255,255,0.7);
+            box-shadow:0 4px 20px rgba(0,0,0,0.08);
         }
         .nav-logo {
-            font-size: 1.4rem; font-weight: 800; cursor: pointer;
-            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size:1.5rem; font-weight:900; cursor:pointer;
+            background:linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            white-space:nowrap; transition:0.2s;
         }
-        .nav-links { display: flex; gap: 6px; list-style: none; }
+        .nav-logo:hover { filter:brightness(1.2); transform:scale(1.03); }
+        .nav-links { display:flex; gap:8px; list-style:none; }
         .nav-links button {
-            background: transparent; border: none; color: var(--text-secondary);
-            padding: 8px 16px; border-radius: 24px; font-size: 0.9rem;
-            cursor: pointer; transition: all var(--transition);
+            background:transparent; border:none; color:var(--text-secondary);
+            padding:8px 16px; border-radius:20px; font-size:0.9rem;
+            cursor:pointer; transition:all var(--transition);
         }
         .nav-links button:hover, .nav-links button.active {
-            background: rgba(155, 77, 202, 0.15); color: var(--neon-purple);
+            color:#fff; background:rgba(179,71,234,0.25);
+            box-shadow:0 0 15px rgba(179,71,234,0.4);
         }
-        .nav-actions { display: flex; align-items: center; gap: 10px; }
-        .theme-toggle {
-            width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
-            background: var(--bg-card); cursor: pointer; font-size: 1.2rem;
-            display: flex; align-items: center; justify-content: center;
-            transition: all var(--transition);
+        .nav-actions { display:flex; align-items:center; gap:12px; }
+        .theme-btn {
+            background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle);
+            color:var(--text-primary); width:38px; height:38px;
+            border-radius:50%; cursor:pointer; font-size:1.2rem;
+            display:flex; align-items:center; justify-content:center;
+            transition:all var(--transition);
         }
+        .theme-btn:hover { border-color:var(--neon-purple); box-shadow:0 0 12px rgba(179,71,234,0.4); }
         .search-box {
-            display: flex; align-items: center; background: var(--bg-card);
-            border: 1px solid var(--border); border-radius: 24px;
-            padding: 6px 16px; transition: all var(--transition);
+            display:flex; align-items:center; background:rgba(255,255,255,0.04);
+            border:1px solid var(--border-subtle); border-radius:25px;
+            padding:6px 16px; transition:all var(--transition);
         }
-        .search-box:focus-within { border-color: var(--neon-purple); box-shadow: 0 0 0 3px rgba(155,77,202,0.15); }
+        .search-box:focus-within {
+            border-color:var(--neon-purple); box-shadow:0 0 15px rgba(179,71,234,0.3);
+            background:rgba(255,255,255,0.07);
+        }
         .search-box input {
-            background: transparent; border: none; color: var(--text);
-            outline: none; font-size: 0.85rem; width: 120px;
+            background:transparent; border:none; color:var(--text-primary);
+            outline:none; font-size:0.85rem; width:140px;
         }
-        .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; }
-        .hamburger span {
-            width: 24px; height: 2px; background: var(--text); border-radius: 2px;
+        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
+        .hamburger span { width:26px; height:2.5px; background:var(--text-primary); border-radius:2px; }
+
+        .main-content { padding:20px 24px 40px; max-width:1300px; margin:0 auto; }
+        .glitch-effect { animation: glitch 0.35s ease; }
+        @keyframes glitch {
+            0%{transform:translate(0)} 20%{transform:translate(-5px,2px); filter:hue-rotate(15deg)}
+            40%{transform:translate(5px,-2px)} 60%{transform:translate(-3px,-3px)}
+            80%{transform:translate(3px,3px)} 100%{transform:translate(0)}
         }
 
-        .main-content { padding: 24px; max-width: 1300px; margin: 0 auto; min-height: 70vh; }
+        .banner-section {
+            position:relative; height:280px; border-radius:var(--radius-lg);
+            overflow:hidden; margin-bottom:24px; border:1px solid var(--border-subtle);
+            box-shadow:var(--shadow-neon); background:#0d0b1a;
+        }
+        .banner-bg {
+            position:absolute; inset:0; background-size:cover;
+            background-position:center; filter:brightness(0.45);
+            transition:0.7s;
+        }
+        .banner-info {
+            position:absolute; bottom:30px; left:30px; z-index:2;
+            color:#fff; text-shadow:0 0 20px rgba(0,0,0,0.6);
+        }
+        .banner-info h2 { font-size:2rem; }
+        .banner-dots { position:absolute; bottom:16px; right:24px; display:flex; gap:8px; }
+        .banner-dots span {
+            width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.4);
+            cursor:pointer; transition:0.2s;
+        }
+        .banner-dots span.active { background:var(--neon-pink); box-shadow:0 0 10px var(--neon-pink); }
 
-        /* 游戏卡片网格 */
         .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
+            display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+            gap:20px;
         }
         .game-card {
-            background: var(--bg-card); border-radius: var(--radius);
-            overflow: hidden; cursor: pointer; border: 1px solid var(--border);
-            transition: all var(--transition); backdrop-filter: blur(8px);
+            background:var(--bg-card); border-radius:var(--radius-md);
+            overflow:hidden; cursor:pointer; border:1px solid var(--border-subtle);
+            transition:all 0.3s cubic-bezier(0.2,0,0,1);
+            backdrop-filter:blur(10px); position:relative;
         }
         .game-card:hover {
-            transform: translateY(-6px); border-color: var(--neon-purple);
-            box-shadow: var(--shadow-hover);
+            transform:translateY(-8px); border-color:var(--border-glow);
+            box-shadow:var(--shadow-neon); z-index:5;
         }
         .card-cover {
-            width: 100%; aspect-ratio: 3/4; object-fit: cover;
-            background: linear-gradient(135deg, #d5c8e8, #e8dff5);
+            width:100%; aspect-ratio:3/4; object-fit:cover;
+            background:linear-gradient(135deg, #1a1535, #251840);
+            transition:0.3s;
         }
-        .card-body { padding: 12px; }
-        .card-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; }
-        .card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .game-card:hover .card-cover { filter:brightness(1.15); }
+        .card-body { padding:12px; }
+        .card-title { font-weight:700; font-size:0.95rem; margin-bottom:6px; }
+        .card-tags { display:flex; flex-wrap:wrap; gap:4px; }
         .tag {
-            font-size: 0.7rem; padding: 2px 8px; border-radius: 8px;
-            background: rgba(155, 77, 202, 0.1); color: var(--neon-purple);
+            font-size:0.68rem; padding:2px 8px; border-radius:8px;
+            background:rgba(179,71,234,0.2); color:#c084f5;
+            white-space:nowrap;
         }
+        body.light-theme .tag { background:rgba(155,77,202,0.15); color:#7c3aed; }
 
-        /* 分类筛选 */
-        .filter-section { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+        .filter-section { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 24px; }
         .filter-btn {
-            padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
-            background: var(--bg-card); color: var(--text-secondary);
-            cursor: pointer; font-size: 0.8rem; transition: all var(--transition);
+            padding:6px 16px; border-radius:20px; border:1px solid var(--border-subtle);
+            background:rgba(255,255,255,0.03); color:var(--text-secondary);
+            cursor:pointer; font-size:0.8rem; transition:all var(--transition);
         }
-        .filter-btn.active { background: var(--neon-purple); color: #fff; border-color: var(--neon-purple); }
+        .filter-btn.active, .filter-btn:hover {
+            background:rgba(179,71,234,0.25); color:#fff;
+            border-color:var(--neon-purple); box-shadow:0 0 12px rgba(179,71,234,0.4);
+        }
 
         /* 模态框 */
         .modal-overlay {
-            position: fixed; inset: 0; z-index: 200;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; visibility: hidden; transition: all 0.25s;
+            position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.75);
+            backdrop-filter:blur(10px); display:flex; align-items:center;
+            justify-content:center; opacity:0; visibility:hidden;
+            transition:0.25s;
         }
-        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal-overlay.open { opacity:1; visibility:visible; }
         .modal-dialog {
-            background: var(--bg-modal); border-radius: var(--radius);
-            padding: 28px; max-width: 800px; width: 90%; max-height: 85vh;
-            overflow-y: auto; position: relative; border: 1px solid var(--border);
-            box-shadow: var(--shadow-hover);
+            background:rgba(18,16,30,0.9); border:1px solid var(--neon-purple);
+            border-radius:var(--radius-lg); padding:28px;
+            max-width:850px; width:100%; max-height:85vh; overflow-y:auto;
+            box-shadow:0 0 50px rgba(179,71,234,0.4);
+            backdrop-filter:blur(20px); animation:modalIn 0.3s;
         }
+        body.light-theme .modal-dialog {
+            background:rgba(255,255,255,0.9);
+            backdrop-filter:blur(30px);
+        }
+        @keyframes modalIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
         .modal-close {
-            position: sticky; top: 0; float: right; z-index: 10;
-            width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
-            background: var(--bg-card); cursor: pointer; font-size: 1.1rem;
-            display: flex; align-items: center; justify-content: center;
+            position:sticky; top:0; float:right; width:36px; height:36px;
+            border-radius:50%; border:1px solid var(--border-subtle);
+            background:rgba(0,0,0,0.5); color:#fff; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
         }
-        .modal-body { display: flex; gap: 24px; flex-wrap: wrap; }
-        .modal-cover img { width: 200px; aspect-ratio: 3/4; object-fit: cover; border-radius: var(--radius-sm); }
-        .modal-info { flex: 1; min-width: 240px; }
-        .modal-info h2 { font-size: 1.4rem; margin-bottom: 10px; }
-        .modal-desc { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 12px 0; }
-        .preview-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
-        .preview-row img { width: 80px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
-        .dl-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .modal-body { display:flex; gap:20px; flex-wrap:wrap; }
+        .modal-cover img { width:200px; aspect-ratio:3/4; object-fit:cover; border-radius:var(--radius-sm); }
+        .modal-info { flex:1; min-width:250px; }
+        .modal-info h2 { font-size:1.5rem; margin-bottom:10px; }
+        .modal-desc { color:var(--text-secondary); line-height:1.7; margin:12px 0; }
+        .preview-row { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
+        .preview-row img { width:80px; height:60px; object-fit:cover; border-radius:6px; border:1px solid var(--border-subtle); }
+        .dl-btns { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
         .dl-btn {
-            padding: 8px 16px; border-radius: 20px; border: 1px solid var(--neon-purple);
-            background: rgba(155,77,202,0.1); color: var(--neon-purple);
-            cursor: pointer; font-weight: 600; font-size: 0.85rem;
-            transition: all var(--transition);
+            padding:8px 18px; border-radius:25px; border:1px solid var(--neon-purple);
+            background:rgba(179,71,234,0.15); color:#fff; cursor:pointer;
+            font-weight:600; font-size:0.85rem; transition:all var(--transition);
         }
-        .dl-btn:hover { background: var(--neon-purple); color: #fff; }
-        .dl-btn.disabled { opacity: 0.4; pointer-events: none; }
+        .dl-btn:hover { background:rgba(179,71,234,0.4); box-shadow:0 0 20px rgba(179,71,234,0.5); transform:translateY(-2px); }
+        .dl-btn.disabled { opacity:0.4; pointer-events:none; }
         .like-btn {
-            padding: 6px 16px; border-radius: 20px; border: 1px solid var(--neon-pink);
-            background: rgba(230,57,100,0.1); color: var(--neon-pink);
-            cursor: pointer; font-weight: 600; transition: all var(--transition);
+            padding:6px 18px; border-radius:20px; border:1px solid var(--neon-pink);
+            background:rgba(255,45,120,0.15); color:#ff6b98; cursor:pointer;
+            font-weight:600; transition:all var(--transition);
         }
-        .like-btn.liked { background: var(--neon-pink); color: #fff; }
-        .comment-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
-        .comment-item { padding: 10px; background: var(--bg-card); border-radius: 8px; margin-bottom: 8px; }
+        .like-btn.liked { background:rgba(255,45,120,0.4); color:#fff; box-shadow:0 0 15px rgba(255,45,120,0.4); }
+        .comment-item {
+            background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle);
+            border-radius:8px; padding:10px; margin-bottom:8px;
+        }
 
-        @media (max-width: 768px) {
-            .nav-links { position: fixed; top: 60px; left: 0; right: 0; background: var(--bg-nav); backdrop-filter: blur(16px); flex-direction: column; padding: 16px; display: none; }
-            .nav-links.open { display: flex; }
-            .hamburger { display: flex; }
-            .search-box input { width: 80px; }
-            .game-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        @media (max-width:768px) {
+            .nav-links { position:fixed; top:60px; left:0; right:0; background:rgba(10,8,22,0.95); backdrop-filter:blur(20px); flex-direction:column; padding:16px; display:none; }
+            .nav-links.open { display:flex; }
+            .hamburger { display:flex; }
+            .search-box input { width:100px; }
+            .banner-section { height:200px; }
+            .game-grid { grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); }
+            .modal-body { flex-direction:column; }
+            .modal-cover img { max-width:180px; }
         }
     </style>
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
 
-    <!-- 启动动画 -->
+    <!-- 启动画面 -->
     <div id="bootScreen">
-        <div class="boot-box">
-            <div style="color:#00e5ff; font-size:0.85rem;">> 系统启动...</div>
-            <div class="boot-line">加载资源库索引</div>
-            <div class="boot-line">数据库校验 OK</div>
-            <div class="boot-line">加载渲染引擎</div>
-            <div class="boot-line">初始化粒子网络</div>
-            <div class="boot-line">正在加载资源库...</div>
-            <div class="boot-line">琉璃资源库已就绪 ▮</div>
+        <div class="boot-container">
+            <div style="color:var(--neon-cyan); margin-bottom:12px;">◆ NEKO_SYSTEM v3.7</div>
+            <div class="boot-line">> 加载资源库索引...</div>
+            <div class="boot-line">> 校验数据库完整性... OK</div>
+            <div class="boot-line">> 启动霓虹渲染引擎... OK</div>
+            <div class="boot-line">> 粒子网络初始化... OK</div>
+            <div class="boot-line">> 正在加载资源库...</div>
+            <div class="boot-line">> 佐久真诗已就绪 ▮</div>
         </div>
     </div>
 
+    <!-- 主界面 -->
     <div id="appContainer">
         <nav class="nav-bar">
             <div class="nav-logo" onclick="navigateTo('home')">🐾 NekoGalgame</div>
             <ul class="nav-links" id="navLinks">
-                <li><button onclick="navigateTo('home')" data-page="home" class="active">首页</button></li>
-                <li><button onclick="navigateTo('category')" data-page="category">分类浏览</button></li>
+                <li><button onclick="navigateTo('home')" data-page="home" class="active">🏠 首页</button></li>
+                <li><button onclick="navigateTo('category')" data-page="category">📂 分类</button></li>
             </ul>
             <div class="nav-actions">
                 <div class="search-box">
                     <span>🔍</span>
-                    <input type="text" id="searchInput" placeholder="搜索..." oninput="handleSearch(this.value)">
+                    <input type="text" id="searchInput" placeholder="搜索游戏..." oninput="handleSearch(this.value)">
                 </div>
-                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌓</button>
+                <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌓</button>
                 <div class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">
                     <span></span><span></span><span></span>
                 </div>
@@ -263,13 +314,13 @@
         <div class="main-content" id="mainContent">
             <div id="homeView">
                 <div class="banner-section" id="bannerSection"></div>
-                <div class="home-tags" id="homeTagCloud" style="margin-bottom:20px;"></div>
-                <h3>🔥 精选推荐</h3>
+                <div class="home-tags" id="homeTagCloud" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;"></div>
+                <h2 class="section-title" style="color:var(--text-primary);">🔥 精选推荐</h2>
                 <div class="game-grid" id="featuredGrid"></div>
-                <div class="online-timer" id="onlineTimer" style="text-align:center;margin-top:30px;color:var(--text-secondary);">⏱️ 在线 00:00:00</div>
+                <div style="text-align:center;margin-top:30px;color:var(--text-secondary);" id="onlineTimer">⏱️ 在线 00:00:00</div>
             </div>
             <div id="categoryView" style="display:none;">
-                <h3>📂 全部作品</h3>
+                <h2 style="color:var(--text-primary);margin-bottom:16px;">📂 全部作品</h2>
                 <div class="filter-section" id="filterSection"></div>
                 <div class="game-grid" id="categoryGrid"></div>
             </div>
@@ -278,66 +329,84 @@
 
     <!-- 详情弹窗 -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
-        <div class="modal-dialog" id="modalDialog" onclick="event.stopPropagation()">
+        <div class="modal-dialog" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal()">✕</button>
             <div class="modal-body" id="modalBody"></div>
-            <div class="like-section" id="likeSection"></div>
+            <div class="like-section" id="likeSection" style="margin:16px 0;"></div>
             <div class="comment-section" id="commentSection"></div>
         </div>
     </div>
 
     <script>
         const API_BASE = 'https://galgame-api.fanggal.workers.dev';
-        let userId = localStorage.getItem('gl_userId') || (userId = 'u_' + Date.now() + Math.random().toString(36).slice(2,9), localStorage.setItem('gl_userId', userId), userId);
+        const userId = (() => {
+            let id = localStorage.getItem('gl_userId');
+            if (!id) { id = 'u_' + Date.now() + Math.random().toString(36).slice(2,9); localStorage.setItem('gl_userId', id); }
+            return id;
+        })();
         const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','猎奇','悬疑','青春','校园','恋爱','战斗','Key社','催泪'];
 
         let gamesData = [];
         let currentPage = 'home';
         let currentFilter = 'all';
-        let bannerIndex = 0, bannerTimer, onlineSec = 0;
+        let bannerIndex = 0;
+        let bannerTimer;
+        let onlineSeconds = 0;
 
-        // ========== 主题切换 ==========
+        // ============ 主题切换 ============
         function toggleTheme() {
-            document.body.classList.toggle('dark');
-            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-            document.getElementById('themeToggle').textContent = document.body.classList.contains('dark') ? '☀️' : '🌓';
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            document.getElementById('themeToggle').textContent = isLight ? '🌙' : '🌓';
         }
         (function initTheme() {
-            const saved = localStorage.getItem('theme') || 'light';
-            if (saved === 'dark') document.body.classList.add('dark');
-            document.getElementById('themeToggle').textContent = saved === 'dark' ? '☀️' : '🌓';
+            const saved = localStorage.getItem('theme') || 'dark';
+            if (saved === 'light') document.body.classList.add('light-theme');
+            document.getElementById('themeToggle').textContent = saved === 'light' ? '🌙' : '🌓';
         })();
 
-        // ========== 数据加载 ==========
+        // ============ 数据加载 ============
         async function fetchGames() {
             try { gamesData = await (await fetch(API_BASE + '/api/games')).json(); }
-            catch(e) { gamesData = []; }
+            catch { gamesData = []; }
             gamesData.forEach(g => {
-                g.downloads = g.downloads || { PC:{url:null}, krkr:{url:null}, Ty:{url:null}, ONS:{url:null}, android_direct:{url:null} };
+                g.downloads = g.downloads || { PC:{}, krkr:{}, Ty:{}, ONS:{}, android_direct:{} };
                 g.previewImages = g.previewImages || [];
             });
         }
 
-        // ========== 粒子背景 ==========
+        // ============ 粒子背景 ============
         function initParticles() {
             const canvas = document.getElementById('particleCanvas');
             const ctx = canvas.getContext('2d');
             let particles = [];
-            const count = window.innerWidth < 768 ? 30 : 70;
-            function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+            const count = window.innerWidth < 768 ? 40 : 80;
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
             resize(); window.addEventListener('resize', resize);
-            for (let i=0; i<count; i++) particles.push({
-                x: Math.random()*canvas.width, y: Math.random()*canvas.height,
-                vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5, r: Math.random()*2+1,
-            });
+            for (let i=0; i<count; i++) {
+                particles.push({
+                    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+                    vx: (Math.random()-0.5)*0.7, vy: (Math.random()-0.5)*0.7,
+                    size: Math.random()*2.5+0.8,
+                    alpha: Math.random()*0.6+0.2,
+                    color: Math.random()<0.5 ? '179,71,234' : '255,45,120'
+                });
+            }
             function draw() {
                 ctx.clearRect(0,0,canvas.width,canvas.height);
                 particles.forEach(p => {
                     p.x += p.vx; p.y += p.vy;
                     if (p.x<0) p.x=canvas.width; if (p.x>canvas.width) p.x=0;
                     if (p.y<0) p.y=canvas.height; if (p.y>canvas.height) p.y=0;
-                    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-                    ctx.fillStyle = document.body.classList.contains('dark') ? 'rgba(193,101,245,0.3)' : 'rgba(155,77,202,0.2)';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                    ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
+                    ctx.fill();
+                    // 光晕
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size*3, 0, Math.PI*2);
+                    ctx.fillStyle = `rgba(${p.color},${p.alpha*0.1})`;
                     ctx.fill();
                 });
                 requestAnimationFrame(draw);
@@ -345,14 +414,14 @@
             draw();
         }
 
-        // ========== 路由与页面保持 ==========
+        // ============ 路由与页面保持 ============
         function updateHash(hash) { window.location.hash = hash; }
         function handleRoute() {
             const hash = window.location.hash.slice(1);
             if (hash.startsWith('detail/')) {
                 const id = parseInt(hash.split('/')[1]);
                 navigateTo('home', true);
-                setTimeout(() => openGameDetail(id), 50);
+                setTimeout(() => openGameDetail(id), 100);
             } else if (hash === 'category') {
                 navigateTo('category', true);
             } else {
@@ -363,74 +432,87 @@
 
         function navigateTo(page, silent = false) {
             if (!silent) {
-                document.getElementById('mainContent').style.opacity = '0.6';
-                setTimeout(() => document.getElementById('mainContent').style.opacity = '1', 150);
+                document.getElementById('mainContent').classList.add('glitch-effect');
+                setTimeout(() => document.getElementById('mainContent').classList.remove('glitch-effect'), 350);
             }
             currentPage = page;
             document.getElementById('homeView').style.display = page === 'home' ? 'block' : 'none';
             document.getElementById('categoryView').style.display = page === 'category' ? 'block' : 'none';
             document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
-            const btn = document.querySelector(`.nav-links button[data-page="${page}"]`);
-            if (btn) btn.classList.add('active');
+            document.querySelector(`.nav-links button[data-page="${page}"]`)?.classList.add('active');
             if (page === 'home') renderHome();
             if (page === 'category') renderCategory();
             if (!silent) updateHash(page);
-            window.scrollTo({ top: 0 });
+            window.scrollTo({ top:0, behavior:'smooth' });
         }
 
-        // ========== 首页 ==========
+        // ============ 首页 ============
         function renderHome() {
             const featured = gamesData.filter(g => g.featured);
-            document.getElementById('bannerSection').innerHTML = featured.length ? `
-                <div style="position:relative;height:200px;border-radius:16px;overflow:hidden;margin-bottom:20px;background:var(--bg-card);">
-                    <img src="${featured[bannerIndex].bannerBg || featured[bannerIndex].cover}" style="width:100%;height:100%;object-fit:cover;filter:brightness(0.7);">
-                    <div style="position:absolute;bottom:20px;left:20px;color:#fff;"><h2>${featured[bannerIndex].title}</h2><p>${featured[bannerIndex].description?.slice(0,50)}</p></div>
-                </div>` : '';
-            document.getElementById('featuredGrid').innerHTML = (gamesData.filter(g => g.featured).length ? gamesData.filter(g => g.featured) : gamesData.slice(0,8)).map(g => createCard(g)).join('');
-            document.getElementById('homeTagCloud').innerHTML = COMMON_TAGS.map(t => `<span class="tag" style="cursor:pointer;" onclick="goToTag('${t}')">#${t}</span>`).join(' ');
+            const banner = document.getElementById('bannerSection');
+            if (featured.length) {
+                const game = featured[bannerIndex % featured.length];
+                banner.innerHTML = `
+                    <div class="banner-bg" style="background-image:url('${game.bannerBg || game.cover}')"></div>
+                    <div class="banner-info">
+                        <span style="background:var(--neon-pink);padding:4px 12px;border-radius:12px;font-size:0.75rem;">🔥 推荐</span>
+                        <h2>${game.title}</h2>
+                        <p style="opacity:0.9;">${game.description?.slice(0,60) || ''}...</p>
+                    </div>
+                    <div class="banner-dots">${featured.map((_,i) => `<span class="${i===bannerIndex%featured.length?'active':''}" onclick="goToBanner(${i})"></span>`).join('')}</div>`;
+            } else banner.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);">暂无推荐</div>';
+
+            const grid = document.getElementById('featuredGrid');
+            const display = featured.length >= 8 ? featured : [...featured, ...gamesData.filter(g=>!g.featured)].slice(0,8);
+            grid.innerHTML = display.length ? display.map(g => createCard(g)).join('') : '<div style="grid-column:1/-1;text-align:center;">还没有游戏，快去添加吧~</div>';
+
+            document.getElementById('homeTagCloud').innerHTML = COMMON_TAGS.map(t => `<span class="tag" style="cursor:pointer;" onclick="goToTag('${t}')"># ${t}</span>`).join('');
+
             clearInterval(bannerTimer);
-            bannerTimer = setInterval(() => { bannerIndex = (bannerIndex+1) % (gamesData.filter(g=>g.featured).length||1); renderHome(); }, 5000);
+            bannerTimer = setInterval(() => {
+                bannerIndex++;
+                renderHome();
+            }, 5000);
         }
 
+        function goToBanner(idx) { bannerIndex = idx; renderHome(); }
+
         function createCard(game) {
+            let tags = '';
+            game.platforms?.forEach(p => tags += `<span class="tag">${p.type==='PC'?'PC':p.sub||'安卓'}</span>`);
+            if (game.isChinese) tags += '<span class="tag">汉化</span>';
             return `<div class="game-card" onclick="openGameDetail(${game.id})">
                 <img class="card-cover" src="${game.cover}" loading="lazy">
-                <div class="card-body"><div class="card-title">${game.title}</div>
-                <div class="card-tags">${(game.platforms||[]).map(p => `<span class="tag">${p.type==='PC'?'PC':p.sub||'安卓'}</span>`).join('')}${game.isChinese?'<span class="tag">汉化</span>':''}</div></div>
+                <div class="card-body"><div class="card-title">${game.title}</div><div class="card-tags">${tags}</div></div>
             </div>`;
         }
 
         function goToTag(tag) { currentFilter = tag; navigateTo('category'); }
 
-        // ========== 分类页 ==========
+        // ============ 分类页 ============
         function renderCategory() {
             let filtered = gamesData;
-            if (currentFilter !== 'all') {
-                if (['PC','Android','krkr','Ty','ONS','android_direct'].includes(currentFilter)) {
-                    filtered = gamesData.filter(g => g.platforms?.some(p => (p.type===currentFilter) || (p.sub===currentFilter)));
-                } else if (currentFilter === 'chinese') filtered = gamesData.filter(g => g.isChinese);
-                else filtered = gamesData.filter(g => g.tags?.includes(currentFilter));
+            const filter = currentFilter;
+            if (filter !== 'all') {
+                if (['PC','Android','krkr','Ty','ONS','android_direct'].includes(filter)) {
+                    filtered = gamesData.filter(g => g.platforms?.some(p => p.type===filter || p.sub===filter));
+                } else if (filter === 'chinese') filtered = gamesData.filter(g => g.isChinese);
+                else filtered = gamesData.filter(g => g.tags?.includes(filter));
             }
             document.getElementById('categoryGrid').innerHTML = filtered.map(g => createCard(g)).join('');
-            document.getElementById('filterSection').innerHTML = `
-                <button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">全部</button>
-                <button class="filter-btn ${currentFilter==='PC'?'active':''}" onclick="setFilter('PC')">PC</button>
-                <button class="filter-btn ${currentFilter==='Android'?'active':''}" onclick="setFilter('Android')">安卓</button>
-                <button class="filter-btn ${currentFilter==='krkr'?'active':''}" onclick="setFilter('krkr')">krkr</button>
-                <button class="filter-btn ${currentFilter==='Ty'?'active':''}" onclick="setFilter('Ty')">Ty</button>
-                <button class="filter-btn ${currentFilter==='ONS'?'active':''}" onclick="setFilter('ONS')">ONS</button>
-                <button class="filter-btn ${currentFilter==='android_direct'?'active':''}" onclick="setFilter('android_direct')">安卓直装</button>
-                <button class="filter-btn ${currentFilter==='chinese'?'active':''}" onclick="setFilter('chinese')">汉化</button>
-                ${COMMON_TAGS.map(t => `<button class="filter-btn ${currentFilter===t?'active':''}" onclick="setFilter('${t}')">${t}</button>`).join('')}
-            `;
+            const filters = ['all','PC','Android','krkr','Ty','ONS','android_direct','chinese',...COMMON_TAGS];
+            document.getElementById('filterSection').innerHTML = filters.map(f => {
+                const label = f==='android_direct'?'安卓直装':f==='chinese'?'汉化':f;
+                return `<button class="filter-btn ${currentFilter===f?'active':''}" onclick="setFilter('${f}')">${label}</button>`;
+            }).join('');
         }
         function setFilter(f) { currentFilter = f; renderCategory(); }
 
-        // ========== 游戏详情 ==========
+        // ============ 游戏详情 ============
         async function openGameDetail(id) {
             const game = gamesData.find(g => g.id == id); if (!game) return;
             const modal = document.getElementById('modalOverlay');
-            const platformNames = { PC:'💻 PC', krkr:'📱 krkr', Ty:'📱 Ty', ONS:'📱 ONS', android_direct:'📱 直装' };
+            const platformNames = { PC:'💻 PC版', krkr:'📱 krkr', Ty:'📱 Tyranor', ONS:'📱 ONS', android_direct:'📱 安卓直装' };
             const keys = ['PC','krkr','Ty','ONS','android_direct'];
             let dlHtml = '';
             keys.forEach(k => {
@@ -443,38 +525,34 @@
                 else { txt += ' (待添加)'; }
                 dlHtml += `<button class="${cls}" ${url?`data-url="${url}" data-title="${game.title}" data-source="${src}" data-instructions="${ins}" onclick="confirmDownload(this)"`:''}>${txt}</button>`;
             });
-
             document.getElementById('modalBody').innerHTML = `
                 <div class="modal-cover"><img src="${game.cover}"></div>
                 <div class="modal-info">
                     <h2>${game.title}</h2>
-                    <div class="modal-tags">${(game.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+                    <div class="card-tags">${(game.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
                     <div class="modal-desc">${game.description||''}</div>
                     ${game.previewImages?.length ? `<div class="preview-row">${game.previewImages.map(u=>`<img src="${u}">`).join('')}</div>` : ''}
-                    <div class="dl-buttons">${dlHtml}</div>
+                    <div class="dl-btns">${dlHtml}</div>
                 </div>`;
-
             // 点赞
             const likeRes = await fetch(`${API_BASE}/api/likes/${id}?userId=${userId}`).then(r=>r.json());
             document.getElementById('likeSection').innerHTML = `
                 <button class="like-btn ${likeRes.liked?'liked':''}" onclick="toggleLike(${id})">❤️ ${likeRes.liked?'已赞':'点赞'}</button>
-                <span>${likeRes.count} 人赞过</span>`;
-
+                <span style="color:var(--text-secondary);">${likeRes.count} 人赞过</span>`;
             // 评论
-            const commRes = await fetch(`${API_BASE}/api/comments/${id}`).then(r=>r.json());
+            const comm = await fetch(`${API_BASE}/api/comments/${id}`).then(r=>r.json());
             document.getElementById('commentSection').innerHTML = `
-                <h4>💬 评论 (${commRes.length})</h4>
-                ${commRes.map(c=>`<div class="comment-item"><b>${escHtml(c.name)}</b> <small>${new Date(c.time).toLocaleString()}</small><p>${escHtml(c.text)}</p></div>`).join('')}
-                <div style="display:flex;gap:8px;margin-top:10px;">
-                    <input id="cmName" placeholder="名字" style="flex:1;padding:6px;border-radius:6px;border:1px solid var(--border);">
-                    <input id="cmText" placeholder="评论" style="flex:2;padding:6px;border-radius:6px;border:1px solid var(--border);">
-                    <button class="dl-btn" onclick="submitComment(${id})">发送</button>
+                <h3 style="color:var(--text-primary);">💬 评论 (${comm.length})</h3>
+                ${comm.map(c=>`<div class="comment-item"><b>${esc(c.name)}</b> <small>${new Date(c.time).toLocaleString()}</small><p>${esc(c.text)}</p></div>`).join('')}
+                <div style="display:flex;gap:8px;margin-top:12px;">
+                    <input id="cmName" placeholder="你的名字" style="flex:1;padding:8px;border-radius:20px;border:1px solid var(--border-subtle);background:var(--bg-glass);color:var(--text-primary);">
+                    <input id="cmText" placeholder="写下评论..." style="flex:2;padding:8px;border-radius:20px;border:1px solid var(--border-subtle);background:var(--bg-glass);color:var(--text-primary);">
+                    <button class="dl-btn" onclick="submitComment(${id})">发送 ✨</button>
                 </div>`;
             modal.classList.add('open');
             updateHash(`detail/${id}`);
         }
-
-        function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
         async function toggleLike(id) {
             await fetch(`${API_BASE}/api/likes/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId}) });
@@ -483,34 +561,33 @@
         async function submitComment(id) {
             const name = document.getElementById('cmName').value.trim();
             const text = document.getElementById('cmText').value.trim();
-            if (!name || !text) return;
+            if (!name||!text) return;
             await fetch(`${API_BASE}/api/comments/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, text}) });
             openGameDetail(id);
         }
-
-        // ========== 下载确认弹窗 (修复卡死) ==========
-        function confirmDownload(btn) {
-            const { url, title, source, instructions } = btn.dataset;
-            const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
-            overlay.innerHTML = `
-                <div style="background:var(--bg-modal);border-radius:16px;padding:24px;max-width:400px;width:90%;border:1px solid var(--neon-purple);" onclick="event.stopPropagation()">
-                    <h3>📥 确认下载</h3>
-                    <p><b>游戏：</b>${title}</p>
-                    <p><b>来源：</b>${source||'未知'}</p>
-                    ${instructions ? `<p style="background:var(--bg-card);padding:8px;border-radius:8px;"><b>说明：</b>${instructions}</p>` : ''}
-                    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
-                        <button onclick="this.closest('.modal-overlay, div').remove()" style="padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text);">取消</button>
-                        <button onclick="window.open('${url}','_blank');this.closest('.modal-overlay, div').remove()" style="padding:8px 20px;border-radius:20px;border:none;background:var(--neon-purple);color:#fff;">确认下载</button>
-                    </div>
-                </div>`;
-            overlay.addEventListener('click', () => overlay.remove());
-            document.body.appendChild(overlay);
-        }
-
         function closeModal() {
             document.getElementById('modalOverlay').classList.remove('open');
             updateHash('home');
+        }
+
+        // 下载确认弹窗
+        function confirmDownload(btn) {
+            const { url, title, source, instructions } = btn.dataset;
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:var(--bg-card);border:1px solid var(--neon-purple);border-radius:var(--radius-lg);padding:24px;max-width:420px;width:90%;box-shadow:0 0 40px rgba(179,71,234,0.5);" onclick="event.stopPropagation()">
+                    <h3 style="color:var(--neon-purple);">📥 确认下载</h3>
+                    <p style="margin:8px 0;"><b>游戏：</b>${title}</p>
+                    <p style="margin:8px 0;"><b>来源：</b><span style="color:var(--neon-cyan);">${source||'未知'}</span></p>
+                    ${instructions ? `<div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin:8px 0;"><b>📝 使用说明：</b><br>${instructions}</div>` : ''}
+                    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+                        <button onclick="this.closest('div[style*='position:fixed']').remove()" style="padding:8px 20px;border-radius:20px;border:1px solid var(--border-subtle);background:transparent;color:var(--text-primary);cursor:pointer;">取消</button>
+                        <button onclick="window.open('${url}','_blank');this.closest('div[style*='position:fixed']').remove()" style="padding:8px 24px;border-radius:20px;border:none;background:var(--neon-purple);color:#fff;cursor:pointer;font-weight:600;">确认下载</button>
+                    </div>
+                </div>`;
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+            document.body.appendChild(overlay);
         }
 
         // 搜索
@@ -524,8 +601,11 @@
 
         // 在线计时
         setInterval(() => {
-            onlineSec++;
-            document.getElementById('onlineTimer').textContent = `⏱️ 在线 ${String(Math.floor(onlineSec/3600)).padStart(2,'0')}:${String(Math.floor(onlineSec%3600/60)).padStart(2,'0')}:${String(onlineSec%60).padStart(2,'0')}`;
+            onlineSeconds++;
+            const h = Math.floor(onlineSeconds/3600);
+            const m = Math.floor(onlineSeconds%3600/60);
+            const s = onlineSeconds%60;
+            document.getElementById('onlineTimer').textContent = `⏱️ 在线 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }, 1000);
 
         // 初始化
@@ -534,7 +614,7 @@
             document.getElementById('bootScreen').classList.add('hidden');
             document.getElementById('appContainer').classList.add('visible');
             initParticles();
-            handleRoute(); // 关键：根据hash恢复页面
+            handleRoute();
         });
     </script>
 </body>
