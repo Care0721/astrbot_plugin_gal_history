@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galfang · 佐久真诗</title>
+    <title>Galfang · 佐久真纺</title>
     <style>
-        /* ========== 主题变量 ========== */
         :root {
             --bg: #f5f7fa;
             --bg-card: rgba(255, 255, 255, 0.85);
@@ -22,11 +21,9 @@
             --shadow-hover: 0 12px 30px rgba(75, 139, 180, 0.2);
             --radius: 14px;
             --radius-sm: 8px;
-            --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
+            --transition: 0.2s cubic-bezier(0.2, 0, 0, 1);
             --font: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
         }
-
-        /* 深色主题 */
         body.dark {
             --bg: #0e1118;
             --bg-card: rgba(22, 26, 35, 0.85);
@@ -42,7 +39,6 @@
             --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
             --shadow-hover: 0 12px 30px rgba(107, 165, 204, 0.25);
         }
-
         * { margin:0; padding:0; box-sizing:border-box; }
         html { scroll-behavior:smooth; font-size:16px; }
         body {
@@ -52,13 +48,26 @@
             transition: background 0.4s, color 0.4s;
         }
 
-        /* 粒子画布 */
+        /* 消除所有焦点轮廓 */
+        *:focus { outline: none; }
+        button:focus, input:focus, select:focus, textarea:focus { outline: none; }
+
+        /* 按钮通用动效 */
+        button {
+            cursor: pointer;
+            transition: all var(--transition);
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+
         #particleCanvas {
             position: fixed; top:0; left:0; width:100%; height:100%;
             z-index:0; pointer-events:none; opacity: 0.6;
         }
 
-        /* 启动屏 */
         #bootScreen {
             position: fixed; inset:0; z-index:9999;
             background: #0e1118;
@@ -88,7 +97,6 @@
         #appContainer { position: relative; z-index:1; opacity:0; transition: opacity 0.5s 0.2s; }
         #appContainer.visible { opacity:1; }
 
-        /* 导航栏 */
         .nav-bar {
             position: sticky; top:0; z-index:100;
             background: var(--bg-nav); backdrop-filter: blur(16px);
@@ -104,16 +112,15 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             transition: 0.2s;
         }
-        .nav-logo:hover { filter: brightness(1.15); transform: scale(1.02); }
+        .nav-logo:active { transform: scale(0.97); }
         .nav-links { display: flex; gap: 4px; list-style: none; }
         .nav-links button {
             background: transparent; border: none; color: var(--text-light);
             padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;
             cursor: pointer; transition: all var(--transition);
         }
-        .nav-links button:hover, .nav-links button.active {
-            color: var(--primary); background: rgba(75,139,180,0.12);
-        }
+        .nav-links button:hover { background: rgba(75,139,180,0.1); }
+        .nav-links button.active { color: var(--primary); background: rgba(75,139,180,0.12); }
         .nav-actions { display: flex; align-items: center; gap: 12px; }
         .theme-btn {
             background: transparent; border: 1px solid var(--border);
@@ -136,7 +143,6 @@
         .hamburger { display: none; flex-direction: column; gap: 4px; cursor: pointer; }
         .hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; }
 
-        /* 主内容 */
         .main-content { padding: 20px 24px 40px; max-width: 1300px; margin: 0 auto; }
         .glitch-effect { animation: glitch 0.3s ease; }
         @keyframes glitch {
@@ -145,7 +151,6 @@
             80%{ transform:translate(2px,2px); } 100%{ transform:translate(0); }
         }
 
-        /* 轮播Banner */
         .banner-section {
             position: relative; height: 240px; border-radius: var(--radius);
             overflow: hidden; margin-bottom: 24px; border: 1px solid var(--border);
@@ -168,7 +173,6 @@
         }
         .banner-dots span.active { background: var(--accent-pink); box-shadow: 0 0 8px var(--accent-pink); }
 
-        /* 卡片网格 */
         .game-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
@@ -176,13 +180,14 @@
         .game-card {
             background: var(--bg-card); border-radius: var(--radius);
             overflow: hidden; cursor: pointer; border: 1px solid var(--border);
-            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
-            backdrop-filter: blur(8px); position: relative;
+            transition: all 0.3s cubic-bezier(0.2,0,0,1);
+            backdrop-filter: blur(8px);
         }
         .game-card:hover {
             transform: translateY(-6px); border-color: var(--primary);
             box-shadow: var(--shadow-hover);
         }
+        .game-card:active { transform: scale(0.98); }
         .card-cover {
             width: 100%; aspect-ratio: 3/4; object-fit: cover;
             transition: 0.3s;
@@ -198,7 +203,6 @@
         }
         .tag.hot { background: rgba(212,123,140,0.12); color: var(--accent-pink); }
 
-        /* 分类筛选 */
         .filter-section { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
         .filter-btn {
             padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border);
@@ -210,7 +214,6 @@
             border-color: var(--primary);
         }
 
-        /* 模态框 */
         .modal-overlay {
             position: fixed; inset: 0; z-index: 200;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
@@ -248,20 +251,18 @@
             cursor: pointer; font-weight: 600; font-size: 0.85rem;
             transition: all var(--transition);
         }
-        .dl-btn:hover { background: var(--primary); color: #fff; transform: scale(1.02); }
+        .dl-btn:hover { background: var(--primary); color: #fff; }
         .dl-btn.disabled { opacity: 0.4; pointer-events: none; }
         .like-btn {
             padding: 6px 16px; border-radius: 20px; border: 1px solid var(--accent-pink);
             background: rgba(212,123,140,0.1); color: var(--accent-pink);
             cursor: pointer; font-weight: 600; transition: all var(--transition);
         }
-        .like-btn.liked { background: var(--accent-pink); color: #fff; transform: scale(1.05); }
+        .like-btn.liked { background: var(--accent-pink); color: #fff; }
         .comment-item {
             background: rgba(75,139,180,0.04); border: 1px solid var(--border);
             border-radius: 8px; padding: 10px; margin-bottom: 8px;
         }
-
-        /* 返回顶部 */
         .back-top {
             position: fixed; bottom: 24px; right: 24px; z-index: 150;
             width: 44px; height: 44px; border-radius: 50%;
@@ -272,7 +273,11 @@
         }
         .back-top:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
 
-        /* 响应式 */
+        /* 修复对话框内按钮的焦点问题 */
+        .modal-overlay button:active, .dl-btn:active, .filter-btn:active, .nav-links button:active {
+            transform: scale(0.96);
+        }
+
         @media (max-width: 768px) {
             .nav-links {
                 position: fixed; top:62px; left:0; right:0;
@@ -292,7 +297,6 @@
 <body>
     <canvas id="particleCanvas"></canvas>
 
-    <!-- 启动加载动画 -->
     <div id="bootScreen">
         <div class="boot-box">
             <div style="font-size:0.9rem; margin-bottom:12px; letter-spacing:2px;"> G A L F A N G · 初 始 化</div>
@@ -301,11 +305,10 @@
             <div class="boot-line">> 启动渲染引擎... OK</div>
             <div class="boot-line">> 连接粒子网络...</div>
             <div class="boot-line">> 正在加载资源库...</div>
-            <div class="boot-line">> 柊白亚已就绪</div>
+            <div class="boot-line">> Fang已就绪</div>
         </div>
     </div>
 
-    <!-- 主应用 -->
     <div id="appContainer">
         <nav class="nav-bar">
             <div class="nav-logo" onclick="navigateTo('home')">Galfang</div>
@@ -341,7 +344,6 @@
         </div>
     </div>
 
-    <!-- 详情弹窗 -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
         <div class="modal-dialog" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -367,7 +369,6 @@
         let currentFilter = 'all';
         let bannerIndex = 0, bannerTimer, onlineSec = 0;
 
-        // 主题切换
         function toggleTheme() {
             document.body.classList.toggle('dark');
             localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
@@ -379,7 +380,6 @@
             document.getElementById('themeToggle').innerHTML = saved === 'dark' ? '&#9788;' : '&#9789;';
         })();
 
-        // 数据加载
         async function fetchGames() {
             try { gamesData = await (await fetch(API_BASE + '/api/games')).json(); }
             catch { gamesData = []; }
@@ -389,7 +389,6 @@
             });
         }
 
-        // 粒子背景
         function initParticles() {
             const canvas = document.getElementById('particleCanvas');
             const ctx = canvas.getContext('2d');
@@ -424,7 +423,6 @@
             draw();
         }
 
-        // 路由保持
         function updateHash(hash) { window.location.hash = hash; }
         function handleRoute() {
             const hash = window.location.hash.slice(1);
@@ -487,7 +485,7 @@
             game.platforms?.forEach(p => tags += `<span class="tag">${p.type==='PC'?'PC':p.sub||'安卓'}</span>`);
             if (game.isChinese) tags += '<span class="tag hot">汉化</span>';
             return `<div class="game-card" onclick="openGameDetail(${game.id})">
-                <img class="card-cover" src="${game.cover}" loading="lazy">
+                <img class="card-cover" src="${game.cover}" loading="lazy" onerror="this.src='https://placehold.co/300x400/4b8bb4/fff?text=No+Img'">
                 <div class="card-body"><div class="card-title">${game.title}</div><div class="card-tags">${tags}</div></div>
             </div>`;
         }
@@ -512,7 +510,6 @@
         }
         function setFilter(f) { currentFilter = f; renderCategory(); }
 
-        // 游戏详情
         async function openGameDetail(id) {
             const game = gamesData.find(g => g.id == id); if (!game) return;
             const modal = document.getElementById('modalOverlay');
@@ -531,24 +528,22 @@
             });
 
             document.getElementById('modalBody').innerHTML = `
-                <div class="modal-cover"><img src="${game.cover}"></div>
+                <div class="modal-cover"><img src="${game.cover}" onerror="this.src='https://placehold.co/300x400/4b8bb4/fff?text=No+Img'"></div>
                 <div class="modal-info">
                     <h2>${game.title}</h2>
                     <div class="card-tags">${(game.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
                     <div class="modal-desc">${game.description||''}</div>
-                    ${game.previewImages?.length ? `<div class="preview-row">${game.previewImages.map(u=>`<img src="${u}">`).join('')}</div>` : ''}
+                    ${game.previewImages?.length ? `<div class="preview-row">${game.previewImages.map(u=>`<img src="${u}" onerror="this.style.display='none'">`).join('')}</div>` : ''}
                     <div class="dl-btns">${dlHtml}</div>
                 </div>`;
-            // 点赞
             const likeRes = await fetch(`${API_BASE}/api/likes/${id}?userId=${userId}`).then(r=>r.json());
             document.getElementById('likeSection').innerHTML = `
                 <button class="like-btn ${likeRes.liked?'liked':''}" onclick="toggleLike(${id})">&#10084; ${likeRes.liked?'已赞':'点赞'}</button>
                 <span style="margin-left:8px;color:var(--text-light);">${likeRes.count} 人赞过</span>`;
-            // 评论
             const comm = await fetch(`${API_BASE}/api/comments/${id}`).then(r=>r.json());
             document.getElementById('commentSection').innerHTML = `
                 <h3 style="margin-bottom:8px;">评论 (${comm.length})</h3>
-                ${comm.map(c=>`<div class="comment-item"><b>${esc(c.name)}</b> <small style="color:var(--text-light);">${new Date(c.time).toLocaleString()}</small><p>${esc(c.text)}</p></div>`).join('')}
+                ${comm.map(c=>`<div class="comment-item"><b>${esc(c.name)}</b> <small style="color:var(--text-light);">${new Date(c.time).toLocaleString()}</small><p style="word-break:break-word;">${esc(c.text)}</p></div>`).join('')}
                 <div style="display:flex;gap:8px;margin-top:12px;">
                     <input id="cmName" placeholder="名字" style="flex:1;padding:8px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);">
                     <input id="cmText" placeholder="写下评论..." style="flex:2;padding:8px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);">
@@ -575,17 +570,16 @@
             updateHash('home');
         }
 
-        // 下载确认
         function confirmDownload(btn) {
             const { url, title, source, instructions } = btn.dataset;
             const overlay = document.createElement('div');
             overlay.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;';
             overlay.innerHTML = `
-                <div style="background:var(--bg-modal);border:1px solid var(--primary);border-radius:var(--radius);padding:24px;max-width:420px;width:90%;box-shadow:0 0 30px rgba(75,139,180,0.3);" onclick="event.stopPropagation()">
+                <div style="background:var(--bg-modal);border:1px solid var(--primary);border-radius:var(--radius);padding:24px;max-width:420px;width:90%;box-shadow:0 0 30px rgba(75,139,180,0.3);word-break:break-word;" onclick="event.stopPropagation()">
                     <h3 style="color:var(--primary);">确认下载</h3>
                     <p style="margin:8px 0;"><b>游戏：</b>${title}</p>
                     <p style="margin:8px 0;"><b>来源：</b><span style="color:var(--accent-green);">${source||'未知'}</span></p>
-                    ${instructions ? `<div style="background:rgba(75,139,180,0.08);padding:10px;border-radius:8px;margin:8px 0;"><b>说明：</b><br>${instructions}</div>` : ''}
+                    ${instructions ? `<div style="background:rgba(75,139,180,0.08);padding:10px;border-radius:8px;margin:8px 0;white-space:pre-wrap;"><b>说明：</b><br>${instructions}</div>` : ''}
                     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
                         <button onclick="this.closest('div[style*='position:fixed']').remove()" style="padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;">取消</button>
                         <button onclick="window.open('${url}','_blank');this.closest('div[style*='position:fixed']').remove()" style="padding:8px 24px;border-radius:20px;border:none;background:var(--primary);color:#fff;cursor:pointer;font-weight:600;">确认下载</button>
