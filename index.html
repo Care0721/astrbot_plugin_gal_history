@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"
+    />
+    <title>Gal坊 · 佐久真纺</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      :root {
+        --bg-deep: #0a0a14;
+        --bg-surface: #12122a;
+        --bg-card: rgba(18, 18, 42, 0.85);
+        --bg-modal: #1a1a30;
+        --border-neon: #b300ff;
+        --border-cyan: #00e5ff;
+        --text-primary: #e0e0ff;
+        --text-secondary: #b0b0d0;
+        --text-accent: #ff66ff;
+        --neon-glow: 0 0 12px #b300ff, 0 0 25px #7a00ff;
+        --cyan-glow: 0 0 10px #00e5ff, 0 0 20px #00b8d4;
+        --tag-bg: rgba(0, 0, 0, 0.5);
+        --tag-border: #b300ff;
+        --tag-text: #00e5ff;
+        --shadow-card: 0 8px 32px rgba(179, 0, 255, 0.25);
+        --transition: 0.25s cubic-bezier(0.2, 0.9, 0.4, 1);
+        --noise-opacity: 0.06;
+      }
+      [data-theme="light"] {
+        --bg-deep: #110022;
+        --bg-surface: #2a1a40;
+        --bg-card: rgba(30, 20, 50, 0.9);
+        --bg-modal: #251840;
+        --border-neon: #ff66ff;
+        --border-cyan: #00ffff;
+        --text-primary: #f5e6ff;
+        --text-secondary: #d0c0e0;
+        --text-accent: #ff99ff;
+        --neon-glow: 0 0 16px #ff66ff, 0 0 30px #cc00ff;
+        --cyan-glow: 0 0 14px #00ffff, 0 0 25px #0099ff;
+        --tag-bg: rgba(0, 0, 0, 0.7);
+        --tag-border: #ff66ff;
+        --tag-text: #00ffff;
+        --shadow-card: 0 8px 32px rgba(255, 0, 255, 0.3);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: var(--bg-deep);
+        background-image: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(255, 255, 255, 0.03) 2px,
+          rgba(255, 255, 255, 0.03) 4px
+        );
+        background-attachment: fixed;
+        min-height: 100vh;
+        color: var(--text-primary);
+        padding: 0 16px 30px;
+        position: relative;
+        transition: background 0.3s, color 0.3s;
+        overflow-x: hidden;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 9999;
+        opacity: var(--noise-opacity);
+      }
+      .container {
+        max-width: 1250px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+      .theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--bg-card);
+        border: 1px solid var(--border-neon);
+        color: var(--text-accent);
+        font-size: 1.4rem;
+        cursor: pointer;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+        box-shadow: var(--neon-glow);
+        transition: all var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .theme-toggle:hover {
+        box-shadow: 0 0 30px var(--border-neon);
+        transform: rotate(30deg);
+      }
+      .site-header {
+        text-align: center;
+        padding: 2.5rem 1rem 1.8rem;
+      }
+      .logo {
+        font-size: 3.2rem;
+        font-weight: 800;
+        letter-spacing: 6px;
+        background: linear-gradient(135deg, #b300ff00, #00e5ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: var(--neon-glow);
+        display: inline-block;
+        filter: drop-shadow(0 0 10px #00ffb7);
+      }
+      .logo i {
+        margin-right: 8px;
+        font-size: 2.8rem;
+        vertical-align: middle;
+      }
+      .subtitle {
+        font-size: 1rem;
+        letter-spacing: 4px;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+        text-transform: uppercase;
+        text-shadow: 0 0 8px var(--border-neon);
+      }
+      .nav-tags {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.8rem;
+        margin: 1.8rem 0 2.2rem;
+      }
+      .tag {
+        background: var(--tag-bg);
+        backdrop-filter: blur(8px);
+        padding: 0.5rem 1.5rem;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--tag-text);
+        cursor: pointer;
+        border: 1px solid var(--tag-border);
+        transition: all var(--transition);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 0 10px rgba(179, 0, 255, 0.3);
+      }
+      .tag:hover,
+      .tag.active {
+        background: var(--border-neon);
+        color: #fff;
+        border-color: var(--border-neon);
+        box-shadow: 0 0 25px var(--border-neon);
+        transform: translateY(-2px);
+      }
+      .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.8rem;
+        margin: 1rem 0 2rem;
+      }
+      .game-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(12px);
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid rgba(179, 0, 255, 0.3);
+        box-shadow: var(--shadow-card);
+        transition: all var(--transition);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+      }
+      .game-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--border-cyan);
+        box-shadow: 0 0 35px rgba(0, 229, 255, 0.4);
+      }
+
+      /* 卡片图片区域 */
+      .card-img {
+        width: 100%;
+        aspect-ratio: 16/10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.7);
+        position: relative;
+        overflow: hidden;
+      }
+      .card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      /* 保留原有的渐变背景占位 */
+      .card-img.placeholder-1 {
+        background: linear-gradient(135deg, #1a0033, #33006600);
+      }
+      .card-img.placeholder-2 {
+        background: linear-gradient(135deg, #0d1b2a, #1b3a4b);
+      }
+      .card-img.placeholder-3 {
+        background: linear-gradient(135deg, #1a0a2e, #2d1b4e);
+      }
+      .card-img.placeholder-4 {
+        background: linear-gradient(135deg, #0f1a2e, #1c2f4a);
+      }
+      .card-img.placeholder-5 {
+        background: linear-gradient(135deg, #1a2a1a, #2e4a2e);
+      }
+      .card-img.placeholder-6 {
+        background: linear-gradient(135deg, #2a1a1a, #4a2e2e);
+      }
+      .card-img i {
+        font-size: 4rem;
+        filter: drop-shadow(0 0 12px var(--border-neon));
+        opacity: 0.9;
+      }
+
+      .card-info {
+        padding: 1.2rem 1rem 1.4rem;
+      }
+      .game-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--text-primary);
+      }
+      .badge {
+        background: var(--border-neon);
+        color: #000;
+        font-size: 0.65rem;
+        padding: 0.2rem 0.7rem;
+        border-radius: 20px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .game-meta {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-top: 0.3rem;
+      }
+      .game-desc {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+        opacity: 0.9;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .detail-panel {
+        display: none;
+        background: var(--bg-card);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 2rem;
+        margin: 1rem 0 2rem;
+        border: 1px solid var(--border-neon);
+        box-shadow: var(--neon-glow);
+        animation: fadeSlide 0.3s ease;
+      }
+      .detail-panel.active {
+        display: block;
+      }
+      @keyframes fadeSlide {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .back-btn {
+        background: transparent;
+        border: 1px solid var(--border-cyan);
+        color: var(--text-accent);
+        padding: 0.5rem 1.5rem;
+        border-radius: 30px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+        transition: all var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .back-btn:hover {
+        background: var(--border-cyan);
+        color: #000;
+        box-shadow: var(--cyan-glow);
+      }
+      .detail-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+      .detail-cover {
+        flex: 0 0 250px;
+        height: 200px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: white;
+        box-shadow: var(--neon-glow);
+        overflow: hidden;
+      }
+      .detail-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .detail-info {
+        flex: 1;
+        min-width: 260px;
+      }
+      .detail-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        text-shadow: 0 0 15px var(--border-neon);
+        margin-bottom: 0.5rem;
+      }
+      .detail-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0;
+      }
+      .detail-tags span {
+        background: rgba(179, 0, 255, 0.2);
+        border: 1px solid var(--border-neon);
+        color: var(--text-accent);
+        padding: 0.2rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+      .platform-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--border-cyan);
+        margin: 1.2rem 0 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-bottom: 1px dashed var(--border-neon);
+        padding-bottom: 0.3rem;
+      }
+      .download-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 0.6rem;
+      }
+      .download-btn {
+        background: linear-gradient(135deg, #ff000000, #ff009500);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 15px rgba(179, 0, 255, 0.4);
+        transition: all var(--transition);
+        text-decoration: none;
+      }
+      .download-btn:hover {
+        box-shadow: 0 0 25px var(--border-neon);
+        transform: scale(1.03);
+      }
+      .download-btn.secondary {
+        background: transparent;
+        border: 1.5px solid var(--border-cyan);
+        color: var(--border-cyan);
+        box-shadow: none;
+      }
+      .download-btn.secondary:hover {
+        background: var(--border-cyan);
+        color: #000;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+      }
+      .modal-overlay.active {
+        display: flex;
+      }
+      .modal-box {
+        background: var(--bg-modal);
+        border: 1px solid var(--border-neon);
+        border-radius: 28px;
+        padding: 2rem 2rem 1.8rem;
+        max-width: 420px;
+        width: 90%;
+        box-shadow: var(--neon-glow);
+        text-align: center;
+        color: var(--text-primary);
+      }
+      .modal-box h3 {
+        color: var(--text-accent);
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+      }
+      .modal-box p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1.8rem;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      }
+      .modal-btn {
+        padding: 0.6rem 1.8rem;
+        border-radius: 30px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all var(--transition);
+      }
+      .modal-btn.confirm {
+        background: linear-gradient(135deg, #b300ff, #ff00ff);
+        color: white;
+        box-shadow: 0 4px 15px rgba(179, 0, 255, 0.5);
+      }
+      .modal-btn.confirm:hover {
+        box-shadow: 0 0 25px #ff00ff;
+      }
+      .modal-btn.cancel {
+        background: transparent;
+        border: 1px solid var(--text-secondary);
+        color: var(--text-secondary);
+      }
+      .modal-btn.cancel:hover {
+        background: var(--text-secondary);
+        color: #000;
+      }
+      .footer-note {
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 2.5rem;
+        letter-spacing: 2px;
+        opacity: 0.7;
+      }
+      @media (max-width: 600px) {
+        .logo {
+          font-size: 2.4rem;
+        }
+        .detail-content {
+          flex-direction: column;
+        }
+        .detail-cover {
+          flex: 0 0 160px;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="theme-toggle" id="themeToggle" title="切换电波模式">
+      <i class="fas fa-moon"></i>
+    </button>
+    <div class="container">
+      <header class="site-header">
+        <div class="logo"><i class="fas fa-broadcast-tower"></i> Gal坊</div>
+        <div class="subtitle">⊱ 全AI生成 ⊰</div>
+      </header>
+
+      <div class="nav-tags">
+        <span class="tag active">全部</span>
+        <span class="tag">纯爱</span>
+        <span class="tag">悬疑</span>
+        <span class="tag">治愈</span>
+        <span class="tag">奇幻</span>
+        <span class="tag">校园</span>
+      </div>
+
+      <div id="gamesView" class="games-grid"></div>
+
+      <div id="detailPanel" class="detail-panel">
+        <button class="back-btn" id="backBtn">
+          <i class="fas fa-arrow-left"></i> 返回作品列表
+        </button>
+        <div class="detail-content" id="detailContent"></div>
+      </div>
+
+      <div class="footer-note">✦ Gal坊 · 佐久真诗 ✦</div>
+    </div>
+
+    <div class="modal-overlay" id="downloadModal">
+      <div class="modal-box">
+        <h3><i class="fas fa-skull"></i> 下載協議</h3>
+        <p id="modalNote">
+          請確保已安裝對應網盤客戶端，資源僅供學習交流，請於24小時內刪除。
+        </p>
+        <div class="modal-actions">
+          <button class="modal-btn cancel" id="modalCancel">取消</button>
+          <button class="modal-btn confirm" id="modalConfirm">契約執行</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        // ========== 游戏数据（内置，可自由增删改） ==========
+        const games = [
+          {
+            id: 1,
+            title: "千恋＊万花",
+            category: "纯爱",
+            badge: "和風戀愛",
+            meta: "💖 純愛 · ⭐ 9.4",
+            desc: "在溫泉旅館展開的奇幻戀愛故事，與神明少女共譜夏日戀曲。",
+            // 图片路径（留空则使用渐变+图标占位）
+            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/00/0-19073.jpg", // 例如："images/qianlian.jpg"
+            detailImage: "", // 例如："images/qianlian_big.jpg"
+            coverClass: "placeholder-1",
+            icon: "fa-hot-tub-person",
+            detailCover: "linear-gradient(135deg, #1a0033, #330066)",
+            detailIcon: "fa-heart",
+            detailTitle: "千恋＊万花",
+            detailDesc:
+              "舞臺是和風溫泉街。主人公因緣巧合與四位少女相遇，逐漸揭開土地隱藏的秘密。溫暖、感動與歡笑交織的純愛物語。",
+            tags: ["純愛", "和風", "治癒", "溫馨"],
+            androidDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/wpwtv",
+                note: "无解压密码请在切换语言的时候，先在开始界面选中 Simplified Chinese ，然后在进游戏之后再使用右下角三条杠系统菜单里面的语言选项进行语种切换，否则直接在开始界面切换语言为繁体中文（城彩学园汉化对应槽位）再启动游戏会导致游戏崩溃！！！",
+              },
+            ],
+            pcDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/6X8Hp",
+                note: "PC版解壓即玩",
+              },
+            ],
+          },
+          {
+            id: 2,
+            title: "RIDDLE JOKER",
+            category: "悬疑",
+            badge: "校園超能",
+            meta: "🔮 奇幻 · ⭐ 9.2",
+            desc: "擁有超能力的少年潛入學院，守護秘密的同時面對心動日常。",
+            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/42/79742.jpg",
+            detailImage: "",
+            coverClass: "placeholder-2",
+            icon: "fa-mask",
+            detailCover: "linear-gradient(135deg, #0d1b2a, #1b3a4b)",
+            detailIcon: "fa-theater-masks",
+            detailTitle: "RIDDLE JOKER",
+            detailDesc:
+              "現代社會存在「星幽能力」。主角兄妹為了守護彼此，潛入研究超能力的學院。日常與非日常交織的青春懸疑劇。",
+            tags: ["校園", "奇幻", "懸疑", "戀愛喜劇"],
+            androidDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/mlrUx",
+                note: "手机ban",
+              },
+            ],
+            pcDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/6X8Hp",
+                note: "PC免安裝版",
+              },
+            ],
+          },
+          {
+            id: 3,
+            title: "星空列車與白的旅行",
+            category: "治愈",
+            badge: "治癒催淚",
+            meta: "🌌 治癒 · ⭐ 9.5",
+            desc: "乘坐列車穿越星空，與少女一同尋找記憶的感人旅程。",
+            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/17/92117.jpg",
+            detailImage: "",
+            coverClass: "placeholder-3",
+            icon: "fa-train",
+            detailCover: "linear-gradient(135deg, #1a0a2e, #2d1b4e)",
+            detailIcon: "fa-cloud-moon",
+            detailTitle: "星空列車與白的旅行",
+            detailDesc:
+              "醒來時身處夜空列車。與神秘少女「白」相遇，在星光之旅中找回失落記憶與重要之物。",
+            tags: ["治癒", "催淚", "奇幻", "短篇"],
+            androidDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/Rnrh7",
+                note: "无",
+              },
+            ],
+            pcDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/gNqiL",
+                note: "无",
+              },
+            ],
+          },
+          {
+            id: 4,
+            title: "ATRI -My Dear Moments-",
+            category: "奇幻",
+            badge: "科幻戀愛",
+            meta: "🤖 科幻 · ⭐ 9.3",
+            desc: "在沉沒的世界裏，與機器人少女共同度過有限時光。",
+            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/41/87041.jpg",
+            detailImage: "",
+            coverClass: "placeholder-4",
+            icon: "fa-robot",
+            detailCover: "linear-gradient(135deg, #0f1a2e, #1c2f4a)",
+            detailIcon: "fa-android",
+            detailTitle: "ATRI -My Dear Moments-",
+            detailDesc:
+              "海平面上升，陸地被淹沒的未來。少年與機器人少女ATRI相遇，尋找希望與愛的定義。",
+            tags: ["科幻", "戀愛", "治癒", "未來"],
+            androidDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/YaRUa",
+                note: "解压码touchgal",
+              },
+            ],
+            pcDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/Vosd",
+                note: "解压码touchgal",
+              },
+            ],
+          },
+          {
+            id: 5,
+            title: "櫻之詩",
+            category: "校园",
+            badge: "藝術群像",
+            meta: "🎨 文藝 · ⭐ 9.1",
+            desc: "在櫻花飄落的季節，追尋藝術與美的青春群像劇。",
+            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/63/79663.jpg",
+            detailImage: "",
+            coverClass: "placeholder-5",
+            icon: "fa-palette",
+            detailCover: "linear-gradient(135deg, #1a2a1a, #2e4a2e)",
+            detailIcon: "fa-feather",
+            detailTitle: "櫻之詩",
+            detailDesc:
+              "以美術為題材的青春故事。主人公與夥伴探討藝術、人生與情感，交織出細膩群像劇。",
+            tags: ["文藝", "青春", "群像", "哲學"],
+            androidDownloads: [
+              {
+                text: "touchgal",
+                Link: "https://pan.touchgal.net/s/eoXhx",
+                note: "解压码touchgal",
+              },
+            ],
+            pcDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/Jkxha",
+                note: "PC漢化硬盤版，解压码touchgal",
+              },
+            ],
+          },
+          {
+            id: 6,
+            title: "Summer Pockets REFLECTION BLUE",
+            category: "校园",
+            badge: "夏日回憶",
+            meta: "☀️ 催淚 · ⭐ 9.6",
+            desc: "在夏日小島上，與夥伴們創造永難忘懷的暑假回憶。",
+            image: "https://img.m.cn.cname4593.yjs-cdn.com/cv/28/85428.jpg",
+            detailImage: "",
+            coverClass: "placeholder-6",
+            icon: "fa-umbrella-beach",
+            detailCover: "linear-gradient(135deg, #2a1a1a, #4a2e2e)",
+            detailIcon: "fa-sun",
+            detailTitle: "Summer Pockets REFLECTION BLUE",
+            detailDesc:
+              "唯有那份眩目　未曾忘却。”“无论何时我都会记得夏天的蓝……。”主人公鹰原羽依里为了整理过世祖母的遗物，利用暑假独自一人来到鸟白岛。在下了一天中只有几趟的客船后，少年与一名少女相遇了。在海风中摆弄头发的少女，只是远远的，远远的，眺望着那海与天的蔚蓝境界线 ，一动不动。回过神来时，少女已经消失，让羽依里不禁怀疑自己是不是看了幻觉，怀着复杂的心情，少年向着祖母的家迈开脚步。在那里见到的女性乃是亲戚的叔母，接着立刻就开始帮忙起遗物的整理来。在整理祖母遗物的过程中，逐渐回忆起儿时记忆的羽依里，并且在初次接触的【海岛生活里】，慢慢的从困惑转而变得适应。那是在喧闹的都市居住时，体会不到的自然生活，那是我们忘却在童年，令人怀念而又眷恋的，淳朴岁月。与眺望大海的少女相遇。与寻找不可思议蝴蝶的少女相遇。与寻找回忆与海盗船的少女相遇。与住在宁静灯塔中的少女相遇。——以及慢慢，和狙击手的风纪委员相熟。开始，同热爱着胸部的会长相约。学会，与迷途的炒饭小丫头相亲。偶然，跟追逐鬼的野营少女相识。还有在这座岛上得到的，独一无二的，欢乐热闹的新的同伴们——啊，啊，要是这样的暑假，能够永远这么继续下去，就好了。 此时，少年不禁，这样想到。",
+            tags: ["夏日", "治癒", "催淚", "Key社"],
+            androidDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/md9Ux",
+                note: "解压码touchgal",
+              },
+            ],
+            pcDownloads: [
+              {
+                text: "touchgal",
+                link: "https://pan.touchgal.net/s/B8wpiw",
+                note: "解压码touchgal",
+              },
+            ],
+          },
+        ];
+
+        // ---------- DOM 元素 ----------
+        const gamesView = document.getElementById("gamesView");
+        const detailPanel = document.getElementById("detailPanel");
+        const detailContent = document.getElementById("detailContent");
+        const backBtn = document.getElementById("backBtn");
+        const themeToggle = document.getElementById("themeToggle");
+        const modalOverlay = document.getElementById("downloadModal");
+        const modalNote = document.getElementById("modalNote");
+        const modalConfirm = document.getElementById("modalConfirm");
+        const modalCancel = document.getElementById("modalCancel");
+
+        let pendingDownloadLink = "";
+
+        // ---------- 主题切换 ----------
+        function applyTheme(theme) {
+          document.documentElement.setAttribute("data-theme", theme);
+          localStorage.setItem("gal-theme", theme);
+          themeToggle.innerHTML =
+            theme === "dark"
+              ? '<i class="fas fa-sun"></i>'
+              : '<i class="fas fa-moon"></i>';
+        }
+        const savedTheme = localStorage.getItem("gal-theme") || "dark";
+        applyTheme(savedTheme);
+        themeToggle.addEventListener("click", () => {
+          const current = document.documentElement.getAttribute("data-theme");
+          applyTheme(current === "dark" ? "light" : "dark");
+        });
+
+        // ---------- 渲染卡片 (支持图片) ----------
+        function renderCards(gamesArray) {
+          gamesView.innerHTML = "";
+          if (gamesArray.length === 0) {
+            gamesView.innerHTML =
+              '<p style="grid-column:1/-1;text-align:center;color:var(--text-secondary);">⛧ 該類別暫無作品 ⛧</p>';
+            return;
+          }
+          gamesArray.forEach((game) => {
+            const card = document.createElement("div");
+            card.className = "game-card";
+
+            // 图片或占位符
+            const imgHtml = game.image
+              ? `<div class="card-img"><img src="${game.image}" alt="${game.title}"></div>`
+              : `<div class="card-img ${game.coverClass}"><i class="fas ${game.icon}"></i></div>`;
+
+            card.innerHTML = `
+                        ${imgHtml}
+                        <div class="card-info">
+                            <div class="game-title">${game.title}<span class="badge">${game.badge}</span></div>
+                            <div class="game-meta">${game.meta}</div>
+                            <div class="game-desc">${game.desc}</div>
+                        </div>
+                    `;
+            card.addEventListener("click", () => {
+              window.history.pushState(
+                { gameId: game.id },
+                "",
+                `?game=${game.id}`
+              );
+              showDetail(game.id);
+            });
+            gamesView.appendChild(card);
+          });
+        }
+
+        // ---------- 显示详情 (支持图片) ----------
+        function showDetail(gameId) {
+          const game = games.find((g) => g.id === gameId);
+          if (!game) return;
+
+          // 详情封面：优先图片，否则渐变
+          const coverHtml = game.detailImage
+            ? `<div class="detail-cover"><img src="${game.detailImage}" alt="${game.detailTitle}"></div>`
+            : `<div class="detail-cover" style="background:${game.detailCover};"><i class="fas ${game.detailIcon}" style="font-size:4rem; text-shadow:0 0 15px #fff;"></i></div>`;
+
+          const buildSection = (arr, platform) => {
+            if (!arr || arr.length === 0) return "";
+            let html = `<div class="platform-title"><i class="fas fa-${
+              platform === "安卓" ? "mobile-alt" : "laptop"
+            }"></i> ${platform}区</div><div class="download-buttons">`;
+            arr.forEach((d) => {
+              html += `<button class="download-btn secondary" data-link="${d.link}" data-note="${d.note}"><i class="fas fa-download"></i> ${d.text}</button>`;
+            });
+            html += "</div>";
+            return html;
+          };
+
+          detailContent.innerHTML = `
+                    ${coverHtml}
+                    <div class="detail-info">
+                        <div class="detail-title">${game.detailTitle}</div>
+                        <p style="color:var(--text-secondary); line-height:1.7; margin:0.6rem 0 1rem;">${
+                          game.detailDesc
+                        }</p>
+                        <div class="detail-tags">${game.tags
+                          .map((t) => `<span># ${t}</span>`)
+                          .join("")}</div>
+                        ${buildSection(game.androidDownloads, "安卓")}
+                        ${buildSection(game.pcDownloads, "PC")}
+                        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:1rem;"><i class="fas fa-info-circle"></i> 點擊按鈕將彈出下載協議</p>
+                    </div>
+                `;
+
+          // 绑定下载按钮
+          document
+            .querySelectorAll(".download-btn[data-link]")
+            .forEach((btn) => {
+              btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                const link = this.dataset.link;
+                if (link === "#") {
+                  alert("鏈接尚未填寫。");
+                  return;
+                }
+                pendingDownloadLink = link;
+                modalNote.textContent = this.dataset.note;
+                modalOverlay.classList.add("active");
+              });
+            });
+
+          gamesView.style.display = "none";
+          detailPanel.classList.add("active");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        // ---------- 返回列表 ----------
+        backBtn.addEventListener("click", () => {
+          detailPanel.classList.remove("active");
+          gamesView.style.display = "";
+          window.history.pushState({}, "", window.location.pathname);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        // ---------- 下载弹窗 ----------
+        modalConfirm.addEventListener("click", () => {
+          if (pendingDownloadLink) window.open(pendingDownloadLink, "_blank");
+          pendingDownloadLink = "";
+          modalOverlay.classList.remove("active");
+        });
+        modalCancel.addEventListener("click", () => {
+          pendingDownloadLink = "";
+          modalOverlay.classList.remove("active");
+        });
+        modalOverlay.addEventListener("click", (e) => {
+          if (e.target === modalOverlay) {
+            pendingDownloadLink = "";
+            modalOverlay.classList.remove("active");
+          }
+        });
+
+        // ---------- 标签筛选 ----------
+        document.querySelectorAll(".tag").forEach((tag) => {
+          tag.addEventListener("click", function () {
+            document
+              .querySelectorAll(".tag")
+              .forEach((t) => t.classList.remove("active"));
+            this.classList.add("active");
+            const category = this.textContent.trim();
+            const filtered =
+              category === "全部"
+                ? games
+                : games.filter((g) => g.category === category);
+            renderCards(filtered);
+            if (detailPanel.classList.contains("active")) {
+              detailPanel.classList.remove("active");
+              gamesView.style.display = "";
+              window.history.pushState({}, "", window.location.pathname);
+            }
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
+        });
+
+        // ---------- 路由恢复 ----------
+        const params = new URLSearchParams(window.location.search);
+        const initialGameId = params.get("game");
+        if (initialGameId) {
+          showDetail(Number(initialGameId));
+        } else {
+          renderCards(games);
+        }
+        window.addEventListener("popstate", (e) => {
+          if (e.state && e.state.gameId) {
+            showDetail(e.state.gameId);
+          } else {
+            detailPanel.classList.remove("active");
+            gamesView.style.display = "";
+            renderCards(games);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
