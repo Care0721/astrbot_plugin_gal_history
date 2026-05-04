@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galfang · 佐久真纺</title>
-    <!-- 网站图标 -->
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Care0721/Fanggal/master/Lain.png">
     <meta property="og:title" content="Galfang 佐久真纺">
     <meta property="og:description" content="发现更多Galgame资源，纯粹、简洁、高速。">
@@ -14,25 +13,26 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         :root {
+            --bg: #0e1118; --bg-card: rgba(22,26,35,0.85); --bg-nav: rgba(14,17,24,0.75);
+            --bg-modal: rgba(22,26,35,0.95); --text: #e1e6ee; --text-light: #8a94a6;
+            --border: rgba(255,255,255,0.06); --primary: #6ba5cc; --accent-pink: #e09eaa;
+            --accent-green: #7eb99a; --shadow: 0 8px 24px rgba(0,0,0,0.3);
+            --shadow-hover: 0 12px 30px rgba(107,165,204,0.25);
+            --radius: 16px; --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
+        }
+        body.light {
             --bg: #f5f7fa; --bg-card: rgba(255,255,255,0.9); --bg-nav: rgba(255,255,255,0.75);
             --bg-modal: rgba(255,255,255,0.95); --text: #1a2233; --text-light: #5e6e82;
             --border: rgba(30,40,60,0.08); --primary: #4b8bb4; --accent-pink: #d47b8c;
             --accent-green: #6ba589; --shadow: 0 8px 24px rgba(30,40,60,0.04);
             --shadow-hover: 0 12px 28px rgba(75,139,180,0.15);
-            --radius: 14px; --radius-sm: 8px;
-            --transition: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
-        }
-        body.dark {
-            --bg: #0e1118; --bg-card: rgba(22,26,35,0.9); --bg-nav: rgba(14,17,24,0.75);
-            --bg-modal: rgba(22,26,35,0.95); --text: #e1e6ee; --text-light: #8a94a6;
-            --border: rgba(255,255,255,0.06); --primary: #6ba5cc; --accent-pink: #e09eaa;
-            --accent-green: #7eb99a;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         html { scroll-behavior:smooth; font-size:16px; }
         body {
             background: var(--bg); color: var(--text);
-            font-family: 'PingFang SC','Microsoft YaHei','宋体',sans-serif;
+            font-family: 'PingFang SC','Microsoft YaHei','Segoe UI',sans-serif;
             min-height:100vh; overflow-x:hidden; line-height:1.6;
             transition: background 0.3s, color 0.3s;
             -webkit-font-smoothing: antialiased;
@@ -41,14 +41,14 @@
         .btn {
             display: inline-flex; align-items: center; justify-content: center;
             padding: 10px 22px; border-radius: 24px; border: 1px solid transparent;
-            background: rgba(255,255,255,0.55); backdrop-filter: blur(8px);
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
             color: var(--text); font-weight: 600; font-size: 0.9rem;
             letter-spacing: 0.5px; cursor: pointer;
             transition: all var(--transition); position: relative; overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             font-family: inherit; white-space: nowrap;
         }
-        .btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: var(--shadow-hover); border-color: var(--primary); }
+        .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--primary); }
         .btn:active { transform: scale(0.97); }
         .btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
         .btn.pink { border-color: var(--accent-pink); color: var(--accent-pink); }
@@ -60,12 +60,13 @@
             position: sticky; top:0; z-index:50; background: var(--bg-nav);
             backdrop-filter: blur(16px); border-bottom:1px solid var(--border);
             padding:0 20px; height:60px; display:flex; align-items:center; justify-content:space-between;
-            box-shadow:0 2px 12px rgba(0,0,0,0.03);
+            transition: box-shadow 0.3s;
         }
+        .nav-bar.scrolled { box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
         .nav-logo { font-size:1.5rem; font-weight:800; cursor:pointer; background:linear-gradient(135deg, var(--primary), var(--accent-pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
         .nav-links { display:flex; gap:4px; list-style:none; }
         .nav-links .btn { background:transparent; box-shadow:none; border:none; padding:8px 16px; }
-        .nav-links .btn.active { background:rgba(75,139,180,0.12); color:var(--primary); }
+        .nav-links .btn.active { background:rgba(107,165,204,0.15); color:var(--primary); }
         .menu-toggle { display:none; background:none; border:none; font-size:1.6rem; cursor:pointer; color:var(--text); }
         @media (max-width:768px) {
             .nav-links { position:fixed; top:60px; left:0; right:0; background:var(--bg-nav); flex-direction:column; padding:16px; display:none; z-index:40; }
@@ -82,19 +83,19 @@
         .game-card {
             background:var(--bg-card); border-radius:var(--radius); overflow:hidden;
             cursor:pointer; border:1px solid var(--border); transition:all var(--transition);
-            box-shadow:var(--shadow);
+            box-shadow:var(--shadow); position:relative;
         }
         .game-card:hover { transform:translateY(-6px); border-color:var(--primary); box-shadow:var(--shadow-hover); }
         .card-cover { width:100%; aspect-ratio:3/4; object-fit:cover; display:block; }
         .card-body { padding:12px 14px; }
         .card-title { font-weight:700; font-size:0.95rem; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .card-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
-        .tag { font-size:0.7rem; padding:3px 10px; border-radius:12px; background:rgba(75,139,180,0.12); color:var(--primary); white-space:nowrap; }
-        .tag.hot { background:rgba(212,123,140,0.12); color:var(--accent-pink); }
+        .tag { font-size:0.7rem; padding:3px 10px; border-radius:12px; background:rgba(107,165,204,0.15); color:var(--primary); white-space:nowrap; }
+        .tag.hot { background:rgba(224,158,170,0.15); color:var(--accent-pink); }
 
         .filter-section { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
         .filter-btn { padding:8px 18px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text-light); cursor:pointer; font-size:0.85rem; transition:all var(--transition); }
-        .filter-btn.active { background:rgba(75,139,180,0.15); color:var(--primary); border-color:var(--primary); }
+        .filter-btn.active { background:rgba(107,165,204,0.2); color:var(--primary); border-color:var(--primary); }
 
         .modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:0.2s; }
         .modal-overlay.open { opacity:1; visibility:visible; }
@@ -106,15 +107,21 @@
         .preview-row { display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; }
         .preview-row img { width:80px; height:60px; object-fit:cover; border-radius:6px; cursor:pointer; transition:transform var(--transition); }
         .preview-row img:hover { transform:scale(1.05); border:1px solid var(--primary); }
-        .rating-star { font-size:1.5rem; color:#ccc; cursor:pointer; transition:0.1s; }
+        .rating-star { font-size:1.5rem; color:#555; cursor:pointer; transition:0.1s; }
         .rating-star.filled { color:#ffb347; }
         .comment-item { background:var(--bg-card); border-radius:10px; padding:12px; margin-bottom:10px; }
         .back-top { position:fixed; bottom:20px; right:20px; width:44px; height:44px; border-radius:50%; background:var(--primary); color:#fff; border:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); cursor:pointer; z-index:30; transition:all var(--transition); }
         .back-top:hover { transform:translateY(-3px); }
         .img-viewer { position:fixed; inset:0; z-index:300; background:rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:0.3s; }
         .img-viewer.active { opacity:1; visibility:visible; }
-        .img-viewer img { max-width:90vw; max-height:90vh; transform:scale(0.9); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+        .img-viewer img { max-width:90vw; max-height:90vh; transform:scale(0.9); transition:transform 0.4s; }
         .img-viewer.active img { transform:scale(1); }
+        /* 骨架屏 */
+        .skeleton { background: linear-gradient(90deg, var(--bg-card) 25%, rgba(255,255,255,0.1) 50%, var(--bg-card) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius); }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        .skeleton-card { height:100%; aspect-ratio:3/4; }
+        .section-title { font-size: 1.3rem; font-weight: 700; margin: 24px 0 16px; display: flex; align-items:center; gap:10px; }
+        .section-title::before { content:''; width:4px; height:24px; background:linear-gradient(180deg, var(--primary), var(--accent-pink)); border-radius:2px; }
         #particleCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
     </style>
 </head>
@@ -122,20 +129,20 @@
     <canvas id="particleCanvas"></canvas>
 
     <div id="appContainer">
-        <nav class="nav-bar">
+        <nav class="nav-bar" id="navBar">
             <div class="nav-logo" onclick="navigateTo('home')">Galfang</div>
             <ul class="nav-links" id="navLinks">
                 <li><button class="btn active" onclick="navigateTo('home')" data-page="home">首页</button></li>
                 <li><button class="btn" onclick="navigateTo('category')" data-page="category">分类浏览</button></li>
+                <li><button class="btn" onclick="randomGame()">&#127922; 随机</button></li>
             </ul>
             <div style="display:flex; gap:12px; align-items:center;">
                 <div class="search-box" style="position:relative">
                     <span>🔍</span>
                     <input type="text" id="searchInput" placeholder="搜索游戏..." autocomplete="off">
                     <button id="searchClear" style="display:none; background:none; border:none; cursor:pointer;">✕</button>
-                    <ul id="searchHistory" style="position:absolute; top:100%; left:0; right:0; background:var(--bg-card); border-radius:12px; list-style:none; max-height:200px; overflow-y:auto; display:none; z-index:60;"></ul>
                 </div>
-                <button class="btn" id="themeToggle" onclick="toggleTheme()" style="background:transparent; border:1px solid var(--border);">🌓</button>
+                <button class="btn" id="themeToggle" onclick="toggleTheme()" style="background:transparent; border:1px solid var(--border);">🌙</button>
                 <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
             </div>
         </nav>
@@ -143,18 +150,23 @@
         <div class="main-content">
             <div id="homeView">
                 <div class="swiper-container" id="featuredSwiper" style="border-radius:var(--radius); overflow:hidden; margin-bottom:24px;"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="section-title">今日推荐</div>
+                </div>
+                <div class="game-grid" id="dailyGrid"></div>
+                <div class="section-title">分类入口</div>
                 <div id="homeTagCloud" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;"></div>
-                <h2 style="margin-bottom:16px;">主页推荐</h2>
-                <div class="game-grid" id="featuredGrid"></div>
-                <div class="game-grid" id="searchResults" style="display:none;"></div>
-                <div id="searchStatus" style="display:none; text-align:center; margin-top:20px; color:var(--text-light);"></div>
-                <div id="onlineTimer" style="text-align:center; margin-top:30px; color:var(--text-light);">carenb666@foxmail.com 00:00:00</div>
+                <div class="section-title">精选推荐</div>
+                <div class="game-grid" id="featuredGrid"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
+                <div id="searchResults" style="display:none;"></div>
+                <div id="searchStatus" style="display:none; text-align:center; margin-top:20px;"></div>
+                <div id="onlineTimer" style="text-align:center; margin-top:30px; color:var(--text-light);">在线 00:00:00</div>
             </div>
             <div id="categoryView" style="display:none;">
-                <h2 style="margin-bottom:16px;">全部作品</h2>
+                <div class="section-title">全部作品</div>
                 <div class="filter-section" id="filterSection"></div>
                 <div class="game-grid" id="categoryGrid"></div>
-                <div id="noResults" style="display:none; text-align:center; padding:40px; color:var(--text-light);">暂时没有游戏，试试其他分类吧~</div>
+                <div id="noResults" style="display:none; text-align:center; padding:40px;">暂时没有游戏，试试其他分类吧~</div>
             </div>
         </div>
     </div>
@@ -176,274 +188,230 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // ==================== 配置 ====================
-        const API_BASE = 'https://galgame-api.fanggal.workers.dev';
-        const userId = (() => { let id = localStorage.getItem('gl_userId'); if (!id) { id = 'u_' + Date.now(); localStorage.setItem('gl_userId', id); } return id; })();
-        const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','悬疑','青春','校园','恋爱','后宫','搞笑','战斗','萝莉','催泪','全年龄'];
-        let gamesData = [];
-        let swiperInstance = null;
-        let currentPage = 'home';
-        let currentFilter = 'all';
-        let isSearching = false;
+        (function() {
+            const API_BASE = 'https://galgame-api.fanggal.workers.dev';
+            const userId = (() => { let id = localStorage.getItem('gl_userId'); if (!id) { id = 'u_' + Date.now(); localStorage.setItem('gl_userId', id); } return id; })();
+            const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','悬疑','青春','校园','恋爱','后宫','搞笑','战斗','萝莉','重口','全年龄'];
+            let gamesData = [];
+            let swiperInstance = null;
+            let currentPage = 'home';
+            let currentFilter = 'all';
 
-        // ==================== 数据加载 ====================
-        async function fetchGames() {
-            try { gamesData = await (await fetch(API_BASE + '/api/games')).json(); }
-            catch { gamesData = []; }
-            gamesData.forEach(g => { g.downloads = g.downloads || {}; g.previewImages = g.previewImages || []; });
-        }
-
-        // ==================== 工具函数 ====================
-        function createCard(game) {
-            let tagHtml = (game.tags||[]).map(t => `<span class="tag">${t}</span>`).join('');
-            if (game.isChinese) tagHtml += '<span class="tag hot">汉化</span>';
-            return `<div class="game-card" onclick="openGameDetail(${game.id})">
-                <img class="card-cover" src="${game.cover}" loading="lazy" onerror="this.style.background='#e0e0e0'">
-                <div class="card-body"><div class="card-title">${game.title}</div><div class="card-tags">${tagHtml}</div></div>
-            </div>`;
-        }
-
-        // 全局函数暴露
-        window.navigateTo = navigateTo;
-        window.toggleTheme = toggleTheme;
-        window.closeModal = closeModal;
-        window.openImageViewer = openImageViewer;
-        window.confirmDownload = confirmDownload;
-        window.toggleLike = toggleLike;
-        window.submitRating = submitRating;
-        window.submitComment = submitComment;
-        window.setFilter = setFilter;
-        window.goToTag = goToTag;
-        window.openGameDetail = openGameDetail;
-
-        // ==================== 核心：页面路由修复（搜索不会乱跑） ====================
-        function navigateTo(page, force = false) {
-            if (currentPage === page && !force) return; // 禁止重复导航
-            currentPage = page;
-            isSearching = false;
-
-            // 切换视图显示
-            document.getElementById('homeView').style.display = (page === 'home') ? 'block' : 'none';
-            document.getElementById('categoryView').style.display = (page === 'category') ? 'block' : 'none';
-
-            // 更新导航栏激活状态
-            document.querySelectorAll('.nav-links .btn').forEach(b => b.classList.remove('active'));
-            const activeBtn = document.querySelector(`.nav-links .btn[data-page="${page}"]`);
-            if (activeBtn) activeBtn.classList.add('active');
-
-            // 渲染对应页面
-            if (page === 'home') {
-                clearSearch();
-                renderHome();
-            }
-            if (page === 'category') {
-                clearSearch();
-                renderCategory();
+            // ==================== 工具函数 ====================
+            function createCard(game) {
+                let tagHtml = (game.tags||[]).slice(0,3).map(t => `<span class="tag">${t}</span>`).join('');
+                if (game.isChinese) tagHtml += '<span class="tag hot">汉化</span>';
+                return `<div class="game-card" onclick="openGameDetail(${game.id})">
+                    <img class="card-cover" src="${game.cover}" loading="lazy" onerror="this.style.background='var(--bg-card)'">
+                    <div class="card-body"><div class="card-title">${game.title}</div><div class="card-tags">${tagHtml}</div></div>
+                </div>`;
             }
 
-            // 更新URL哈希
-            window.location.hash = page;
-        }
-
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('searchClear').style.display = 'none';
-            document.getElementById('searchResults').style.display = 'none';
-            document.getElementById('searchStatus').style.display = 'none';
-            document.getElementById('featuredGrid').style.display = '';
-            searchInput.value = ''; // 确保清除输入框
-            isSearching = false;
-        }
-
-        // ==================== 页面渲染 ====================
-        function renderHome() {
-            if (!gamesData.length) {
-                document.getElementById('featuredGrid').innerHTML = '<div style="text-align:center;padding:40px;">正在连接服务器...</div>';
-                return;
+            function getTodaySeed() {
+                const now = new Date(); return now.getFullYear() * 10000 + (now.getMonth()+1)*100 + now.getDate();
             }
-            // 轮播图
-            const featured = gamesData.filter(g => g.featured);
-            const swiperContainer = document.getElementById('featuredSwiper');
-            if (featured.length && swiperContainer) {
-                swiperContainer.innerHTML = `<div class="swiper-wrapper">${featured.map(g => `
-                    <div class="swiper-slide" style="background-image:url('${g.bannerBg || g.cover}'); height:240px; background-size:cover; display:flex; align-items:flex-end; cursor:pointer;" onclick="openGameDetail(${g.id})">
-                        <div style="background:linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 60%); padding:24px; width:100%;">
-                            <h2 style="color:#fff;">${g.title}</h2>
-                            <p style="color:#fff; opacity:0.9;">${g.description?.slice(0,50) || ''}</p>
+
+            function randomGame() {
+                if (!gamesData.length) return;
+                const idx = Math.floor(Math.random() * gamesData.length);
+                openGameDetail(gamesData[idx].id);
+            }
+
+            // ==================== 页面导航 ====================
+            window.navigateTo = function(page, force = false) {
+                if (currentPage === page && !force) return;
+                currentPage = page;
+                document.getElementById('homeView').style.display = page === 'home' ? 'block' : 'none';
+                document.getElementById('categoryView').style.display = page === 'category' ? 'block' : 'none';
+                document.querySelectorAll('.nav-links .btn').forEach(b => b.classList.remove('active'));
+                const activeBtn = document.querySelector(`.nav-links .btn[data-page="${page}"]`);
+                if (activeBtn) activeBtn.classList.add('active');
+                if (page === 'home') { clearSearch(); renderHome(); }
+                if (page === 'category') { clearSearch(); renderCategory(); }
+                window.location.hash = page;
+            };
+            window.goToTag = (tag) => { currentFilter = tag; navigateTo('category', true); };
+            window.setFilter = (f) => { currentFilter = f; renderCategory(); };
+
+            function clearSearch() {
+                searchInput.value = ''; document.getElementById('searchClear').style.display = 'none';
+                document.getElementById('searchResults').style.display = 'none'; document.getElementById('searchStatus').style.display = 'none';
+            }
+
+            // ==================== 首页渲染 ====================
+            function renderHome() {
+                if (!gamesData.length) return;
+                // 轮播
+                const featured = gamesData.filter(g => g.featured);
+                const swiperContainer = document.getElementById('featuredSwiper');
+                if (featured.length && swiperContainer) {
+                    swiperContainer.innerHTML = `<div class="swiper-wrapper">${featured.map(g => `
+                        <div class="swiper-slide" style="background-image:url('${g.bannerBg || g.cover}'); height:240px; background-size:cover; display:flex; align-items:flex-end; cursor:pointer;" onclick="openGameDetail(${g.id})">
+                            <div style="background:linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 60%); padding:24px; width:100%;">
+                                <h2 style="color:#fff;">${g.title}</h2>
+                                <p style="color:#fff; opacity:0.9;">${g.description?.slice(0,50)||''}</p>
+                            </div>
+                        </div>`).join('')}</div><div class="swiper-pagination"></div>`;
+                    if (swiperInstance) swiperInstance.destroy();
+                    swiperInstance = new Swiper('#featuredSwiper', {
+                        slidesPerView: 1, loop: featured.length > 1,
+                        autoplay: { delay: 4000, disableOnInteraction: false },
+                        pagination: { el: '.swiper-pagination', clickable: true },
+                        speed: 600, grabCursor: true,
+                    });
+                }
+                // 今日推荐
+                const todaySeed = getTodaySeed();
+                const todayIndex = todaySeed % gamesData.length;
+                const todayGame = gamesData[todayIndex];
+                document.getElementById('dailyGrid').innerHTML = todayGame ? createCard(todayGame) : '';
+                // 精选
+                document.getElementById('featuredGrid').innerHTML = gamesData.slice(0,8).map(g => createCard(g)).join('');
+                // 分类标签
+                document.getElementById('homeTagCloud').innerHTML = COMMON_TAGS.map(t => `<span class="tag" style="cursor:pointer;" onclick="goToTag('${t}')">${t}</span>`).join('');
+            }
+
+            function renderCategory() {
+                let filtered = gamesData;
+                if (currentFilter !== 'all') {
+                    if (['PC','Android','krkr','Ty','ONS','android_direct'].includes(currentFilter))
+                        filtered = gamesData.filter(g => g.platforms?.some(p => p.type===currentFilter || p.sub===currentFilter));
+                    else if (currentFilter === 'chinese') filtered = gamesData.filter(g => g.isChinese);
+                    else filtered = gamesData.filter(g => g.tags?.includes(currentFilter));
+                }
+                document.getElementById('categoryGrid').innerHTML = filtered.map(g => createCard(g)).join('');
+                document.getElementById('noResults').style.display = filtered.length ? 'none' : 'block';
+                const filters = ['all','PC','Android','krkr','Ty','ONS','android_direct','chinese',...COMMON_TAGS];
+                document.getElementById('filterSection').innerHTML = filters.map(f => {
+                    let l = f; if(f==='android_direct') l='安卓直装'; if(f==='chinese') l='汉化';
+                    return `<button class="filter-btn ${currentFilter===f?'active':''}" onclick="setFilter('${f}')">${l}</button>`;
+                }).join('');
+            }
+
+            // ==================== 搜索 ====================
+            const searchInput = document.getElementById('searchInput');
+            const searchClear = document.getElementById('searchClear');
+            function getSearchHistory() { try{return JSON.parse(localStorage.getItem('searchHistory')||'[]');}catch{return[]} }
+            function addSearchHistory(k) { if(!k.trim())return; let h = getSearchHistory().filter(v=>v!==k); h.unshift(k); if(h.length>10)h.pop(); localStorage.setItem('searchHistory',JSON.stringify(h)); }
+            searchInput.addEventListener('input', () => {
+                const term = searchInput.value.trim();
+                searchClear.style.display = term ? 'block' : 'none';
+                if (term) {
+                    addSearchHistory(term);
+                    const results = gamesData.filter(g => g.title.includes(term) || g.tags?.some(t=>t.includes(term)));
+                    document.getElementById('featuredGrid').style.display = 'none';
+                    document.getElementById('searchResults').style.display = '';
+                    document.getElementById('searchResults').innerHTML = results.map(g => createCard(g)).join('');
+                    document.getElementById('searchStatus').style.display = 'block';
+                    document.getElementById('searchStatus').textContent = results.length ? `共找到 ${results.length} 个游戏` : '未找到相关游戏';
+                } else {
+                    document.getElementById('featuredGrid').style.display = '';
+                    document.getElementById('searchResults').style.display = 'none';
+                    document.getElementById('searchStatus').style.display = 'none';
+                    renderHome();
+                }
+            });
+            searchClear.addEventListener('click', () => { searchInput.value=''; searchClear.style.display='none'; document.getElementById('featuredGrid').style.display=''; document.getElementById('searchResults').style.display='none'; document.getElementById('searchStatus').style.display='none'; renderHome(); });
+
+            // ==================== 详情弹窗 ====================
+            window.openGameDetail = async function(id) {
+                const game = gamesData.find(g => g.id == id); if (!game) return;
+                const modal = document.getElementById('modalOverlay');
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="modal-cover"><img src="${game.cover}" onerror="this.style.background='var(--bg-card)'"></div>
+                    <div style="flex:1;">
+                        <h2>${game.title}</h2>
+                        <div class="card-tags">${(game.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+                        <p style="margin-top:12px;">${game.description||''}</p>
+                        ${game.previewImages?.length ? `<div class="preview-row">${game.previewImages.map(img => `<img src="${img}" onclick="openImageViewer('${img}')">`).join('')}</div>` : ''}
+                        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;">
+                            ${['PC','krkr','Ty','ONS','android_direct'].map(k => {
+                                const has = game.platforms?.some(p=>(k==='PC'?p.type==='PC':p.sub===k));
+                                const dl = game.downloads?.[k] || {};
+                                if (!has) return `<button class="btn disabled">${k} (无资源)</button>`;
+                                if (dl.url) return `<button class="btn primary" data-url="${dl.url}" data-source="${dl.source||''}" data-instructions="${dl.instructions||''}" onclick="window.confirmDownload(this)">${k} | ${dl.source||''}</button>`;
+                                return `<button class="btn disabled">${k} (待添加)</button>`;
+                            }).join('')}
                         </div>
-                    </div>`).join('')}</div><div class="swiper-pagination"></div>`;
-                if (swiperInstance) swiperInstance.destroy();
-                swiperInstance = new Swiper('#featuredSwiper', {
-                    slidesPerView: 1, loop: featured.length > 1,
-                    autoplay: { delay: 4000, disableOnInteraction: false },
-                    pagination: { el: '.swiper-pagination', clickable: true },
-                    speed: 600, grabCursor: true,
+                    </div>`;
+                const likeRes = await fetch(`${API_BASE}/api/likes/${id}?userId=${userId}`).then(r=>r.json());
+                document.getElementById('likeSection').innerHTML = `<button class="btn pink ${likeRes.liked?'liked':''}" onclick="window.toggleLike(${id})">❤️ ${likeRes.liked?'已赞':'点赞'}</button><span style="margin-left:10px;">${likeRes.count} 人赞过</span>`;
+                const ratingRes = await fetch(`${API_BASE}/api/ratings/${id}?userId=${userId}`).then(r=>r.json());
+                let stars = '';
+                for (let i=1;i<=5;i++) stars += `<span class="rating-star ${i<=ratingRes.myRating?'filled':''}" onclick="window.submitRating(${id},${i})">★</span>`;
+                document.getElementById('ratingSection').innerHTML = `<span>评分：</span><span style="display:inline-flex; gap:4px;">${stars}</span><span style="margin-left:8px;">(${ratingRes.average?.toFixed(1)||0} 分)</span>`;
+                const comments = await fetch(`${API_BASE}/api/comments/${id}`).then(r=>r.json());
+                document.getElementById('commentSection').innerHTML = `
+                    <h3>💬 评论 (${comments.length})</h3>
+                    ${comments.map(c => `<div class="comment-item"><b>${escapeHtml(c.name)}</b> <small>${new Date(c.time).toLocaleString()}</small><p>${escapeHtml(c.text)}</p></div>`).join('')}
+                    <div style="display:flex; gap:8px; margin-top:12px;">
+                        <input id="cmName" placeholder="名字" style="flex:1; padding:10px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text);">
+                        <input id="cmText" placeholder="写下评论..." style="flex:2; padding:10px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text);">
+                        <button class="btn primary" onclick="window.submitComment(${id})">发送</button>
+                    </div>`;
+                modal.classList.add('open');
+                window.location.hash = `detail/${id}`;
+            };
+            function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+            window.openImageViewer = (src) => { const v=document.getElementById('imgViewer'); document.getElementById('imgViewerImg').src=src; v.classList.add('active'); };
+            window.confirmDownload = (btn) => {
+                const url=btn.dataset.url, source=btn.dataset.source||'未知', ins=btn.dataset.instructions||'';
+                const overlay=document.createElement('div'); overlay.style.cssText='position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
+                overlay.innerHTML=`<div style="background:var(--bg-modal); border-radius:var(--radius); padding:24px; max-width:360px;"><h3>确认下载</h3><p>来源：${source}</p>${ins?`<p>说明：${ins}</p>`:''}<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;"><button class="btn" onclick="this.closest('div').parentElement.remove()">取消</button><button class="btn primary" onclick="window.open('${url}','_blank');this.closest('div').parentElement.remove()">确认下载</button></div></div>`;
+                overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();}); document.body.appendChild(overlay);
+            };
+            window.toggleLike = async (id) => { await fetch(`${API_BASE}/api/likes/${id}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId})}); openGameDetail(id); };
+            window.submitRating = async (id,rating) => { await fetch(`${API_BASE}/api/ratings/${id}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId,rating})}); openGameDetail(id); };
+            window.submitComment = async (id) => { const name=document.getElementById('cmName').value.trim(); const text=document.getElementById('cmText').value.trim(); if(!name||!text)return; await fetch(`${API_BASE}/api/comments/${id}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,text})}); openGameDetail(id); };
+            window.closeModal = () => { document.getElementById('modalOverlay').classList.remove('open'); window.location.hash='home'; };
+
+            // 主题切换
+            window.toggleTheme = () => {
+                document.body.classList.toggle('light'); // 默认深色，所以切换light类
+                const isLight = document.body.classList.contains('light');
+                localStorage.setItem('theme', isLight?'light':'dark');
+                document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+            };
+            (function initTheme(){ const t=localStorage.getItem('theme')||'dark'; if(t==='light'){ document.body.classList.add('light'); document.getElementById('themeToggle').textContent='☀️'; } })();
+
+            // 雪花
+            function initSnow() {
+                const c=document.getElementById('particleCanvas'), ctx=c.getContext('2d'); let pts=[];
+                const N=50; c.width=innerWidth; c.height=innerHeight;
+                window.addEventListener('resize',()=>{c.width=innerWidth;c.height=innerHeight;});
+                for(let i=0;i<N;i++) pts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,s:0.3+Math.random()*0.5,w:Math.random()*0.2-0.1});
+                function draw(){ ctx.clearRect(0,0,c.width,c.height); pts.forEach(p=>{p.y+=p.s;p.x+=p.w;if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;} if(p.x>c.width)p.x=0; if(p.x<0)p.x=c.width; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=`rgba(255,255,255,0.3)`; ctx.fill();}); requestAnimationFrame(draw); }
+                draw();
+            }
+            setInterval(()=>{ let s=(window.onlineSec=(window.onlineSec||0)+1), h=Math.floor(s/3600), m=Math.floor(s%3600/60), se=s%60; document.getElementById('onlineTimer').textContent=`在线 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(se).padStart(2,'0')}`; },1000);
+
+            // 导航栏滚动效果
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navBar');
+                nav.classList.toggle('scrolled', window.scrollY > 10);
+                document.getElementById('backTop').style.display = window.scrollY > 400 ? 'flex' : 'none';
+            });
+
+            // 数据加载与启动
+            window.addEventListener('load', async () => {
+                try { gamesData = await (await fetch(API_BASE + '/api/games')).json(); } catch { gamesData = []; }
+                gamesData.forEach(g => { g.downloads = g.downloads || {}; g.previewImages = g.previewImages || []; });
+                renderHome();
+                renderCategory();
+                initSnow();
+                // 路由监听
+                window.addEventListener('hashchange', () => {
+                    const hash = window.location.hash.slice(1);
+                    if (hash.startsWith('detail/')) {
+                        const id = parseInt(hash.split('/')[1]);
+                        if (id) openGameDetail(id);
+                    } else if (hash === 'category') navigateTo('category');
+                    else navigateTo('home');
                 });
-            }
-            // 正常显示精选推荐
-            document.getElementById('featuredGrid').style.display = '';
-            document.getElementById('featuredGrid').innerHTML = gamesData.slice(0, 8).map(g => createCard(g)).join('');
-            document.getElementById('homeTagCloud').style.display = '';
-            document.getElementById('homeTagCloud').innerHTML = COMMON_TAGS.map(t => `<span class="tag" style="cursor:pointer;" onclick="goToTag('${t}')">${t}</span>`).join('');
-        }
-
-        function goToTag(tag) {
-            currentFilter = tag;
-            navigateTo('category', true); // 强制跳转到分类页
-            setTimeout(() => {
-                const activeFilterBtn = document.querySelector(`.filter-btn[data-filter="${tag}"]`);
-                if (activeFilterBtn) activeFilterBtn.classList.add('active');
-            }, 100);
-        }
-
-        function renderCategory() {
-            let filtered = gamesData;
-            if (currentFilter !== 'all') {
-                if (['PC','Android','krkr','Ty','ONS','android_direct'].includes(currentFilter))
-                    filtered = gamesData.filter(g => g.platforms?.some(p => p.type===currentFilter || p.sub===currentFilter));
-                else if (currentFilter === 'chinese') filtered = gamesData.filter(g => g.isChinese);
-                else filtered = gamesData.filter(g => g.tags?.includes(currentFilter));
-            }
-            document.getElementById('categoryGrid').innerHTML = filtered.length ? filtered.map(g => createCard(g)).join('') : '';
-            document.getElementById('noResults').style.display = filtered.length ? 'none' : 'block';
-            const allFilters = ['all','PC','Android','krkr','Ty','ONS','android_direct','chinese',...COMMON_TAGS];
-            document.getElementById('filterSection').innerHTML = allFilters.map(ft => {
-                let label = ft; if (ft === 'android_direct') label = '安卓直装'; if (ft === 'chinese') label = '汉化';
-                return `<button class="filter-btn ${currentFilter===ft?'active':''}" data-filter="${ft}" onclick="setFilter('${ft}')">${label}</button>`;
-            }).join('');
-        }
-
-        function setFilter(f) {
-            currentFilter = f;
-            renderCategory();
-            // 更新筛选按钮状态
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            const activeBtn = document.querySelector(`.filter-btn[data-filter="${f}"]`);
-            if (activeBtn) activeBtn.classList.add('active');
-        }
-
-        // ==================== 搜索 ====================
-        const searchInput = document.getElementById('searchInput');
-        const searchClear = document.getElementById('searchClear');
-        function getSearchHistory() { try { return JSON.parse(localStorage.getItem('searchHistory')||'[]'); } catch { return []; } }
-        function addSearchHistory(kw) { if (!kw.trim()) return; let h = getSearchHistory().filter(h => h !== kw); h.unshift(kw); if (h.length>10) h.pop(); localStorage.setItem('searchHistory', JSON.stringify(h)); }
-
-        searchInput.addEventListener('input', () => {
-            const term = searchInput.value.trim();
-            searchClear.style.display = term ? 'block' : 'none';
-            if (term) {
-                addSearchHistory(term);
-                performSearch(term);
-            } else {
-                isSearching = false;
-                document.getElementById('searchResults').style.display = 'none';
-                document.getElementById('searchStatus').style.display = 'none';
-                document.getElementById('featuredGrid').style.display = '';
-                document.getElementById('homeTagCloud').style.display = '';
-                if (currentPage === 'home') renderHome();
-            }
-        });
-
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
-            searchClear.style.display = 'none';
-            isSearching = false;
-            document.getElementById('searchResults').style.display = 'none';
-            document.getElementById('searchStatus').style.display = 'none';
-            document.getElementById('featuredGrid').style.display = '';
-            document.getElementById('homeTagCloud').style.display = '';
-            if (currentPage === 'home') renderHome();
-        });
-
-        function performSearch(term) {
-            isSearching = true;
-            const results = gamesData.filter(g => g.title.includes(term) || g.tags?.some(t => t.includes(term)));
-            if (currentPage === 'home') {
-                document.getElementById('featuredGrid').style.display = 'none';
-                document.getElementById('homeTagCloud').style.display = 'none';
-                document.getElementById('searchResults').style.display = '';
-                document.getElementById('searchResults').innerHTML = results.length ? results.map(g => createCard(g)).join('') : '';
-                document.getElementById('searchStatus').style.display = 'block';
-                document.getElementById('searchStatus').textContent = results.length ? `共找到 ${results.length} 个游戏` : '未找到相关游戏';
-            }
-        }
-
-        // ==================== 详情与互动 ====================
-        async function openGameDetail(id) {
-            const game = gamesData.find(g => g.id == id);
-            if (!game) return;
-            const modal = document.getElementById('modalOverlay');
-            document.getElementById('modalBody').innerHTML = `
-                <div class="modal-cover"><img src="${game.cover}" onerror="this.style.background='#e0e0e0'"></div>
-                <div style="flex:1;">
-                    <h2>${game.title}</h2>
-                    <div class="card-tags">${(game.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-                    <p style="margin-top:12px; color:var(--text-light);">${game.description||''}</p>
-                    ${game.previewImages?.length ? `<div class="preview-row">${game.previewImages.map(img => `<img src="${img}" onclick="openImageViewer('${img}')">`).join('')}</div>` : ''}
-                    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;">
-                        ${['PC','krkr','Ty','ONS','android_direct'].map(k => {
-                            const has = game.platforms?.some(p => (k==='PC'?p.type==='PC':p.sub===k));
-                            const dl = game.downloads?.[k] || {};
-                            if (!has) return `<button class="btn disabled">${k} (无资源)</button>`;
-                            if (dl.url) return `<button class="btn primary" data-url="${dl.url}" data-source="${dl.source||''}" data-instructions="${dl.instructions||''}" onclick="confirmDownload(this)">${k} | ${dl.source||''}</button>`;
-                            return `<button class="btn disabled">${k} (待添加)</button>`;
-                        }).join('')}
-                    </div>
-                </div>`;
-            const likeRes = await fetch(`${API_BASE}/api/likes/${id}?userId=${userId}`).then(r=>r.json());
-            document.getElementById('likeSection').innerHTML = `<button class="btn pink ${likeRes.liked?'liked':''}" onclick="toggleLike(${id})">❤️ ${likeRes.liked?'已赞':'点赞'}</button><span style="margin-left:10px;">${likeRes.count} 人赞过</span>`;
-            const ratingRes = await fetch(`${API_BASE}/api/ratings/${id}?userId=${userId}`).then(r=>r.json());
-            let stars = '';
-            for (let i=1; i<=5; i++) stars += `<span class="rating-star ${i<=ratingRes.myRating?'filled':''}" onclick="submitRating(${id},${i})">★</span>`;
-            document.getElementById('ratingSection').innerHTML = `<span>评分：</span><span style="display:inline-flex; gap:4px;">${stars}</span><span style="margin-left:8px;">(${ratingRes.average?.toFixed(1)||0} 分)</span>`;
-            const comments = await fetch(`${API_BASE}/api/comments/${id}`).then(r=>r.json());
-            document.getElementById('commentSection').innerHTML = `
-                <h3>💬 评论 (${comments.length})</h3>
-                ${comments.map(c => `<div class="comment-item"><b>${escapeHtml(c.name)}</b> <small>${new Date(c.time).toLocaleString()}</small><p>${escapeHtml(c.text)}</p></div>`).join('')}
-                <div style="display:flex; gap:8px; margin-top:12px;">
-                    <input id="cmName" placeholder="名字" style="flex:1; padding:10px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text);">
-                    <input id="cmText" placeholder="写下评论..." style="flex:2; padding:10px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text);">
-                    <button class="btn primary" onclick="submitComment(${id})">发送</button>
-                </div>`;
-            modal.classList.add('open');
-            window.location.hash = `detail/${id}`;
-        }
-
-        function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-        function openImageViewer(src) { const v = document.getElementById('imgViewer'); document.getElementById('imgViewerImg').src = src; v.classList.add('active'); }
-        function confirmDownload(btn) {
-            const url = btn.dataset.url, source = btn.dataset.source||'未知', instructions = btn.dataset.instructions||'';
-            const overlay = document.createElement('div'); overlay.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
-            overlay.innerHTML = `<div style="background:var(--bg-modal); border-radius:var(--radius); padding:24px; max-width:360px;"><h3>确认下载</h3><p>来源：${source}</p>${instructions?`<p>说明：${instructions}</p>`:''}<div style="display:flex; gap:8px; justify-content:flex-end; margin-top:16px;"><button class="btn" onclick="this.closest('div').parentElement.remove()">取消</button><button class="btn primary" onclick="window.open('${url}','_blank');this.closest('div').parentElement.remove()">确认下载</button></div></div>`;
-            overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
-            document.body.appendChild(overlay);
-        }
-        async function toggleLike(id) { await fetch(`${API_BASE}/api/likes/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId}) }); openGameDetail(id); }
-        async function submitRating(id, rating) { await fetch(`${API_BASE}/api/ratings/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId, rating}) }); openGameDetail(id); }
-        async function submitComment(id) { const name = document.getElementById('cmName').value.trim(); const text = document.getElementById('cmText').value.trim(); if (!name||!text) return; await fetch(`${API_BASE}/api/comments/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, text}) }); openGameDetail(id); }
-        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
-
-        function toggleTheme() { document.body.classList.toggle('dark'); localStorage.setItem('theme', document.body.classList.contains('dark')?'dark':'light'); document.getElementById('themeToggle').textContent = document.body.classList.contains('dark')?'☀️':'🌓'; }
-        (function(){ const t=localStorage.getItem('theme')||'light'; if(t==='dark'){ document.body.classList.add('dark'); document.getElementById('themeToggle').textContent='☀️'; } })();
-
-        function initSnow() {
-            const c=document.getElementById('particleCanvas'), ctx=c.getContext('2d'); let pts=[];
-            const N=50; c.width=innerWidth; c.height=innerHeight;
-            window.addEventListener('resize',()=>{c.width=innerWidth;c.height=innerHeight;});
-            for(let i=0;i<N;i++) pts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*2+1,s:0.3+Math.random()*0.5,w:Math.random()*0.2-0.1});
-            function draw(){ ctx.clearRect(0,0,c.width,c.height); pts.forEach(p=>{p.y+=p.s;p.x+=p.w;if(p.y>c.height){p.y=-10;p.x=Math.random()*c.width;} if(p.x>c.width)p.x=0; if(p.x<0)p.x=c.width; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=`rgba(${document.body.classList.contains('dark')?'255':'200'},255,255,0.5)`; ctx.fill();}); requestAnimationFrame(draw); }
-            draw();
-        }
-
-        setInterval(()=>{ let s=(window.onlineSec=(window.onlineSec||0)+1), h=Math.floor(s/3600), m=Math.floor(s%3600/60), se=s%60; document.getElementById('onlineTimer').textContent=`在线 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(se).padStart(2,'0')}`; },1000);
-
-        window.addEventListener('load', async () => {
-            await fetchGames();
-            document.getElementById('appContainer').style.opacity = '1';
-            renderHome();
-            initSnow();
-            window.addEventListener('scroll', () => { document.getElementById('backTop').style.display = window.scrollY > 400 ? 'flex' : 'none'; });
-        });
+                // 根据初始hash
+                if (window.location.hash === '#category') navigateTo('category');
+            });
+        })();
     </script>
 </body>
 </html>
