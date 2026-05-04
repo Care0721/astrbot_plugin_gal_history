@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galfang · 佐久真纺</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Care0721/Fanggal/master/Lain.png">
-    <meta property="og:title" content="Galfang 佐久真纺">
+    <meta property="og:title" content="Galfang 佐久真诗">
     <meta property="og:description" content="发现更多Galgame资源，纯粹、简洁、高速。">
     <meta property="og:image" content="https://raw.githubusercontent.com/Care0721/Fanggal/master/Lain.png">
     <meta property="og:url" content="https://care0721.github.io/Fanggal">
@@ -54,7 +54,6 @@
         .btn.green { border-color: var(--green); color: var(--green); }
         .btn.disabled { opacity: 0.4; pointer-events: none; }
 
-        /* 导航 */
         .nav-bar {
             position: sticky; top:0; z-index:50; background: var(--nav-bg);
             backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
@@ -74,16 +73,12 @@
                 flex-direction: column; padding: 20px; display: none; z-index:40; }
             .nav-links.open { display: flex; }
             .menu-toggle { display: block; }
-            .search-box { width: 160px; }
-            .search-box input { width: 120px; }
         }
         .search-box { position: relative; display: flex; align-items: center; background: var(--card);
             border: 1px solid var(--border); border-radius: 30px; padding: 8px 20px; cursor: pointer; }
-        .search-box span { margin-right: 8px; opacity: 0.6; }
         .search-box input { background: transparent; border: none; color: var(--text);
-            font-size: 0.9rem; width: 160px; pointer-events: none; } /* 只读样式，点击整体触发 */
+            font-size: 0.9rem; width: 160px; pointer-events: none; }
 
-        /* 搜索独立界面 */
         .search-overlay {
             position: fixed; top:0; left:0; right:0; bottom:0; z-index:60;
             background: var(--bg); display: none; flex-direction: column;
@@ -110,7 +105,6 @@
             flex:1; overflow-y: auto; padding: 24px; max-width: 1320px;
             width: 100%; margin: 0 auto;
         }
-        .search-body .game-grid { margin-top: 20px; }
 
         .main-content { padding: 32px; max-width: 1320px; margin: 0 auto; }
         .hero {
@@ -183,6 +177,10 @@
         .category-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
         .category-icon { font-size: 1.8rem; margin-bottom: 8px; }
         .category-name { font-size: 0.85rem; font-weight: 500; }
+
+        .site-footer { text-align:center; margin-top:40px; padding:20px 0; color:var(--text-light); font-size:0.85rem; }
+        .site-footer a { color: var(--primary); text-decoration: none; font-weight: 500; }
+        .site-footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -204,7 +202,6 @@
             </div>
         </nav>
 
-        <!-- 专属搜索界面 -->
         <div class="search-overlay" id="searchOverlay">
             <div class="search-header">
                 <button onclick="closeSearchView()">← 返回</button>
@@ -240,13 +237,16 @@
                     <div class="skeleton skeleton-card"></div>
                     <div class="skeleton skeleton-card"></div>
                 </div>
-                <div id="onlineTimer" style="text-align:center; margin-top:40px; color:var(--text-light); font-size:0.8rem;">在线 00:00:00</div>
             </div>
             <div id="categoryView" style="display:none;">
                 <div class="section-title">全部作品</div>
                 <div class="filter-section" id="filterSection"></div>
                 <div class="game-grid" id="categoryGrid"></div>
                 <div id="noResults" style="display:none; text-align:center; padding:40px; color:var(--text-light);">暂时没有游戏，试试其他分类吧～</div>
+            </div>
+            <div class="site-footer">
+                <div id="uptimeDisplay">本站已运营 0 天 00:00:00</div>
+                <div style="margin-top:6px;">联系站长：<a href="mailto:carenb666@foxmail.com">carenb666@foxmail.com</a></div>
             </div>
         </div>
     </div>
@@ -270,7 +270,7 @@
         (function() {
             const API_BASE = 'https://galgame-api.fanggal.workers.dev';
             const userId = (() => { let id = localStorage.getItem('gl_userId'); if (!id) { id = 'u_' + Date.now(); localStorage.setItem('gl_userId', id); } return id; })();
-            const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','悬疑','青春','校园','恋爱','后宫','搞笑','战斗','催泪','萝莉','全年龄'];
+            const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','悬疑','青春','校园','恋爱','后宫','搞笑','战斗','萝莉','催泪','重口','全年龄'];
             let gamesData = [];
             let currentPage = 'home', currentFilter = 'all';
 
@@ -341,7 +341,7 @@
                 }).join('');
             }
 
-            // ====================== 搜索界面 ======================
+            // 搜索界面
             const searchOverlay = document.getElementById('searchOverlay');
             const searchViewInput = document.getElementById('searchViewInput');
             const searchViewClear = document.getElementById('searchViewClear');
@@ -352,7 +352,6 @@
             window.openSearchView = function() {
                 searchOverlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                // 可以携带当前输入框的值（但顶部是只读，忽略）
                 searchViewInput.value = '';
                 searchViewClear.style.display = 'none';
                 searchViewResults.innerHTML = '';
@@ -360,18 +359,15 @@
                 searchViewStatus.style.display = 'block';
                 setTimeout(() => searchViewInput.focus(), 100);
             };
-
             window.closeSearchView = function() {
                 searchOverlay.classList.remove('active');
                 document.body.style.overflow = '';
             };
 
-            // 监听搜索视图输入
             searchViewInput.addEventListener('input', function() {
                 const term = this.value.trim();
                 searchViewClear.style.display = term ? 'block' : 'none';
                 if (term) {
-                    // 保存历史
                     if (!searchHistory.includes(term)) {
                         searchHistory.unshift(term);
                         if (searchHistory.length > 10) searchHistory.pop();
@@ -391,7 +387,6 @@
                     searchViewStatus.style.display = 'block';
                 }
             });
-
             searchViewClear.addEventListener('click', () => {
                 searchViewInput.value = '';
                 searchViewClear.style.display = 'none';
@@ -400,18 +395,15 @@
                 searchViewStatus.style.display = 'block';
                 searchViewInput.focus();
             });
-
-            // 关闭搜索视图的键盘事件
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
                     closeSearchView();
                 }
             });
 
-            // ====================== 详情弹窗 ======================
+            // 详情弹窗
             window.openGameDetail = async function(id) {
                 const game = gamesData.find(g => g.id == id); if (!game) return;
-                // 如果搜索视图打开，关闭它
                 if (searchOverlay.classList.contains('active')) closeSearchView();
                 const modal = document.getElementById('modalOverlay');
                 modal.classList.add('open');
@@ -473,11 +465,31 @@
             };
             (function initTheme(){ const t=localStorage.getItem('theme')||'light'; if(t==='dark'){ document.body.classList.add('dark'); document.getElementById('themeToggle').textContent='○'; } })();
 
+            // 运营时间 (硬编码起始日期 2026-05-04)
+            (function startUptime() {
+                const START_DATE = new Date('2026-05-04T00:00:00'); // 固定起始日
+                function update() {
+                    const now = new Date();
+                    const diff = now - START_DATE;
+                    if (diff < 0) {
+                        document.getElementById('uptimeDisplay').textContent = '本站尚未开始运营';
+                        return;
+                    }
+                    const totalSec = Math.floor(diff / 1000);
+                    const days = Math.floor(totalSec / 86400);
+                    const hours = Math.floor((totalSec % 86400) / 3600);
+                    const minutes = Math.floor((totalSec % 3600) / 60);
+                    const seconds = totalSec % 60;
+                    document.getElementById('uptimeDisplay').textContent = `本站已运营 ${days} 天 ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+                }
+                update();
+                setInterval(update, 1000);
+            })();
+
             window.addEventListener('scroll', () => {
                 document.getElementById('navBar').classList.toggle('scrolled', window.scrollY > 10);
                 document.getElementById('backTop').style.display = window.scrollY > 400 ? 'flex' : 'none';
             });
-            setInterval(()=>{ let s=(window.onlineSec=(window.onlineSec||0)+1), h=Math.floor(s/3600), m=Math.floor(s%3600/60), se=s%60; document.getElementById('onlineTimer').textContent=`在线 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(se).padStart(2,'0')}`; },1000);
 
             // 初始化
             window.addEventListener('load', async () => {
