@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galfang · 佐久真纺</title>
-
-    <!-- 网站图标 (请替换 href 为你的图片链接) -->
+    <!-- 网站图标 (请替换 href) -->
     <link rel="icon" type="image/png" href="https://github.com/Care0721/Fanggal/blob/master/Lain.png">
-    <meta property="og:title" content="Galfang 佐久真纺">
+    <meta property="og:title" content="Galfang 琉璃资源库">
     <meta property="og:description" content="发现更多Galgame资源，纯粹、简洁、高速。">
     <meta property="og:image" content="https://github.com/Care0721/Fanggal/blob/master/Lain.png">
     <meta property="og:url" content="https://care0721.github.io/Fanggal">
     <meta property="og:type" content="website">
-
-    <!-- Swiper 轮播样式 -->
+    <!-- Swiper -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         :root {
@@ -22,8 +20,9 @@
             --border: rgba(30,40,60,0.08); --primary: #4b8bb4; --accent-pink: #d47b8c;
             --accent-green: #6ba589; --shadow: 0 8px 24px rgba(30,40,60,0.06);
             --shadow-hover: 0 12px 28px rgba(75,139,180,0.18);
-            --radius: 14px; --radius-sm: 8px;
-            --transition: 0.2s cubic-bezier(0.2, 0, 0, 1);
+            --radius: 16px; --radius-sm: 10px;
+            /* 精工回弹动画 */
+            --transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         body.dark {
             --bg: #0e1118; --bg-card: rgba(22,26,35,0.85); --bg-nav: rgba(14,17,24,0.7);
@@ -42,30 +41,52 @@
         }
         *:focus { outline: none; }
         button, input, textarea { outline: none; }
+        /* 可爱按钮核心样式 */
         button {
             cursor:pointer; font-family:inherit;
             transition: all var(--transition);
             position: relative; overflow: hidden;
             -webkit-tap-highlight-color: transparent;
+            border-radius: 24px;
+            border: 1px solid transparent;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            color: var(--text);
+            padding: 8px 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        button:active { transform: scale(0.97); }
-        #particleCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
-        #bootScreen { position:fixed; inset:0; z-index:9999; background:#0e1118; display:flex; align-items:center; justify-content:center; flex-direction:column; transition: opacity 0.6s; }
-        #bootScreen.hidden { opacity:0; visibility:hidden; pointer-events:none; }
-        .boot-box { background:rgba(14,17,24,0.9); border:1px solid #4b8bb4; border-radius:12px; padding:30px 40px; max-width:500px; color:#b4cde0; }
-        .boot-line { font-size:0.8rem; margin:5px 0; opacity:0; animation:bootIn 0.25s forwards; }
-        @keyframes bootIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
-        #appContainer { position:relative; z-index:1; opacity:0; transition: opacity 0.5s; }
-        #appContainer.visible { opacity:1; }
-        .nav-bar { position:sticky; top:0; z-index:100; background:var(--bg-nav); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:0 20px; height:60px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow); }
-        .nav-logo { font-size:1.4rem; font-weight:800; cursor:pointer; background:linear-gradient(135deg, var(--primary), var(--accent-pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-        .nav-links { display:flex; gap:4px; list-style:none; }
-        .nav-links button { background:transparent; border:none; color:var(--text-light); padding:8px 14px; border-radius:20px; font-size:0.9rem; }
-        .nav-links button.active { color:var(--primary); background:rgba(75,139,180,0.12); }
-        .theme-btn { background:transparent; border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
-        .search-box { display:flex; align-items:center; background:var(--bg-card); border:1px solid var(--border); border-radius:24px; padding:5px 12px; }
+        button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 18px rgba(75,139,180,0.25);
+            border-color: var(--primary);
+        }
+        button:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        /* 特定按钮重置 */
+        .nav-links button, .theme-btn, .menu-toggle, .filter-btn, .dl-btn, .like-btn, .back-top, .modal-close {
+            border-radius: 24px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+        }
+        .nav-links button, .filter-btn {
+            padding: 8px 18px;
+            font-size: 0.9rem;
+        }
+        .nav-links button.active {
+            background: rgba(75,139,180,0.15);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .search-box {
+            background: var(--bg-card); border:1px solid var(--border); border-radius:24px; padding:6px 14px;
+            display:flex; align-items:center;
+        }
         .search-box input { background:transparent; border:none; color:var(--text); outline:none; font-size:0.85rem; width:130px; font-family:inherit; }
-        .search-box button { background:transparent; border:none; color:var(--text-light); cursor:pointer; }
+        .search-box button { background:transparent; border:none; color:var(--text-light); padding:0 4px; }
         .menu-toggle { display:none; }
         @media (max-width:768px) {
             .nav-links { position:fixed; top:60px; left:0; right:0; background:var(--bg-nav); flex-direction:column; padding:16px; display:none; }
@@ -77,40 +98,74 @@
         .swiper-slide { height:260px; background-size:cover; background-position:center; display:flex; align-items:flex-end; }
         .slide-overlay { background:linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 60%); }
         .slide-info { padding:24px; color:#fff; }
-        .game-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:18px; margin:16px 0; }
-        .game-card { background:var(--bg-card); border-radius:var(--radius); overflow:hidden; cursor:pointer; border:1px solid var(--border); transition:0.2s; }
-        .game-card:hover { transform:translateY(-6px); border-color:var(--primary); box-shadow:var(--shadow-hover); }
+        .game-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:20px; margin:16px 0; }
+        @media (max-width:480px) { .game-grid { grid-template-columns:repeat(2, 1fr); gap:14px; } }
+        .game-card {
+            background: var(--bg-card); border-radius:var(--radius); overflow:hidden;
+            cursor:pointer; border:1px solid var(--border);
+            transition: all var(--transition);
+            box-shadow: var(--shadow);
+        }
+        .game-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
+        }
         .card-cover { width:100%; aspect-ratio:3/4; object-fit:cover; display:block; }
-        .card-body { padding:12px; }
-        .card-title { font-weight:700; margin-bottom:4px; }
-        .tag { font-size:0.65rem; padding:2px 8px; border-radius:6px; background:rgba(75,139,180,0.12); color:var(--primary); }
-        .filter-section { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
-        .filter-btn { padding:6px 16px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text-light); cursor:pointer; }
-        .filter-btn.active { background:rgba(75,139,180,0.15); color:var(--primary); border-color:var(--primary); }
+        .card-body { padding:14px; }
+        .card-title { font-weight:700; margin-bottom:6px; font-size:0.95rem; }
+        .tag { font-size:0.7rem; padding:2px 10px; border-radius:12px; background:rgba(75,139,180,0.15); color:var(--primary); }
+        .filter-section { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
+        .filter-btn { padding:8px 20px; border-radius:24px; border:1px solid var(--border); background:var(--bg-card); color:var(--text-light); cursor:pointer; font-size:0.85rem; transition: all var(--transition); }
+        .filter-btn.active { background:rgba(75,139,180,0.2); color:var(--primary); border-color:var(--primary); }
         .modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.65); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:0.3s; }
         .modal-overlay.open { opacity:1; visibility:visible; }
-        .modal-dialog { background:var(--bg-modal); border-radius:var(--radius); padding:24px; max-width:800px; width:92%; max-height:85vh; overflow-y:auto; }
+        .modal-dialog { background:var(--bg-modal); border-radius:var(--radius); padding:28px; max-width:800px; width:92%; max-height:85vh; overflow-y:auto; box-shadow:0 20px 50px rgba(0,0,0,0.2); transition: transform var(--transition); }
+        .modal-overlay.open .modal-dialog { transform: scale(1); }
+        .modal-overlay:not(.open) .modal-dialog { transform: scale(0.95); }
         .modal-close { float:right; background:transparent; border:none; font-size:1.5rem; cursor:pointer; }
-        .modal-body { display:flex; gap:20px; flex-wrap:wrap; }
-        .modal-cover img { width:180px; border-radius:var(--radius-sm); }
-        .preview-row { display:flex; gap:8px; margin:12px 0; }
-        .preview-row img { width:80px; height:60px; object-fit:cover; border-radius:6px; cursor:pointer; }
-        .dl-btn { padding:8px 18px; border-radius:24px; border:1px solid var(--primary); background:rgba(75,139,180,0.1); color:var(--primary); cursor:pointer; margin-right:8px; margin-bottom:8px; }
-        .dl-btn:hover { background:var(--primary); color:#fff; }
-        .like-btn { padding:6px 16px; border-radius:20px; border:1px solid var(--accent-pink); background:rgba(212,123,140,0.1); color:var(--accent-pink); cursor:pointer; }
-        .like-btn.liked { background:var(--accent-pink); color:#fff; }
-        .rating-star { font-size:1.4rem; color:#ccc; cursor:pointer; }
-        .rating-star.filled { color:#ffb347; }
-        .comment-item { background:var(--bg-card); border-radius:8px; padding:10px; margin-bottom:8px; }
-        .back-top { position:fixed; bottom:20px; right:20px; width:44px; height:44px; border-radius:50%; background:var(--primary); color:#fff; border:none; display:flex; align-items:center; justify-content:center; }
+        .modal-body { display:flex; gap:24px; flex-wrap:wrap; }
+        .modal-cover img { width:190px; border-radius:var(--radius-sm); transition: all var(--transition); }
+        .modal-cover img:hover { transform: scale(1.03); }
+        .preview-row { display:flex; gap:10px; margin:14px 0; }
+        .preview-row img { width:85px; height:65px; object-fit:cover; border-radius:8px; cursor:pointer; transition: all var(--transition); }
+        .preview-row img:hover { transform: scale(1.08); border:1px solid var(--primary); }
+        .dl-btn, .like-btn {
+            padding:10px 22px; border-radius:24px;
+            background: rgba(255,255,255,0.5); backdrop-filter: blur(10px);
+            border:1px solid var(--primary); color:var(--primary);
+            font-weight:700; font-size:0.85rem; margin:4px 6px 4px 0;
+            transition: all var(--transition);
+        }
+        .dl-btn:hover { background: var(--primary); color:#fff; transform: translateY(-2px); }
+        .dl-btn:disabled { opacity:0.4; pointer-events:none; }
+        .like-btn { border-color: var(--accent-pink); color: var(--accent-pink); }
+        .like-btn:hover { background: var(--accent-pink); color:#fff; }
+        .like-btn.liked { background: var(--accent-pink); color:#fff; }
+        .rating-star { font-size:1.5rem; color:#ccc; cursor:pointer; transition:0.1s; }
+        .rating-star.filled { color:#ffb347; transform: scale(1.1); }
+        .comment-item { background:var(--bg-card); border-radius:12px; padding:14px; margin-bottom:10px; }
+        .back-top { position:fixed; bottom:20px; right:20px; width:46px; height:46px; border-radius:50%; background:var(--primary); color:#fff; border:none; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); transition: all var(--transition); }
+        .back-top:hover { transform: translateY(-4px) scale(1.05); }
         .img-viewer { position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:0.3s; }
         .img-viewer.active { opacity:1; visibility:visible; }
-        .img-viewer img { max-width:90vw; max-height:90vh; }
+        .img-viewer img { max-width:90vw; max-height:90vh; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .img-viewer.active img { transform: scale(1); }
     </style>
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
-    <div id="bootScreen"><div class="boot-box"><div>GALFANG 初始化</div><div class="boot-line">加载资源索引...</div><div class="boot-line">数据库校验 OK</div><div class="boot-line">启动渲染引擎...</div><div class="boot-line">正在加载资源库...</div><div class="boot-line">一直卡在此界面请开启VPN</div></div></div>
+    <div id="bootScreen" class="boot-screen">
+        <div class="boot-box">
+            <div style="font-size:1rem; margin-bottom:10px; letter-spacing:2px;">G A L F A N G · 初 始 化</div>
+            <div class="boot-line">> 加载资源索引...</div>
+            <div class="boot-line">> 校验数据库完整性... OK</div>
+            <div class="boot-line">> 启动渲染引擎... OK</div>
+            <div class="boot-line">> 连接粒子网络...</div>
+            <div class="boot-line">> 正在加载资源库...</div>
+            <div class="boot-line">> 一直卡在此界面请开启VPN</div>
+        </div>
+    </div>
 
     <div id="appContainer">
         <nav class="nav-bar">
@@ -124,7 +179,7 @@
                     <span>🔍</span>
                     <input type="text" id="searchInput" placeholder="搜索游戏..." autocomplete="off">
                     <button id="searchClear" style="display:none;">✕</button>
-                    <ul id="searchHistory" style="position:absolute; top:100%; left:0; right:0; background:var(--bg-card); border-radius:var(--radius); list-style:none; display:none; z-index:10;"></ul>
+                    <ul id="searchHistory" style="position:absolute; top:100%; left:0; right:0; background:var(--bg-card); border-radius:var(--radius); list-style:none; display:none; z-index:10; padding:8px;"></ul>
                 </div>
                 <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌓</button>
                 <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
@@ -134,16 +189,16 @@
         <div class="main-content">
             <div id="homeView">
                 <div class="swiper-container" id="featuredSwiper"></div>
-                <div id="homeTagCloud" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;"></div>
-                <h2>站长推荐</h2>
+                <div id="homeTagCloud" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;"></div>
+                <h2 style="margin-bottom:18px;">站长推荐</h2>
                 <div class="game-grid" id="featuredGrid"></div>
-                <div id="onlineTimer" style="text-align:center; margin-top:30px;">在线 00:00:00</div>
+                <div id="onlineTimer" style="text-align:center; margin-top:30px; color:var(--text-light);">在线 00:00:00</div>
             </div>
             <div id="categoryView" style="display:none;">
-                <h2>全部作品</h2>
+                <h2 style="margin-bottom:18px;">全部作品</h2>
                 <div class="filter-section" id="filterSection"></div>
                 <div class="game-grid" id="categoryGrid"></div>
-                <div id="noResults" style="display:none; text-align:center; padding:40px;">暂时没有游戏，试试其他分类吧~</div>
+                <div id="noResults" style="display:none; text-align:center; padding:40px; color:var(--text-light);">暂时没有游戏，试试其他分类吧~</div>
             </div>
         </div>
     </div>
@@ -152,20 +207,20 @@
         <div class="modal-dialog" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal()">&times;</button>
             <div class="modal-body" id="modalBody"></div>
-            <div id="likeSection"></div>
-            <div id="ratingSection"></div>
-            <div id="commentSection"></div>
+            <div id="likeSection" style="margin-top:18px;"></div>
+            <div id="ratingSection" style="margin-top:12px;"></div>
+            <div id="commentSection" style="margin-top:20px;"></div>
         </div>
     </div>
 
     <div class="img-viewer" id="imgViewer" onclick="this.classList.remove('active')">
-        <img id="imgViewerImg" src="">
+        <img id="imgViewerImg" src="" style="transform:scale(0.9);">
     </div>
-    <button class="back-top" id="backTop" onclick="window.scrollTo({top:0})">↑</button>
+    <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // ==================== 配置与工具 ====================
+        // 配置
         const API_BASE = 'https://galgame-api.fanggal.workers.dev';
         const userId = (() => { let id = localStorage.getItem('gl_userId'); if (!id) { id = 'u_' + Date.now(); localStorage.setItem('gl_userId', id); } return id; })();
         const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','悬疑','青春','校园','恋爱','后宫','搞笑','战斗','催泪','萝莉','全年龄'];
@@ -173,7 +228,6 @@
         let swiperInstance = null;
         let currentPage = 'home', currentFilter = 'all';
 
-        // ==================== 初始化 ====================
         async function fetchGames() {
             try { gamesData = await (await fetch(API_BASE + '/api/games')).json(); }
             catch { gamesData = []; }
@@ -191,10 +245,9 @@
 
         function renderHome() {
             if (!gamesData.length) {
-                document.getElementById('featuredGrid').innerHTML = '正在连接服务器...';
+                document.getElementById('featuredGrid').innerHTML = '<div style="text-align:center;padding:40px;">正在连接服务器...</div>';
                 return;
             }
-            // 轮播
             const featured = gamesData.filter(g => g.featured);
             const swiperContainer = document.getElementById('featuredSwiper');
             if (featured.length && swiperContainer) {
@@ -215,7 +268,6 @@
             document.getElementById('homeTagCloud').innerHTML = COMMON_TAGS.map(t => `<span class="tag" style="cursor:pointer;" onclick="goToTag('${t}')">${t}</span>`).join('');
         }
 
-        // ==================== 导航 ====================
         function navigateTo(page) {
             currentPage = page;
             document.getElementById('homeView').style.display = page === 'home' ? 'block' : 'none';
@@ -249,11 +301,10 @@
 
         function setFilter(f) { currentFilter = f; renderCategory(); }
 
-        // ==================== 搜索 ====================
+        // 搜索功能 (与之前一致，保持流畅)
         const searchInput = document.getElementById('searchInput');
-        const searchClear = document.getElementById('searchClear');
-        const searchHistory = document.getElementById('searchHistory');
-
+        const searchClearBtn = document.getElementById('searchClear');
+        const searchHistoryEl = document.getElementById('searchHistory');
         function getSearchHistory() { try { return JSON.parse(localStorage.getItem('searchHistory')||'[]'); } catch { return []; } }
         function addSearchHistory(keyword) {
             if (!keyword.trim()) return;
@@ -264,52 +315,50 @@
         }
         function updateHistoryUI() {
             const history = getSearchHistory();
-            searchHistory.innerHTML = history.map(h => `<li style="padding:8px 12px; cursor:pointer;">${h}</li>`).join('');
+            searchHistoryEl.innerHTML = history.map(h => `<li style="padding:8px 12px; cursor:pointer; border-radius:12px;">${h}</li>`).join('');
         }
-
         searchInput.addEventListener('input', () => {
             const term = searchInput.value.trim();
-            searchClear.style.display = term ? 'block' : 'none';
+            searchClearBtn.style.display = term ? 'block' : 'none';
             if (term) {
                 addSearchHistory(term);
                 performSearch(term);
             } else {
                 if (currentPage === 'home') renderHome();
                 else renderCategory();
-                searchHistory.style.display = 'none';
+                searchHistoryEl.style.display = 'none';
             }
         });
-
-        searchInput.addEventListener('focus', () => { updateHistoryUI(); searchHistory.style.display = 'block'; });
-        searchInput.addEventListener('blur', () => setTimeout(() => searchHistory.style.display = 'none', 200));
-        searchHistory.addEventListener('mousedown', (e) => {
+        searchInput.addEventListener('focus', () => { updateHistoryUI(); searchHistoryEl.style.display = 'block'; });
+        searchInput.addEventListener('blur', () => setTimeout(() => searchHistoryEl.style.display = 'none', 200));
+        searchHistoryEl.addEventListener('mousedown', (e) => {
             if (e.target.tagName === 'LI') {
                 searchInput.value = e.target.textContent;
                 performSearch(e.target.textContent);
-                searchHistory.style.display = 'none';
+                searchHistoryEl.style.display = 'none';
             }
         });
-        searchClear.addEventListener('click', () => { searchInput.value = ''; searchClear.style.display = 'none'; if (currentPage === 'home') renderHome(); else renderCategory(); });
-
+        searchClearBtn.addEventListener('click', () => { searchInput.value = ''; searchClearBtn.style.display = 'none'; if (currentPage === 'home') renderHome(); else renderCategory(); });
         function performSearch(term) {
             if (!term) return;
             const results = gamesData.filter(g => g.title.toLowerCase().includes(term.toLowerCase()) || g.tags?.some(t => t.includes(term)));
             const gridId = currentPage === 'home' ? 'featuredGrid' : 'categoryGrid';
-            document.getElementById(gridId).innerHTML = results.length ? results.map(g => createCard(g)).join('') : '<div style="grid-column:1/-1; padding:40px;">未找到相关游戏</div>';
+            document.getElementById(gridId).innerHTML = results.length ? results.map(g => createCard(g)).join('') : '<div style="grid-column:1/-1; padding:40px; text-align:center;">未找到相关游戏</div>';
         }
 
-        // ==================== 详情弹窗 ====================
+        // 详情弹窗 (动画优化)
         async function openGameDetail(id) {
             const game = gamesData.find(g => g.id == id);
             if (!game) return;
             const modal = document.getElementById('modalOverlay');
-            document.getElementById('modalBody').innerHTML = `<div class="modal-cover"><img src="${game.cover}" onerror="this.style.background='#e0e0e0'"></div>
+            document.getElementById('modalBody').innerHTML = `
+                <div class="modal-cover"><img src="${game.cover}" onerror="this.style.background='#e0e0e0'"></div>
                 <div class="modal-info">
                     <h2>${game.title}</h2>
-                    <div>${(game.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
-                    <p style="margin-top:12px;">${game.description||''}</p>
+                    <div class="card-tags">${(game.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+                    <p style="margin-top:12px; color:var(--text-light);">${game.description||''}</p>
                     ${game.previewImages?.length ? `<div class="preview-row">${game.previewImages.map(img => `<img src="${img}" onclick="openImageViewer('${img}')">`).join('')}</div>` : ''}
-                    <div style="margin-top:16px;">
+                    <div style="margin-top:16px; display:flex; flex-wrap:wrap;">
                         ${['PC','krkr','Ty','ONS','android_direct'].map(k => {
                             const has = game.platforms?.some(p => (k==='PC'?p.type==='PC':p.sub===k));
                             const dl = game.downloads?.[k] || {};
@@ -319,35 +368,35 @@
                         }).join('')}
                     </div>
                 </div>`;
-            // 点赞与评分
+            // 点赞
             const likeRes = await fetch(`${API_BASE}/api/likes/${id}?userId=${userId}`).then(r=>r.json());
-            document.getElementById('likeSection').innerHTML = `<button class="like-btn ${likeRes.liked?'liked':''}" onclick="toggleLike(${id})">❤️ ${likeRes.liked?'已赞':'点赞'}</button> <span>${likeRes.count} 人赞过</span>`;
+            document.getElementById('likeSection').innerHTML = `<button class="like-btn ${likeRes.liked?'liked':''}" onclick="toggleLike(${id})">❤️ ${likeRes.liked?'已赞':'点赞'}</button><span style="margin-left:10px;">${likeRes.count} 人赞过</span>`;
+            // 评分
             const ratingRes = await fetch(`${API_BASE}/api/ratings/${id}?userId=${userId}`).then(r=>r.json());
             let stars = '';
             for (let i=1; i<=5; i++) stars += `<span class="rating-star ${i<=ratingRes.myRating?'filled':''}" onclick="submitRating(${id},${i})">★</span>`;
-            document.getElementById('ratingSection').innerHTML = `<span>评分：</span><div style="display:inline;">${stars}</div> <span>(${ratingRes.average?.toFixed(1) || 0} 分)</span>`;
+            document.getElementById('ratingSection').innerHTML = `<span>评分：</span><div style="display:inline-flex; gap:4px;">${stars}</div><span style="margin-left:8px;">(${ratingRes.average?.toFixed(1) || 0} 分)</span>`;
             // 评论
             const comments = await fetch(`${API_BASE}/api/comments/${id}`).then(r=>r.json());
             document.getElementById('commentSection').innerHTML = `
-                <h3>评论 (${comments.length})</h3>
-                ${comments.map(c => `<div class="comment-item"><b>${escapeHtml(c.name)}</b> <small>${new Date(c.time).toLocaleString()}</small><p>${escapeHtml(c.text)}</p></div>`).join('')}
-                <div style="display:flex; gap:8px; margin-top:12px;">
-                    <input id="cmName" placeholder="名字" style="flex:1; padding:8px; border-radius:20px; border:1px solid var(--border);">
-                    <input id="cmText" placeholder="评论..." style="flex:2; padding:8px; border-radius:20px; border:1px solid var(--border);">
+                <h3>💬 评论 (${comments.length})</h3>
+                ${comments.map(c => `<div class="comment-item"><b>${escapeHtml(c.name)}</b> <small style="margin-left:8px;">${new Date(c.time).toLocaleString()}</small><p style="margin-top:6px;">${escapeHtml(c.text)}</p></div>`).join('')}
+                <div style="display:flex; gap:8px; margin-top:14px;">
+                    <input id="cmName" placeholder="名字" style="flex:1; padding:10px; border-radius:24px; border:1px solid var(--border); background:var(--bg-card); color:var(--text);">
+                    <input id="cmText" placeholder="写下评论..." style="flex:2; padding:10px; border-radius:24px; border:1px solid var(--border); background:var(--bg-card); color:var(--text);">
                     <button class="dl-btn" onclick="submitComment(${id})">发送</button>
                 </div>`;
             modal.classList.add('open');
+            window.location.hash = `detail/${id}`;
         }
 
         function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
         function openImageViewer(src) { const v = document.getElementById('imgViewer'); document.getElementById('imgViewerImg').src = src; v.classList.add('active'); }
         function confirmDownload(btn) {
-            const url = btn.dataset.url;
-            const source = btn.dataset.source || '未知';
-            const instructions = btn.dataset.instructions || '';
+            const url = btn.dataset.url, source = btn.dataset.source || '未知', instructions = btn.dataset.instructions || '';
             const overlay = document.createElement('div');
             overlay.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
-            overlay.innerHTML = `<div style="background:var(--bg-modal); padding:24px; border-radius:var(--radius);"><h3>确认下载</h3><p>来源：${source}</p>${instructions ? `<p>说明：${instructions}</p>` : ''}<div style="margin-top:16px; text-align:right;"><button onclick="this.closest('div').parentElement.remove()">取消</button> <button onclick="window.open('${url}','_blank');this.closest('div').parentElement.remove()">确认下载</button></div></div>`;
+            overlay.innerHTML = `<div style="background:var(--bg-modal); border-radius:var(--radius); padding:24px; max-width:360px;"><h3>确认下载</h3><p style="margin:8px 0;">来源：${source}</p>${instructions ? `<p>说明：${instructions}</p>` : ''}<div style="margin-top:16px; display:flex; justify-content:flex-end; gap:8px;"><button onclick="this.closest('div').parentElement.remove()" style="background:transparent; border:1px solid var(--border);">取消</button><button onclick="window.open('${url}','_blank');this.closest('div').parentElement.remove()" style="background:var(--primary); color:#fff;">确认下载</button></div></div>`;
             overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
             document.body.appendChild(overlay);
         }
@@ -356,24 +405,22 @@
         async function submitComment(id) { const name = document.getElementById('cmName').value.trim(); const text = document.getElementById('cmText').value.trim(); if (!name||!text) return; await fetch(`${API_BASE}/api/comments/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, text}) }); openGameDetail(id); }
         function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
-        // 主题切换
+        // 主题
         function toggleTheme() { document.body.classList.toggle('dark'); localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light'); document.getElementById('themeToggle').textContent = document.body.classList.contains('dark') ? '☀️' : '🌓'; }
         (function initTheme() { const saved = localStorage.getItem('theme') || 'light'; if (saved === 'dark') document.body.classList.add('dark'); document.getElementById('themeToggle').textContent = saved === 'dark' ? '☀️' : '🌓'; })();
 
-        // 在线计时与特效
+        // 在线计时 & 雪花特效 (保持一致)
         setInterval(() => {
             window.onlineSec = (window.onlineSec||0) + 1;
             const sec = window.onlineSec, h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
-            const el = document.getElementById('onlineTimer');
-            if (el) el.textContent = `在线 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            document.getElementById('onlineTimer').textContent = `在线 ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }, 1000);
 
-        // 雪花特效
         function initSnow() {
             const canvas = document.getElementById('particleCanvas');
             const ctx = canvas.getContext('2d');
             let particles = [];
-            const count = 40;
+            const count = 45;
             canvas.width = innerWidth; canvas.height = innerHeight;
             window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });
             for (let i=0; i<count; i++) particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2+1, speed: 0.3+Math.random()*0.5, wind: Math.random()*0.2-0.1 });
