@@ -1,2259 +1,730 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FangGal · Galgame 佐久真纺</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Noto+Serif+SC:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: {
-        ui: ['Outfit', 'sans-serif'],
-        title: ['"Noto Serif SC"', 'serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
-      },
-      colors: {
-        pk: { DEFAULT: '#ff6eb4', light: '#ffaed6', dark: '#d63f8c' },
-        pu: { DEFAULT: '#b06ef3', light: '#d4a8ff', dark: '#7c3aed' },
-        cy: { DEFAULT: '#5ce0e6', dark: '#0891b2' },
-        bg: {
-          base: '#060914',
-          900: '#09101f',
-          800: '#0d1526',
-          700: '#111c30',
-          600: '#16233c',
-          card: 'rgba(11,16,34,0.88)',
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GalHub - 纺</title>
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        card: '#1e293b',
+                        primary: '#ec4899', 
+                        secondary: '#a855f7',
+                        accent: '#8b5cf6'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+                    }
+                }
+            }
         }
-      },
-      backdropBlur: { xs: '4px' },
-    }
-  }
-}
-</script>
-<style>
-/* ============================================================
-   CSS CUSTOM PROPERTIES & BASE
-   ============================================================ */
-:root {
-  --pk: #ff6eb4;
-  --pu: #b06ef3;
-  --cy: #5ce0e6;
-  --bg-base: #060914;
-  --glow-pk: 0 0 24px rgba(255,110,180,0.35), 0 0 60px rgba(255,110,180,0.12);
-  --glow-pu: 0 0 24px rgba(176,110,243,0.35), 0 0 60px rgba(176,110,243,0.12);
-  --card-border: rgba(255,110,180,0.12);
-  --card-bg: rgba(11,16,34,0.88);
-  --card-hover-border: rgba(255,110,180,0.35);
-  --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Outfit', sans-serif;
-  background-color: var(--bg-base);
-  color: #e2e8f0;
-  min-height: 100vh;
-  overflow-x: hidden;
-  line-height: 1.6;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0a0e1a; }
-::-webkit-scrollbar-thumb { background: rgba(255,110,180,0.4); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,110,180,0.7); }
-
-/* ============================================================
-   ANIMATED BACKGROUND
-   ============================================================ */
-#bg-canvas {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.6;
-}
-
-.bg-mesh {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(176,110,243,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(255,110,180,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 60% at 50% 50%, rgba(92,224,230,0.03) 0%, transparent 70%),
-    linear-gradient(180deg, #060914 0%, #0a0e1a 100%);
-}
-
-.bg-grid {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    linear-gradient(rgba(255,110,180,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,110,180,0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: linear-gradient(180deg, transparent, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.3) 70%, transparent);
-}
-
-/* ============================================================
-   PARTICLES
-   ============================================================ */
-.particle {
-  position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  animation: float-up linear infinite;
-  opacity: 0;
-}
-@keyframes float-up {
-  0%   { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 0.6; }
-  100% { transform: translateY(-20px) translateX(var(--drift)) rotate(360deg); opacity: 0; }
-}
-
-/* ============================================================
-   NAVBAR
-   ============================================================ */
-#navbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), background 0.3s;
-  background: rgba(6,9,20,0.0);
-}
-#navbar.scrolled {
-  background: rgba(6,9,20,0.92);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(255,110,180,0.1);
-  box-shadow: 0 4px 32px rgba(0,0,0,0.4);
-}
-#navbar.hidden { transform: translateY(-100%); }
-
-.nav-logo {
-  font-family: 'Noto Serif SC', serif;
-  font-weight: 900;
-  font-size: 1.4rem;
-  background: linear-gradient(135deg, var(--pk) 0%, var(--pu) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 0.02em;
-  text-shadow: none;
-  filter: drop-shadow(0 0 12px rgba(255,110,180,0.5));
-}
-
-.nav-link {
-  position: relative;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #94a3b8;
-  transition: color 0.2s;
-  padding: 0.25rem 0;
-}
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--pk), var(--pu));
-  transform: scaleX(0);
-  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-  border-radius: 99px;
-}
-.nav-link:hover, .nav-link.active { color: #e2e8f0; }
-.nav-link:hover::after, .nav-link.active::after { transform: scaleX(1); }
-
-.search-bar {
-  display: flex; align-items: center; gap: 0.5rem;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,110,180,0.15);
-  border-radius: 999px;
-  padding: 0.4rem 1rem;
-  transition: var(--transition);
-  min-width: 240px;
-}
-.search-bar:focus-within {
-  border-color: rgba(255,110,180,0.5);
-  background: rgba(255,110,180,0.05);
-  box-shadow: 0 0 0 3px rgba(255,110,180,0.1);
-}
-.search-bar input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #e2e8f0;
-  font-size: 0.875rem;
-  width: 100%;
-  font-family: 'Outfit', sans-serif;
-}
-.search-bar input::placeholder { color: #475569; }
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--pk) 0%, var(--pu) 100%);
-  color: white;
-  font-weight: 600;
-  padding: 0.45rem 1.2rem;
-  border-radius: 999px;
-  font-size: 0.875rem;
-  transition: var(--transition);
-  border: none;
-  cursor: pointer;
-  white-space: nowrap;
-  position: relative;
-  overflow: hidden;
-}
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.btn-primary:hover::before { opacity: 1; }
-.btn-primary:hover { box-shadow: var(--glow-pk); transform: translateY(-1px); }
-.btn-primary:active { transform: translateY(0); }
-
-/* ============================================================
-   BANNER / CAROUSEL
-   ============================================================ */
-.banner-section {
-  position: relative;
-  height: 500px;
-  overflow: hidden;
-  border-radius: 0;
-}
-@media(max-width: 768px) { .banner-section { height: 320px; } }
-
-.banner-slide {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1);
-}
-.banner-slide.active { opacity: 1; }
-
-.banner-img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  filter: brightness(0.55) saturate(1.2);
-  transform: scale(1.05);
-  transition: transform 8s linear;
-}
-.banner-slide.active .banner-img { transform: scale(1.0); }
-
-.banner-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(6,9,20,0.92) 0%,
-    rgba(6,9,20,0.6) 40%,
-    rgba(6,9,20,0.1) 70%,
-    transparent 100%
-  );
-}
-
-.banner-overlay-bottom {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 200px;
-  background: linear-gradient(0deg, var(--bg-base) 0%, transparent 100%);
-}
-
-.banner-content {
-  position: absolute;
-  bottom: 60px; left: 80px;
-  max-width: 520px;
-}
-@media(max-width: 768px) { .banner-content { left: 20px; bottom: 40px; max-width: 90%; } }
-
-.banner-tag {
-  display: inline-flex; align-items: center; gap: 0.375rem;
-  background: rgba(255,110,180,0.2);
-  border: 1px solid rgba(255,110,180,0.4);
-  color: var(--pk);
-  padding: 0.2rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  backdrop-filter: blur(8px);
-}
-
-.banner-title {
-  font-family: 'Noto Serif SC', serif;
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  font-weight: 900;
-  line-height: 1.25;
-  color: #fff;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.8);
-  margin-bottom: 0.75rem;
-}
-
-.banner-desc {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.7);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-height: 1.6;
-  margin-bottom: 1.25rem;
-}
-
-.banner-dots {
-  position: absolute;
-  bottom: 24px; right: 40px;
-  display: flex; gap: 8px; align-items: center;
-}
-.banner-dot {
-  width: 8px; height: 8px;
-  border-radius: 99px;
-  background: rgba(255,255,255,0.3);
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.banner-dot.active {
-  width: 24px;
-  background: var(--pk);
-  box-shadow: var(--glow-pk);
-}
-
-/* ============================================================
-   GAME CARDS
-   ============================================================ */
-.game-card {
-  position: relative;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: var(--transition);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  group: true;
-}
-.game-card:hover {
-  border-color: var(--card-hover-border);
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5), var(--glow-pk);
-}
-
-.card-cover-wrap {
-  position: relative;
-  padding-top: 140%;
-  overflow: hidden;
-  background: #0d1526;
-}
-
-.card-cover {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
-}
-.game-card:hover .card-cover { transform: scale(1.08); }
-
-.card-cover-placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #0d1526 0%, #111c30 100%);
-  color: #334155;
-}
-
-.card-hover-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(0deg, rgba(6,9,20,0.85) 0%, rgba(255,110,180,0.08) 100%);
-  opacity: 0;
-  transition: opacity 0.3s;
-  display: flex; align-items: center; justify-content: center;
-}
-.game-card:hover .card-hover-overlay { opacity: 1; }
-
-.card-view-btn {
-  background: linear-gradient(135deg, var(--pk) 0%, var(--pu) 100%);
-  color: white;
-  padding: 0.5rem 1.25rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transform: translateY(12px);
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-  white-space: nowrap;
-  box-shadow: 0 8px 24px rgba(255,110,180,0.4);
-}
-.game-card:hover .card-view-btn {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.card-badge {
-  position: absolute;
-  top: 10px; right: 10px;
-  background: rgba(6,9,20,0.85);
-  border: 1px solid rgba(255,110,180,0.3);
-  color: var(--pk);
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  backdrop-filter: blur(8px);
-  display: flex; align-items: center; gap: 0.25rem;
-}
-
-.card-cn-badge {
-  position: absolute;
-  top: 10px; left: 10px;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  backdrop-filter: blur(8px);
-}
-.card-cn-badge.cn {
-  background: rgba(255,110,180,0.2);
-  border: 1px solid rgba(255,110,180,0.4);
-  color: var(--pk);
-}
-.card-cn-badge.raw {
-  background: rgba(251,191,36,0.15);
-  border: 1px solid rgba(251,191,36,0.35);
-  color: #fbbf24;
-}
-
-.card-body {
-  padding: 0.875rem;
-}
-.card-title {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin-bottom: 0.5rem;
-  transition: color 0.2s;
-}
-.game-card:hover .card-title { color: var(--pk); }
-
-.card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 0.5rem;
-}
-
-.tag-chip {
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-.card-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.72rem;
-  color: #475569;
-}
-
-.platform-icons { display: flex; gap: 6px; align-items: center; }
-.platform-icon {
-  font-size: 0.75rem;
-  padding: 3px 7px;
-  border-radius: 6px;
-  font-weight: 600;
-}
-.platform-icon.pc {
-  background: rgba(59,130,246,0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59,130,246,0.25);
-}
-.platform-icon.android {
-  background: rgba(52,211,153,0.15);
-  color: #34d399;
-  border: 1px solid rgba(52,211,153,0.25);
-}
-
-/* ============================================================
-   SECTION HEADERS
-   ============================================================ */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-.section-title {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-}
-.section-title::before {
-  content: '';
-  display: block;
-  width: 4px;
-  height: 1.25rem;
-  background: linear-gradient(180deg, var(--pk), var(--pu));
-  border-radius: 999px;
-}
-.section-more {
-  font-size: 0.8rem;
-  color: #475569;
-  display: flex; align-items: center; gap: 0.25rem;
-  transition: color 0.2s;
-  cursor: pointer;
-}
-.section-more:hover { color: var(--pk); }
-
-/* ============================================================
-   HORIZONTAL SCROLL STRIP
-   ============================================================ */
-.h-scroll {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 0.75rem;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.h-scroll::-webkit-scrollbar { display: none; }
-.h-scroll > * { scroll-snap-align: start; flex-shrink: 0; }
-
-/* ============================================================
-   LIST ROW (latest updates)
-   ============================================================ */
-.list-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  transition: var(--transition);
-  cursor: pointer;
-}
-.list-row:hover {
-  background: rgba(255,110,180,0.05);
-  border-color: rgba(255,110,180,0.15);
-}
-.list-row-cover {
-  width: 52px;
-  height: 52px;
-  border-radius: 8px;
-  object-fit: cover;
-  flex-shrink: 0;
-  background: #0d1526;
-}
-.list-row-num {
-  width: 28px;
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700;
-  font-size: 1rem;
-  text-align: center;
-  flex-shrink: 0;
-}
-.list-row-num.top1 { color: #fbbf24; filter: drop-shadow(0 0 6px rgba(251,191,36,0.5)); }
-.list-row-num.top2 { color: #9ca3af; }
-.list-row-num.top3 { color: #cd7c4e; }
-.list-row-num.other { color: #475569; }
-
-/* ============================================================
-   FILTER SIDEBAR
-   ============================================================ */
-.filter-panel {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 1.25rem;
-  backdrop-filter: blur(12px);
-  position: sticky;
-  top: 80px;
-  max-height: calc(100vh - 100px);
-  overflow-y: auto;
-}
-.filter-panel::-webkit-scrollbar { width: 3px; }
-.filter-panel::-webkit-scrollbar-thumb { background: rgba(255,110,180,0.3); }
-
-.filter-group { margin-bottom: 1.5rem; }
-.filter-group-title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #475569;
-  margin-bottom: 0.75rem;
-}
-.filter-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #94a3b8;
-  transition: var(--transition);
-  margin: 0.25rem 0.2rem;
-  background: rgba(255,255,255,0.03);
-}
-.filter-chip:hover {
-  border-color: rgba(255,110,180,0.35);
-  color: var(--pk);
-  background: rgba(255,110,180,0.08);
-}
-.filter-chip.active {
-  background: rgba(255,110,180,0.18);
-  border-color: rgba(255,110,180,0.5);
-  color: var(--pk);
-  box-shadow: 0 0 12px rgba(255,110,180,0.15);
-}
-
-/* ============================================================
-   SORT BAR
-   ============================================================ */
-.sort-bar {
-  display: flex; align-items: center; gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  margin-bottom: 1.25rem;
-  backdrop-filter: blur(12px);
-  flex-wrap: wrap;
-}
-.sort-btn {
-  padding: 0.3rem 0.875rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition);
-  color: #64748b;
-  border: 1px solid transparent;
-}
-.sort-btn:hover { color: var(--pk); background: rgba(255,110,180,0.08); }
-.sort-btn.active {
-  color: var(--pk);
-  background: rgba(255,110,180,0.15);
-  border-color: rgba(255,110,180,0.35);
-}
-
-/* ============================================================
-   DETAIL PAGE
-   ============================================================ */
-.detail-cover {
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 32px 64px rgba(0,0,0,0.6), var(--glow-pk);
-  border: 1px solid var(--card-border);
-  position: sticky;
-  top: 80px;
-}
-.detail-cover img {
-  width: 100%;
-  display: block;
-  aspect-ratio: 3/4;
-  object-fit: cover;
-}
-
-.detail-panel {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 2rem;
-  backdrop-filter: blur(16px);
-}
-
-.detail-title {
-  font-family: 'Noto Serif SC', serif;
-  font-size: clamp(1.25rem, 3vw, 1.875rem);
-  font-weight: 900;
-  color: #f1f5f9;
-  line-height: 1.3;
-  margin-bottom: 0.5rem;
-}
-
-.detail-subtitle {
-  font-size: 0.875rem;
-  color: #64748b;
-  font-family: 'JetBrains Mono', monospace;
-  margin-bottom: 1.25rem;
-}
-
-.info-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.625rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  font-size: 0.875rem;
-}
-.info-label {
-  color: #475569;
-  min-width: 60px;
-  flex-shrink: 0;
-  font-weight: 500;
-}
-.info-value { color: #94a3b8; }
-
-.download-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255,110,180,0.2);
-  background: rgba(255,110,180,0.08);
-  cursor: pointer;
-  transition: var(--transition);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #94a3b8;
-  width: 100%;
-  text-align: left;
-}
-.download-btn:hover {
-  background: rgba(255,110,180,0.18);
-  border-color: rgba(255,110,180,0.45);
-  color: var(--pk);
-  box-shadow: 0 4px 16px rgba(255,110,180,0.15);
-}
-.download-btn .dl-icon { font-size: 1.125rem; color: var(--pk); flex-shrink: 0; }
-.download-btn .dl-label { font-weight: 600; color: #e2e8f0; }
-
-/* ============================================================
-   GALLERY
-   ============================================================ */
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.75rem;
-}
-.gallery-item {
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  aspect-ratio: 16/9;
-  border: 1px solid var(--card-border);
-  transition: var(--transition);
-}
-.gallery-item:hover {
-  transform: scale(1.02);
-  border-color: var(--pk);
-  box-shadow: var(--glow-pk);
-}
-.gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-/* ============================================================
-   LIGHTBOX
-   ============================================================ */
-.lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  background: rgba(0,0,0,0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  backdrop-filter: blur(20px);
-}
-.lightbox.open {
-  opacity: 1;
-  pointer-events: all;
-}
-.lightbox img {
-  max-width: 90vw;
-  max-height: 85vh;
-  border-radius: 12px;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-}
-
-/* ============================================================
-   COMMENTS
-   ============================================================ */
-.comment-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
-  transition: var(--transition);
-}
-.comment-card:hover { border-color: rgba(255,110,180,0.2); }
-.avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--pk), var(--pu));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: white;
-  flex-shrink: 0;
-}
-
-/* ============================================================
-   SKELETON
-   ============================================================ */
-.skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.6s infinite;
-  border-radius: 8px;
-}
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* ============================================================
-   SEARCH OVERLAY
-   ============================================================ */
-.search-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: rgba(6,9,20,0.96);
-  backdrop-filter: blur(30px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  overflow-y: auto;
-}
-.search-overlay.open {
-  opacity: 1;
-  pointer-events: all;
-}
-.search-overlay-input {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,110,180,0.25);
-  border-radius: 16px;
-  padding: 1rem 1.5rem;
-  font-size: 1.25rem;
-  color: #e2e8f0;
-  width: 100%;
-  outline: none;
-  font-family: 'Outfit', sans-serif;
-  transition: border-color 0.2s;
-}
-.search-overlay-input:focus {
-  border-color: rgba(255,110,180,0.6);
-  box-shadow: 0 0 0 4px rgba(255,110,180,0.08);
-}
-.search-overlay-input::placeholder { color: #334155; }
-
-/* ============================================================
-   DOWNLOAD MODAL
-   ============================================================ */
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(16px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-.modal.open { opacity: 1; pointer-events: all; }
-.modal-box {
-  background: #0d1526;
-  border: 1px solid rgba(255,110,180,0.2);
-  border-radius: 20px;
-  padding: 2rem;
-  max-width: 480px;
-  width: 100%;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.8);
-  transform: translateY(20px);
-  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-.modal.open .modal-box { transform: translateY(0); }
-
-/* ============================================================
-   SCROLL TO TOP
-   ============================================================ */
-.scroll-top-btn {
-  position: fixed;
-  bottom: 2rem; right: 2rem;
-  z-index: 50;
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--pk), var(--pu));
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--glow-pk), 0 8px 24px rgba(0,0,0,0.4);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-  border: none;
-}
-.scroll-top-btn.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.scroll-top-btn:hover { transform: translateY(-4px); }
-
-/* ============================================================
-   PAGE TRANSITION
-   ============================================================ */
-.page-enter { animation: fadeSlideIn 0.4s cubic-bezier(0.4,0,0.2,1) both; }
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ============================================================
-   MISC
-   ============================================================ */
-.glass-panel {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, var(--pk) 0%, var(--pu) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.glow-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,110,180,0.3), rgba(176,110,243,0.3), transparent);
-  margin: 2rem 0;
-}
-
-.random-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  border: 1px solid rgba(92,224,230,0.35);
-  color: var(--cy);
-  background: rgba(92,224,230,0.08);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.random-btn:hover {
-  background: rgba(92,224,230,0.18);
-  box-shadow: 0 0 20px rgba(92,224,230,0.2);
-  transform: translateY(-1px);
-}
-
-/* Responsive nav hide on mobile */
-@media(max-width: 768px) {
-  .nav-links { display: none; }
-  .search-bar { min-width: 160px; }
-  .banner-content { left: 16px; }
-}
-
-.stars-row {
-  color: #fbbf24;
-  font-size: 0.75rem;
-}
-
-.chip-new {
-  background: rgba(52,211,153,0.15);
-  color: #34d399;
-  border: 1px solid rgba(52,211,153,0.3);
-}
-
-/* Hero gradient glow bar */
-.hero-glow {
-  position: absolute;
-  bottom: -2px; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--pk), var(--pu), var(--cy), transparent);
-}
-
-/* empty state */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  color: #334155;
-  text-align: center;
-}
-.empty-state i { font-size: 3rem; margin-bottom: 1rem; }
-</style>
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #0f172a; color: #f8fafc; overflow-x: hidden; }
+        .glass { background: rgba(30, 41, 59, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card { background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .text-gradient { background: linear-gradient(to right, #ec4899, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .bg-gradient-primary { background: linear-gradient(135deg, #ec4899, #a855f7); }
+        
+        .page-enter-active, .page-leave-active { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .page-enter-from { opacity: 0; transform: translateY(10px); }
+        .page-leave-to { opacity: 0; transform: translateY(-10px); }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        /* Skeleton Animation */
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
+        .skeleton { position: relative; overflow: hidden; background-color: rgba(255,255,255,0.05); }
+        .skeleton::after {
+            position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.05) 20%, rgba(255, 255, 255, 0.1) 60%, rgba(255, 255, 255, 0));
+            animation: shimmer 2s infinite; content: '';
+        }
+    </style>
 </head>
+<body class="selection:bg-primary/30 selection:text-white text-sm md:text-base">
 
-<body>
-<div id="app" style="position:relative; z-index:1;">
+<div id="app"></div>
 
-  <!-- BACKGROUND LAYERS -->
-  <div class="bg-mesh"></div>
-  <div class="bg-grid"></div>
-  <canvas id="bg-canvas"></canvas>
-
-  <!-- NAVBAR -->
-  <nav id="navbar" :class="{ scrolled: navScrolled, hidden: navHidden }">
-    <div style="max-width:1400px; margin:0 auto; padding:0 1.5rem; display:flex; align-items:center; gap:1.5rem; height:64px;">
-      <div class="nav-logo" style="cursor:pointer;" @click="navigate('home')">
-        <span>方</span><span style="opacity:0.85">Gal</span>
-      </div>
-
-      <div class="nav-links" style="display:flex; gap:1.5rem; align-items:center; flex:1;">
-        <a class="nav-link" :class="{active: page==='home'}" @click="navigate('home')" style="cursor:pointer;">首页</a>
-        <a class="nav-link" :class="{active: page==='list'}" @click="navigate('list')" style="cursor:pointer;">游戏库</a>
-        <a class="nav-link" style="cursor:pointer;">排行榜</a>
-        <a class="nav-link" style="cursor:pointer;">公告</a>
-      </div>
-
-      <div class="search-bar" @click="openSearch" style="cursor:pointer;">
-        <i class="fas fa-search" style="color:#475569; font-size:0.85rem;"></i>
-        <span style="color:#475569; font-size:0.875rem; pointer-events:none;">搜索游戏…</span>
-      </div>
-
-      <button class="random-btn" @click="randomGame" title="随机推荐">
-        <i class="fas fa-dice"></i>
-        <span class="nav-links">随机</span>
-      </button>
-
-      <button class="btn-primary" style="display:flex; align-items:center; gap:0.4rem;">
-        <i class="fas fa-user" style="font-size:0.8rem;"></i> 登录
-      </button>
-    </div>
-  </nav>
-
-  <!-- SEARCH OVERLAY -->
-  <div class="search-overlay" :class="{open: searchOpen}" @click.self="closeSearch">
-    <div style="max-width:720px; margin:0 auto; padding:5rem 1.5rem 2rem;">
-      <div style="display:flex; align-items:center; gap:1rem; margin-bottom:2rem;">
-        <i class="fas fa-search" style="color:var(--pk); font-size:1.25rem;"></i>
-        <input
-          class="search-overlay-input"
-          v-model="searchQuery"
-          @keydown.esc="closeSearch"
-          ref="searchInput"
-          placeholder="输入游戏名称、标签或类型…"
-        />
-        <button @click="closeSearch" style="color:#475569; font-size:1.5rem; background:none; border:none; cursor:pointer; padding:0.5rem;">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <div v-if="searchQuery.length >= 1">
-        <div style="font-size:0.78rem; color:#475569; margin-bottom:1rem;">
-          找到 {{ searchResults.length }} 个结果
-        </div>
-        <div style="display:flex; flex-direction:column; gap:0.75rem;">
-          <div v-for="g in searchResults.slice(0,8)" :key="g.id"
-               class="list-row glass-panel"
-               @click="openDetail(g.id); closeSearch()">
-            <img :src="g.cover || ''" :alt="g.title"
-                 class="list-row-cover"
-                 @error="$event.target.style.display='none'"
-                 style="width:60px;height:60px;"/>
-            <div style="flex:1; min-width:0;">
-              <div style="font-family:'Noto Serif SC'; font-weight:700; font-size:0.9rem; color:#e2e8f0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                {{ g.title }}
-              </div>
-              <div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap;">
-                <span v-for="t in g.tags.slice(0,4)" :key="t" class="tag-chip" :style="tagStyle(t)">{{t}}</span>
-              </div>
-            </div>
-            <div>
-              <span v-if="g.isChinese" style="color:var(--pk); font-size:0.75rem; font-weight:600;">汉化</span>
-              <span v-else style="color:#fbbf24; font-size:0.75rem; font-weight:600;">生肉</span>
-            </div>
-          </div>
-          <div v-if="searchResults.length === 0" class="empty-state" style="padding:2rem;">
-            <i class="fas fa-search" style="margin-bottom:0.75rem;"></i>
-            <div>未找到匹配的游戏</div>
-          </div>
-        </div>
-      </div>
-
-      <div v-else>
-        <div style="font-size:0.8rem; color:#334155; margin-bottom:1rem;">热门搜索</div>
-        <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-          <span v-for="t in popularTags" :key="t"
-                class="filter-chip"
-                @click="searchQuery=t">
-            {{ t }}
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DOWNLOAD MODAL -->
-  <div class="modal" :class="{open: downloadModal.open}" @click.self="downloadModal.open=false">
-    <div class="modal-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-        <div>
-          <div style="font-family:'Noto Serif SC'; font-size:1.1rem; font-weight:700; color:#e2e8f0;">下载资源</div>
-          <div style="font-size:0.8rem; color:#475569; margin-top:2px;">{{ downloadModal.title }}</div>
-        </div>
-        <button @click="downloadModal.open=false" style="background:none;border:none;color:#475569;cursor:pointer;font-size:1.25rem;">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:0.625rem;">
-        <template v-for="(info, key) in downloadModal.downloads" :key="key">
-          <a v-if="info && info.url"
-             :href="info.url"
-             target="_blank"
-             class="download-btn"
-             style="text-decoration:none;">
-            <span class="dl-icon">
-              <i :class="dlIcon(key)"></i>
-            </span>
-            <div style="flex:1;">
-              <div class="dl-label">{{ dlLabel(key) }}</div>
-              <div v-if="info.source" style="font-size:0.72rem; color:#475569; margin-top:2px;">
-                来源: {{ info.source }}
-              </div>
-              <div v-if="info.instructions" style="font-size:0.72rem; color:#64748b; margin-top:2px;">
-                {{ info.instructions }}
-              </div>
-            </div>
-            <i class="fas fa-external-link-alt" style="color:#334155; font-size:0.75rem;"></i>
-          </a>
-        </template>
-        <div v-if="!hasAnyDownload" class="empty-state" style="padding:1.5rem; background:rgba(255,255,255,0.02); border-radius:10px;">
-          <i class="fas fa-cloud-slash" style="font-size:1.5rem;"></i>
-          <div style="margin-top:0.5rem; font-size:0.875rem;">暂无下载资源</div>
-        </div>
-      </div>
-      <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.05); font-size:0.75rem; color:#334155; line-height:1.5;">
-        ⚠ 请支持正版，下载资源仅供学习体验
-      </div>
-    </div>
-  </div>
-
-  <!-- LIGHTBOX -->
-  <div class="lightbox" :class="{open: lightbox.open}" @click="lightbox.open=false">
-    <div style="position:relative;">
-      <img :src="lightbox.src" alt="preview" />
-      <button @click="lightbox.open=false" style="position:absolute;top:-12px;right:-12px;width:32px;height:32px;border-radius:50%;background:rgba(255,110,180,0.3);border:1px solid var(--pk);color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-        <i class="fas fa-times" style="font-size:0.75rem;"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- SCROLL TO TOP -->
-  <button class="scroll-top-btn" :class="{visible: showScrollTop}" @click="scrollToTop" aria-label="返回顶部">
-    <i class="fas fa-chevron-up"></i>
-  </button>
-
-  <!-- MAIN CONTENT -->
-  <main style="padding-top:64px; position:relative; z-index:2;">
-
-    <!-- ============ HOME PAGE ============ -->
-    <div v-if="page === 'home'" class="page-enter">
-
-      <!-- BANNER CAROUSEL -->
-      <div class="banner-section" v-if="!loading">
-        <div v-for="(game, i) in featuredGames" :key="game.id"
-             class="banner-slide" :class="{active: bannerIndex === i}">
-          <img :src="game.bannerBg || game.cover || ''" :alt="game.title"
-               class="banner-img"
-               @error="$event.target.src=''"
-               @click="openDetail(game.id)" style="cursor:pointer;" />
-          <div class="banner-overlay"></div>
-          <div class="banner-overlay-bottom"></div>
-          <div class="banner-content">
-            <div class="banner-tag">
-              <i class="fas fa-star" style="font-size:0.65rem;"></i> 精选推荐
-            </div>
-            <div class="banner-title" @click="openDetail(game.id)" style="cursor:pointer;">{{ game.title }}</div>
-            <div class="banner-desc">{{ game.description }}</div>
-            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1rem;">
-              <span v-for="t in game.tags.slice(0,4)" :key="t" class="tag-chip" :style="tagStyle(t)">{{t}}</span>
-            </div>
-            <div style="display:flex; gap:0.75rem; align-items:center;">
-              <button class="btn-primary" @click="openDetail(game.id)">
-                <i class="fas fa-eye" style="margin-right:0.4rem;"></i>查看详情
-              </button>
-              <button class="download-btn" @click="openDownload(game)"
-                      style="width:auto; padding:0.5rem 1rem; font-size:0.85rem;">
-                <i class="fas fa-download" style="color:var(--pk);"></i>
-                <span style="color:#e2e8f0; font-weight:600;">下载</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Banner dots -->
-        <div class="banner-dots">
-          <div v-for="(g, i) in featuredGames" :key="i"
-               class="banner-dot" :class="{active: bannerIndex === i}"
-               @click="bannerIndex = i"></div>
-        </div>
-
-        <!-- Hero glow line -->
-        <div class="hero-glow"></div>
-      </div>
-
-      <!-- BANNER SKELETON -->
-      <div v-if="loading" style="height:500px; position:relative;" class="skeleton">
-        <div style="position:absolute; bottom:60px; left:80px; max-width:480px;">
-          <div class="skeleton" style="height:24px; width:120px; margin-bottom:12px; border-radius:99px;"></div>
-          <div class="skeleton" style="height:40px; width:400px; margin-bottom:10px;"></div>
-          <div class="skeleton" style="height:20px; width:360px;"></div>
-        </div>
-      </div>
-
-      <div style="max-width:1400px; margin:0 auto; padding:2.5rem 1.5rem;">
-
-        <!-- LATEST GAMES -->
-        <div style="margin-bottom:3rem;">
-          <div class="section-header">
-            <div class="section-title">最新 Galgame</div>
-            <div class="section-more" @click="navigate('list')">
-              全部 <i class="fas fa-chevron-right" style="font-size:0.7rem;"></i>
-            </div>
-          </div>
-
-          <!-- Skeleton -->
-          <div v-if="loading" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem;">
-            <div v-for="i in 6" :key="i" style="border-radius:16px; overflow:hidden;">
-              <div class="skeleton" style="padding-top:140%;"></div>
-              <div style="padding:0.875rem; background:rgba(11,16,34,0.88);">
-                <div class="skeleton" style="height:14px; width:80%; margin-bottom:8px;"></div>
-                <div class="skeleton" style="height:10px; width:60%;"></div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="!loading" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem;">
-            <div v-for="game in latestGames.slice(0,12)" :key="game.id"
-                 class="game-card"
-                 @click="openDetail(game.id)">
-              <div class="card-cover-wrap">
-                <img v-if="game.cover" :src="game.cover" :alt="game.title"
-                     class="card-cover"
-                     @error="$event.target.style.display='none'" />
-                <div v-if="!game.cover" class="card-cover-placeholder">
-                  <i class="fas fa-gamepad" style="font-size:2rem; margin-bottom:0.5rem;"></i>
-                  <span style="font-size:0.7rem;">暂无封面</span>
-                </div>
-                <div class="card-cn-badge" :class="game.isChinese ? 'cn' : 'raw'">
-                  {{ game.isChinese ? '汉化' : '生肉' }}
-                </div>
-                <div class="card-hover-overlay">
-                  <div class="card-view-btn">查看详情</div>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="card-title">{{ game.title }}</div>
-                <div class="card-tags">
-                  <span v-for="t in game.tags.slice(0,3)" :key="t" class="tag-chip" :style="tagStyle(t)">{{t}}</span>
-                </div>
-                <div class="card-meta">
-                  <div class="platform-icons">
-                    <span v-if="hasPlatform(game,'PC')" class="platform-icon pc"><i class="fab fa-windows"></i> PC</span>
-                    <span v-if="hasPlatform(game,'Android')" class="platform-icon android"><i class="fab fa-android"></i></span>
-                  </div>
-                  <span style="color:#475569; font-size:0.7rem;">
-                    <i class="fas fa-tag" style="margin-right:2px;"></i>{{ game.tags.length }}标签
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="glow-divider"></div>
-
-        <!-- FEATURED / HOT RANKING + UPDATES row -->
-        <div style="display:grid; grid-template-columns:1fr 340px; gap:2rem;" class="hot-grid">
-
-          <!-- HOT RANKING (horizontal scroll) -->
-          <div>
-            <div class="section-header">
-              <div class="section-title">热门排行</div>
-              <div class="random-btn" @click="randomGame" style="font-size:0.75rem;">
-                <i class="fas fa-dice"></i> 随机推荐
-              </div>
-            </div>
-
-            <div class="h-scroll">
-              <div v-for="(game, idx) in hotGames" :key="game.id"
-                   class="game-card" style="width:200px; cursor:pointer;"
-                   @click="openDetail(game.id)">
-                <div class="card-cover-wrap">
-                  <img v-if="game.cover" :src="game.cover" :alt="game.title"
-                       class="card-cover" @error="$event.target.style.display='none'" />
-                  <div v-if="!game.cover" class="card-cover-placeholder">
-                    <i class="fas fa-gamepad" style="font-size:1.5rem;"></i>
-                  </div>
-                  <div class="card-badge">
-                    <i class="fas fa-fire"></i> TOP {{ idx+1 }}
-                  </div>
-                  <div class="card-hover-overlay">
-                    <div class="card-view-btn">查看详情</div>
-                  </div>
-                </div>
-                <div class="card-body">
-                  <div class="card-title">{{ game.title }}</div>
-                  <div class="card-tags">
-                    <span v-for="t in game.tags.slice(0,2)" :key="t" class="tag-chip" :style="tagStyle(t)">{{t}}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- LATEST UPDATES LIST -->
-          <div>
-            <div class="section-header">
-              <div class="section-title">最近更新</div>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:0.25rem;">
-              <div v-for="(game, idx) in latestGames.slice(0,8)" :key="game.id"
-                   class="list-row" @click="openDetail(game.id)">
-                <div class="list-row-num" :class="rankClass(idx)">{{ idx+1 }}</div>
-                <img :src="game.cover || ''" :alt="game.title"
-                     class="list-row-cover"
-                     @error="$event.target.style.display='none'" />
-                <div style="flex:1; min-width:0;">
-                  <div style="font-size:0.82rem; font-weight:600; color:#e2e8f0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:'Noto Serif SC';">
-                    {{ game.title }}
-                  </div>
-                  <div style="font-size:0.7rem; color:#475569; margin-top:2px; display:flex; gap:4px; flex-wrap:wrap;">
-                    <span v-for="t in game.tags.slice(0,2)" :key="t" class="tag-chip" :style="tagStyle(t)" style="font-size:0.62rem;">{{t}}</span>
-                  </div>
-                </div>
-                <div style="font-size:0.7rem; color:#334155; flex-shrink:0;">
-                  <i class="fas fa-chevron-right"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="glow-divider"></div>
-
-        <!-- ALL GAMES SECTION -->
-        <div>
-          <div class="section-header">
-            <div class="section-title">全部游戏</div>
-            <div class="section-more" @click="navigate('list')">
-              进入游戏库 <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i>
-            </div>
-          </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:0.875rem;">
-            <div v-for="game in games.slice(0,18)" :key="game.id"
-                 class="game-card"
-                 @click="openDetail(game.id)">
-              <div class="card-cover-wrap">
-                <img v-if="game.cover" :src="game.cover" :alt="game.title"
-                     class="card-cover" @error="$event.target.style.display='none'" />
-                <div v-if="!game.cover" class="card-cover-placeholder">
-                  <i class="fas fa-gamepad" style="font-size:1.5rem;"></i>
-                </div>
-                <div class="card-cn-badge" :class="game.isChinese ? 'cn' : 'raw'">
-                  {{ game.isChinese ? '汉化' : '生肉' }}
-                </div>
-                <div class="card-hover-overlay">
-                  <div class="card-view-btn">查看详情</div>
-                </div>
-              </div>
-              <div class="card-body">
-                <div class="card-title">{{ game.title }}</div>
-                <div class="card-tags">
-                  <span v-for="t in game.tags.slice(0,2)" :key="t" class="tag-chip" :style="tagStyle(t)">{{t}}</span>
-                </div>
-                <div class="card-meta">
-                  <div class="platform-icons">
-                    <span v-if="hasPlatform(game,'PC')" class="platform-icon pc"><i class="fab fa-windows"></i></span>
-                    <span v-if="hasPlatform(game,'Android')" class="platform-icon android"><i class="fab fa-android"></i></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ============ LIST PAGE ============ -->
-    <div v-if="page === 'list'" class="page-enter">
-      <div style="max-width:1400px; margin:0 auto; padding:2rem 1.5rem;">
-        <div style="margin-bottom:1.5rem;">
-          <h1 style="font-family:'Noto Serif SC'; font-size:1.75rem; font-weight:900; color:#f1f5f9;">
-            游戏库
-          </h1>
-          <p style="color:#475569; font-size:0.875rem; margin-top:0.25rem;">
-            共收录 {{ games.length }} 款 Galgame
-          </p>
-        </div>
-
-        <div style="display:grid; grid-template-columns:260px 1fr; gap:1.5rem; align-items:start;">
-
-          <!-- FILTER SIDEBAR -->
-          <div class="filter-panel">
-            <!-- Search inline -->
-            <div class="filter-group">
-              <div class="filter-group-title">搜索</div>
-              <div class="search-bar" style="min-width:auto; border-radius:10px;">
-                <i class="fas fa-search" style="color:#475569; font-size:0.8rem;"></i>
-                <input v-model="listSearch" placeholder="搜索游戏…" style="font-size:0.85rem;" />
-              </div>
-            </div>
-
-            <!-- Language filter -->
-            <div class="filter-group">
-              <div class="filter-group-title">语言</div>
-              <span class="filter-chip" :class="{active: langFilter==='all'}" @click="langFilter='all'">全部</span>
-              <span class="filter-chip" :class="{active: langFilter==='cn'}" @click="langFilter='cn'">
-                <i class="fas fa-check-circle" style="font-size:0.65rem;"></i> 汉化
-              </span>
-              <span class="filter-chip" :class="{active: langFilter==='raw'}" @click="langFilter='raw'">生肉</span>
-            </div>
-
-            <!-- Platform filter -->
-            <div class="filter-group">
-              <div class="filter-group-title">平台</div>
-              <span class="filter-chip" :class="{active: platformFilter.includes('PC')}"
-                    @click="toggleFilter(platformFilter,'PC')">
-                <i class="fab fa-windows" style="font-size:0.7rem;"></i> PC
-              </span>
-              <span class="filter-chip" :class="{active: platformFilter.includes('Android')}"
-                    @click="toggleFilter(platformFilter,'Android')">
-                <i class="fab fa-android" style="font-size:0.7rem;"></i> Android
-              </span>
-            </div>
-
-            <!-- Tag filters -->
-            <div class="filter-group">
-              <div class="filter-group-title">类型标签</div>
-              <span v-for="t in allTags" :key="t"
-                    class="filter-chip"
-                    :class="{active: tagFilters.includes(t)}"
-                    @click="toggleFilter(tagFilters, t)">
-                {{ t }}
-              </span>
-            </div>
-
-            <button v-if="tagFilters.length || langFilter!=='all' || platformFilter.length"
-                    @click="clearFilters"
-                    style="width:100%; padding:0.5rem; border-radius:8px; border:1px solid rgba(255,110,180,0.2); background:rgba(255,110,180,0.08); color:var(--pk); font-size:0.8rem; cursor:pointer; font-weight:600; margin-top:0.5rem; transition:var(--transition);">
-              <i class="fas fa-times-circle" style="margin-right:0.3rem;"></i> 清除筛选
-            </button>
-          </div>
-
-          <!-- GAMES GRID -->
-          <div>
-            <!-- Sort bar -->
-            <div class="sort-bar">
-              <span style="font-size:0.78rem; color:#334155; margin-right:0.25rem; font-weight:500;">排序：</span>
-              <button class="sort-btn" :class="{active: sortBy==='latest'}" @click="sortBy='latest'">
-                <i class="fas fa-clock" style="margin-right:3px; font-size:0.75rem;"></i>最新
-              </button>
-              <button class="sort-btn" :class="{active: sortBy==='name'}" @click="sortBy='name'">
-                <i class="fas fa-sort-alpha-down" style="margin-right:3px; font-size:0.75rem;"></i>名称
-              </button>
-              <button class="sort-btn" :class="{active: sortBy==='id'}" @click="sortBy='id'">
-                <i class="fas fa-hashtag" style="margin-right:3px; font-size:0.75rem;"></i>ID
-              </button>
-              <div style="margin-left:auto; font-size:0.78rem; color:#334155;">
-                显示 {{ filteredGames.length }} / {{ games.length }} 款
-              </div>
-            </div>
-
-            <!-- Loading skeleton -->
-            <div v-if="loading" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem;">
-              <div v-for="i in 12" :key="i" style="border-radius:16px; overflow:hidden;">
-                <div class="skeleton" style="padding-top:140%;"></div>
-                <div style="padding:0.875rem; background:rgba(11,16,34,0.88);">
-                  <div class="skeleton" style="height:14px; width:80%; margin-bottom:8px;"></div>
-                  <div class="skeleton" style="height:10px; width:60%;"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Empty state -->
-            <div v-if="!loading && filteredGames.length === 0" class="empty-state glass-panel">
-              <i class="fas fa-magnifying-glass-minus"></i>
-              <div style="font-size:1rem; font-weight:600; color:#64748b; margin-bottom:0.5rem;">没有找到匹配的游戏</div>
-              <div style="font-size:0.85rem;">试试调整筛选条件</div>
-              <button class="btn-primary" style="margin-top:1rem;" @click="clearFilters">清除所有筛选</button>
-            </div>
-
-            <!-- Games grid -->
-            <div v-if="!loading && filteredGames.length > 0"
-                 style="display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:1rem;">
-              <div v-for="game in filteredGames" :key="game.id"
-                   class="game-card"
-                   @click="openDetail(game.id)">
-                <div class="card-cover-wrap">
-                  <img v-if="game.cover" :src="game.cover" :alt="game.title"
-                       class="card-cover" @error="$event.target.style.display='none'" />
-                  <div v-if="!game.cover" class="card-cover-placeholder">
-                    <i class="fas fa-gamepad" style="font-size:2rem; margin-bottom:0.5rem;"></i>
-                    <span style="font-size:0.65rem;">暂无封面</span>
-                  </div>
-                  <div class="card-cn-badge" :class="game.isChinese ? 'cn' : 'raw'">
-                    {{ game.isChinese ? '汉化' : '生肉' }}
-                  </div>
-                  <div class="card-hover-overlay">
-                    <div class="card-view-btn">查看详情</div>
-                  </div>
-                </div>
-                <div class="card-body">
-                  <div class="card-title">{{ game.title }}</div>
-                  <div class="card-tags">
-                    <span v-for="t in game.tags.slice(0,3)" :key="t" class="tag-chip" :style="tagStyle(t)">{{t}}</span>
-                  </div>
-                  <div class="card-meta">
-                    <div class="platform-icons">
-                      <span v-if="hasPlatform(game,'PC')" class="platform-icon pc"><i class="fab fa-windows"></i> PC</span>
-                      <span v-if="hasPlatform(game,'Android')" class="platform-icon android"><i class="fab fa-android"></i></span>
+<script type="text/x-template" id="app-layout">
+    <div class="min-h-screen flex flex-col">
+        <header :class="['fixed top-0 w-full z-50 transition-all duration-300', scrolled ? 'glass shadow-lg py-3' : 'bg-transparent py-5']">
+            <div class="container mx-auto px-4 md:px-6 flex justify-between items-center">
+                <router-link to="/" class="flex items-center gap-2 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-gamepad text-white text-xl"></i>
                     </div>
-                    <span style="font-size:0.68rem; color:#334155;">#{{ game.id }}</span>
-                  </div>
+                    <span class="text-2xl font-black italic tracking-wider text-white hidden sm:block">Gal<span class="text-gradient">Hub</span></span>
+                </router-link>
+
+                <div class="flex-1 max-w-xl mx-4 lg:mx-12 relative hidden md:block">
+                    <div class="relative group">
+                        <input type="text" v-model="globalSearch" @keyup.enter="handleSearch" placeholder="搜索游戏、社团、标签..." 
+                               class="w-full bg-slate-800/80 border border-slate-700 rounded-full py-2.5 pl-12 pr-4 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all">
+                        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors"></i>
+                    </div>
                 </div>
-              </div>
+
+                <nav class="flex items-center gap-2 sm:gap-6">
+                    <router-link to="/" class="text-slate-300 hover:text-white font-medium transition-colors" exact-active-class="text-primary font-bold">首页</router-link>
+                    <router-link to="/list" class="text-slate-300 hover:text-white font-medium transition-colors" exact-active-class="text-primary font-bold">资源库</router-link>
+                    <button @click="randomGame" class="text-slate-300 hover:text-secondary transition-colors" title="随便看看"><i class="fa-solid fa-dice"></i></button>
+                    <div class="w-px h-6 bg-slate-700 hidden sm:block"></div>
+                    <button class="bg-gradient-primary hover:opacity-90 text-white px-5 py-2 rounded-full font-medium shadow-lg shadow-primary/20 transition-all hover:scale-105 text-sm">
+                        登录
+                    </button>
+                </nav>
             </div>
-          </div>
-        </div>
-      </div>
+        </header>
+
+        <main class="flex-1 pt-20">
+            <router-view v-slot="{ Component }">
+                <transition name="page" mode="out-in">
+                    <component :is="Component" />
+                </transition>
+            </router-view>
+        </main>
+
+        <footer class="glass mt-20 py-8 text-center text-slate-500 text-sm">
+            <div class="container mx-auto px-4">
+                <p>© 2026 GalHub Resource Platform. All rights reserved.</p>
+                <p class="mt-2 text-xs">This site is for demo purposes. Data is simulated.</p>
+            </div>
+        </footer>
     </div>
+</script>
 
-    <!-- ============ DETAIL PAGE ============ -->
-    <div v-if="page === 'detail' && currentGame" class="page-enter">
-      <div style="max-width:1400px; margin:0 auto; padding:2rem 1.5rem;">
-
-        <!-- Breadcrumb -->
-        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1.5rem; font-size:0.8rem; color:#334155;">
-          <span style="cursor:pointer; transition:color 0.2s;" @click="navigate('home')"
-                onmouseover="this.style.color='var(--pk)'" onmouseout="this.style.color='#334155'">首页</span>
-          <i class="fas fa-chevron-right" style="font-size:0.6rem;"></i>
-          <span style="cursor:pointer; transition:color 0.2s;" @click="navigate('list')"
-                onmouseover="this.style.color='var(--pk)'" onmouseout="this.style.color='#334155'">游戏库</span>
-          <i class="fas fa-chevron-right" style="font-size:0.6rem;"></i>
-          <span style="color:#64748b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:300px;">
-            {{ currentGame.title }}
-          </span>
-        </div>
-
-        <div style="display:grid; grid-template-columns:280px 1fr; gap:2rem; align-items:start;">
-
-          <!-- LEFT: COVER + DOWNLOAD -->
-          <div>
-            <div class="detail-cover">
-              <img v-if="currentGame.cover" :src="currentGame.cover" :alt="currentGame.title"
-                   @error="$event.target.style.display='none'" />
-              <div v-if="!currentGame.cover"
-                   style="aspect-ratio:3/4; background:linear-gradient(135deg,#0d1526,#111c30); display:flex; flex-direction:column; align-items:center; justify-content:center; color:#334155;">
-                <i class="fas fa-gamepad" style="font-size:3rem; margin-bottom:1rem;"></i>
-                <span>暂无封面</span>
-              </div>
+<script type="text/x-template" id="game-card">
+    <div class="group relative rounded-xl overflow-hidden glass-card shadow-lg hover:shadow-primary/20 transition-all duration-300 hover:-translate-y-2 cursor-pointer flex flex-col h-full" @click="goToDetail">
+        <div class="relative aspect-[3/4] overflow-hidden bg-slate-800">
+            <img v-if="game.cover" :src="game.cover" :alt="game.title" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy">
+            <div v-else class="w-full h-full flex items-center justify-center skeleton text-slate-600"><i class="fa-solid fa-image text-4xl"></i></div>
+            
+            <div class="absolute top-2 right-2 flex flex-col gap-1 items-end">
+                <span class="bg-black/70 backdrop-blur text-yellow-400 text-xs font-bold px-2 py-1 rounded-md border border-yellow-400/30 flex items-center gap-1 shadow-lg">
+                    <i class="fa-solid fa-star text-[10px]"></i> 9.{{ game.id % 10 }}
+                </span>
+            </div>
+            <div class="absolute top-2 left-2 flex gap-1 flex-wrap w-2/3">
+                <span v-if="game.isChinese" class="bg-primary/90 backdrop-blur text-white text-[10px] px-2 py-0.5 rounded shadow-sm">汉化</span>
             </div>
 
-            <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem;">
-              <button class="btn-primary" style="width:100%; padding:0.75rem; font-size:0.9rem; border-radius:12px; display:flex; align-items:center; justify-content:center; gap:0.5rem;"
-                      @click="openDownload(currentGame)">
-                <i class="fas fa-download"></i> 获取下载
-              </button>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
-                <button style="padding:0.5rem; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); color:#64748b; cursor:pointer; font-size:0.78rem; transition:var(--transition);"
-                        onmouseover="this.style.borderColor='rgba(255,110,180,0.3)'; this.style.color='var(--pk)'"
-                        onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.color='#64748b'">
-                  <i class="fas fa-heart" style="margin-right:4px;"></i>收藏
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <button class="bg-white/20 hover:bg-primary backdrop-blur-md border border-white/30 text-white px-6 py-2 rounded-full font-medium transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-[0_0_15px_rgba(236,72,153,0.5)]">
+                    查看详情
                 </button>
-                <button style="padding:0.5rem; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); color:#64748b; cursor:pointer; font-size:0.78rem; transition:var(--transition);"
-                        onmouseover="this.style.borderColor='rgba(92,224,230,0.3)'; this.style.color='var(--cy)'"
-                        onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.color='#64748b'">
-                  <i class="fas fa-share-alt" style="margin-right:4px;"></i>分享
-                </button>
-              </div>
             </div>
-
-            <!-- Platform badges -->
-            <div style="margin-top:1rem; padding:0.875rem; background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px;">
-              <div style="font-size:0.72rem; color:#475569; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.625rem;">支持平台</div>
-              <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
-                <span v-if="hasPlatform(currentGame,'PC')" class="platform-icon pc" style="font-size:0.8rem; padding:0.3rem 0.75rem;">
-                  <i class="fab fa-windows" style="margin-right:4px;"></i>PC / Windows
-                </span>
-                <span v-if="hasPlatform(currentGame,'Android')" class="platform-icon android" style="font-size:0.8rem; padding:0.3rem 0.75rem;">
-                  <i class="fab fa-android" style="margin-right:4px;"></i>Android
-                </span>
-                <span v-if="currentGame.downloads?.krkr?.url" class="tag-chip" style="background:rgba(176,110,243,0.15); color:#b06ef3; border:1px solid rgba(176,110,243,0.3); font-size:0.72rem;">
-                  KrKr 引擎
-                </span>
-                <span v-if="currentGame.downloads?.Ty?.url" class="tag-chip" style="background:rgba(176,110,243,0.15); color:#b06ef3; border:1px solid rgba(176,110,243,0.3); font-size:0.72rem;">
-                  Tyrono
-                </span>
-                <span v-if="currentGame.downloads?.ONS?.url" class="tag-chip" style="background:rgba(176,110,243,0.15); color:#b06ef3; border:1px solid rgba(176,110,243,0.3); font-size:0.72rem;">
-                  ONScripter
-                </span>
-                <span v-if="!hasPlatform(currentGame,'PC') && !hasPlatform(currentGame,'Android')" style="color:#334155; font-size:0.8rem;">
-                  暂未标注
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- RIGHT: INFO -->
-          <div>
-            <div class="detail-panel">
-              <!-- Title -->
-              <div style="display:flex; align-items:flex-start; gap:0.75rem; margin-bottom:0.5rem; flex-wrap:wrap;">
-                <span class="tag-chip" :style="currentGame.isChinese ? 'background:rgba(255,110,180,0.15);color:var(--pk);border:1px solid rgba(255,110,180,0.3);' : 'background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);'">
-                  {{ currentGame.isChinese ? '汉化版' : '生肉' }}
-                </span>
-                <span v-if="currentGame.featured" class="tag-chip chip-new">
-                  <i class="fas fa-star" style="font-size:0.6rem;"></i> 精选
-                </span>
-              </div>
-
-              <h1 class="detail-title">{{ currentGame.title }}</h1>
-              <div class="detail-subtitle">ID: #{{ currentGame.id }}</div>
-
-              <!-- Tags -->
-              <div style="display:flex; flex-wrap:wrap; gap:0.375rem; margin-bottom:1.5rem;">
-                <span v-for="t in currentGame.tags" :key="t" class="tag-chip" :style="tagStyle(t)">{{t}}</span>
-              </div>
-
-              <div class="glow-divider" style="margin:1rem 0;"></div>
-
-              <!-- Description -->
-              <div style="margin-bottom:1.5rem;">
-                <div style="font-size:0.72rem; color:#475569; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.625rem;">游戏简介</div>
-                <div style="font-size:0.9rem; color:#94a3b8; line-height:1.8; font-family:'Noto Serif SC';">
-                  {{ currentGame.description || '暂无简介信息。' }}
-                </div>
-              </div>
-
-              <!-- Download quick list -->
-              <div style="margin-bottom:1rem;">
-                <div style="font-size:0.72rem; color:#475569; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.875rem;">下载资源</div>
-                <div style="display:flex; flex-direction:column; gap:0.5rem;">
-                  <template v-for="(info, key) in currentGame.downloads" :key="key">
-                    <a v-if="info && info.url"
-                       :href="info.url"
-                       target="_blank"
-                       class="download-btn"
-                       style="text-decoration:none;">
-                      <span class="dl-icon"><i :class="dlIcon(key)"></i></span>
-                      <div style="flex:1;">
-                        <div class="dl-label">{{ dlLabel(key) }}</div>
-                        <div v-if="info.source" style="font-size:0.72rem; color:#475569; margin-top:1px;">{{ info.source }}</div>
-                      </div>
-                      <i class="fas fa-external-link-alt" style="color:#334155; font-size:0.72rem;"></i>
-                    </a>
-                  </template>
-                  <div v-if="!hasDownloads(currentGame)"
-                       style="padding:1rem; text-align:center; color:#334155; font-size:0.85rem; border:1px dashed rgba(255,255,255,0.06); border-radius:10px;">
-                    <i class="fas fa-clock" style="margin-right:0.4rem;"></i>资源整理中，敬请期待
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- PREVIEW GALLERY -->
-            <div v-if="currentGame.previewImages && currentGame.previewImages.length > 0"
-                 style="margin-top:1.5rem;" class="detail-panel">
-              <div style="font-size:0.72rem; color:#475569; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.875rem;">
-                预览截图 ({{ currentGame.previewImages.length }})
-              </div>
-              <div class="gallery-grid">
-                <div v-for="(img, i) in currentGame.previewImages" :key="i"
-                     class="gallery-item"
-                     @click="openLightbox(img)">
-                  <img :src="img" :alt="'Preview ' + (i+1)"
-                       @error="$event.target.parentElement.style.display='none'" />
-                </div>
-              </div>
-            </div>
-
-            <!-- COMMENTS -->
-            <div style="margin-top:1.5rem;" class="detail-panel">
-              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem;">
-                <div style="font-size:0.72rem; color:#475569; font-weight:700; text-transform:uppercase; letter-spacing:0.07em;">
-                  玩家评论 ({{ fakeComments.length }})
-                </div>
-                <button class="btn-primary" style="font-size:0.78rem; padding:0.35rem 0.875rem;">发表评论</button>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:0.75rem;">
-                <div v-for="c in fakeComments" :key="c.id" class="comment-card">
-                  <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.625rem;">
-                    <div class="avatar">{{ c.avatar }}</div>
-                    <div style="flex:1;">
-                      <div style="font-weight:600; font-size:0.875rem; color:#e2e8f0;">{{ c.name }}</div>
-                      <div style="font-size:0.72rem; color:#334155;">{{ c.date }}</div>
-                    </div>
-                    <div class="stars-row">
-                      <i v-for="s in c.stars" :key="s" class="fas fa-star"></i>
-                      <i v-for="s in (5-c.stars)" :key="'e'+s" class="far fa-star" style="color:#334155;"></i>
-                    </div>
-                  </div>
-                  <p style="font-size:0.875rem; color:#94a3b8; line-height:1.7; margin:0;">{{ c.text }}</p>
-                </div>
-              </div>
-            </div>
-
-          </div>
         </div>
 
-        <!-- RELATED GAMES -->
-        <div style="margin-top:3rem;">
-          <div class="section-header">
-            <div class="section-title">相关推荐</div>
-          </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:1rem;">
-            <div v-for="game in relatedGames" :key="game.id"
-                 class="game-card"
-                 @click="openDetail(game.id)">
-              <div class="card-cover-wrap">
-                <img v-if="game.cover" :src="game.cover" :alt="game.title"
-                     class="card-cover" @error="$event.target.style.display='none'" />
-                <div v-if="!game.cover" class="card-cover-placeholder">
-                  <i class="fas fa-gamepad" style="font-size:1.5rem;"></i>
+        <div class="p-4 flex flex-col flex-1">
+            <h3 class="font-bold text-slate-100 line-clamp-2 leading-snug group-hover:text-primary transition-colors text-sm md:text-base">{{ game.title }}</h3>
+            
+            <div class="mt-auto pt-3 space-y-2">
+                <div class="flex flex-wrap gap-1.5 h-[22px] overflow-hidden">
+                    <span v-for="tag in game.tags.slice(0,3)" :key="tag" class="text-[10px] bg-slate-700/50 text-slate-300 px-1.5 py-0.5 rounded border border-slate-600">
+                        {{ tag }}
+                    </span>
                 </div>
-                <div class="card-hover-overlay">
-                  <div class="card-view-btn">查看详情</div>
+                <div class="flex items-center gap-2 text-slate-400 text-xs">
+                    <i v-if="hasPlatform('PC')" class="fa-brands fa-windows"></i>
+                    <i v-if="hasPlatform('Android')" class="fa-brands fa-android text-green-400/80"></i>
+                    <span class="ml-auto text-[10px] opacity-70"><i class="fa-solid fa-fire text-orange-500 mr-1"></i>{{ 1000 + game.id * 123 }}</span>
                 </div>
-              </div>
-              <div class="card-body">
-                <div class="card-title">{{ game.title }}</div>
-                <div class="card-tags">
-                  <span v-for="t in game.tags.slice(0,2)" :key="t" class="tag-chip" :style="tagStyle(t)">{{t}}</span>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
-
-      </div>
     </div>
+</script>
 
-    <!-- DETAIL LOADING -->
-    <div v-if="page === 'detail' && !currentGame" class="page-enter">
-      <div style="max-width:1400px; margin:0 auto; padding:2rem 1.5rem;">
-        <div style="display:grid; grid-template-columns:280px 1fr; gap:2rem;">
-          <div class="skeleton" style="border-radius:16px; aspect-ratio:3/4;"></div>
-          <div style="display:flex; flex-direction:column; gap:1rem;">
-            <div class="skeleton" style="height:40px; width:70%; border-radius:8px;"></div>
-            <div class="skeleton" style="height:20px; width:40%; border-radius:8px;"></div>
-            <div class="skeleton" style="height:120px; border-radius:12px;"></div>
-          </div>
+<script type="text/x-template" id="view-home">
+    <div class="animate-fade-in">
+        <div class="container mx-auto px-4 md:px-6 mb-12 mt-4 relative group">
+            <div v-if="loading" class="w-full h-[300px] md:h-[450px] rounded-2xl skeleton"></div>
+            <div v-else class="relative w-full h-[300px] md:h-[450px] rounded-2xl overflow-hidden shadow-2xl shadow-primary/10">
+                <transition name="fade" mode="out-in">
+                    <div :key="currentBanner.id" class="absolute inset-0 cursor-pointer" @click="$router.push(`/game/${currentBanner.id}`)">
+                        <img :src="currentBanner.bannerBg || currentBanner.cover" class="w-full h-full object-cover object-center scale-105" alt="Banner">
+                        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/50 to-transparent"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                        
+                        <div class="absolute bottom-0 left-0 p-8 md:p-16 w-full md:w-2/3 transform transition-transform duration-500 hover:translate-x-2">
+                            <span class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full mb-4 inline-block shadow-[0_0_10px_rgba(236,72,153,0.8)]">本周推荐</span>
+                            <h2 class="text-3xl md:text-5xl font-black text-white mb-4 leading-tight drop-shadow-lg">{{ currentBanner.title }}</h2>
+                            <p class="text-slate-300 line-clamp-2 md:line-clamp-3 mb-6 max-w-xl text-sm md:text-base text-shadow">{{ currentBanner.description }}</p>
+                            <div class="flex gap-2">
+                                <span v-for="tag in currentBanner.tags.slice(0,4)" class="glass px-3 py-1 rounded-full text-xs text-white border-white/20">{{ tag }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </transition>
+                
+                <button @click.stop="prevBanner" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full glass flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/50"><i class="fa-solid fa-chevron-left"></i></button>
+                <button @click.stop="nextBanner" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full glass flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/50"><i class="fa-solid fa-chevron-right"></i></button>
+                
+                <div class="absolute bottom-6 right-8 flex gap-2">
+                    <button v-for="(item, index) in featuredGames" :key="index" @click="bannerIndex = index"
+                            :class="['w-2 h-2 rounded-full transition-all duration-300', bannerIndex === index ? 'w-6 bg-primary' : 'bg-white/50 hover:bg-white']"></button>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="flex-1">
+                    <div class="flex justify-between items-end mb-6 border-b border-slate-700/50 pb-2">
+                        <h2 class="text-2xl font-bold flex items-center gap-2"><i class="fa-solid fa-sparkles text-primary"></i> 最新入库</h2>
+                        <router-link to="/list" class="text-sm text-slate-400 hover:text-primary transition-colors">查看全部 <i class="fa-solid fa-angle-right"></i></router-link>
+                    </div>
+                    
+                    <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                        <div v-for="i in 8" :key="i" class="skeleton rounded-xl aspect-[3/4]"></div>
+                    </div>
+                    <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                        <game-card v-for="game in latestGames" :key="game.id" :game="game" />
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-80">
+                    <div class="flex justify-between items-end mb-6 border-b border-slate-700/50 pb-2">
+                        <h2 class="text-2xl font-bold flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> 热门榜单</h2>
+                    </div>
+                    
+                    <div v-if="loading" class="space-y-4">
+                        <div v-for="i in 5" :key="i" class="h-20 skeleton rounded-xl"></div>
+                    </div>
+                    <div v-else class="space-y-4">
+                        <div v-for="(game, index) in hotGames" :key="game.id" @click="$router.push(`/game/${game.id}`)"
+                             class="group flex gap-3 glass-card p-2.5 rounded-xl cursor-pointer hover:bg-slate-800 transition-colors relative overflow-hidden">
+                            <div :class="['absolute top-0 left-0 w-6 h-6 flex items-center justify-center rounded-br-lg text-xs font-bold z-10 text-white', index === 0 ? 'bg-red-500' : index === 1 ? 'bg-orange-500' : index === 2 ? 'bg-yellow-500' : 'bg-slate-600']">
+                                {{ index + 1 }}
+                            </div>
+                            
+                            <img :src="game.cover" class="w-16 h-20 object-cover rounded-lg shadow-md group-hover:scale-105 transition-transform" alt="cover">
+                            <div class="flex-1 flex flex-col justify-center overflow-hidden">
+                                <h4 class="font-bold text-sm text-slate-200 truncate group-hover:text-primary transition-colors pl-1">{{ game.title }}</h4>
+                                <div class="flex gap-1 mt-1 pl-1">
+                                    <span class="text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded">{{ game.tags[0] }}</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500 mt-1 pl-1"><i class="fa-solid fa-arrow-trend-up mr-1 text-primary"></i>指数 {{ 9999 - index*800 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</script>
 
-    <!-- FOOTER -->
-    <footer style="border-top:1px solid rgba(255,255,255,0.04); padding:3rem 1.5rem 2rem; margin-top:4rem; background:rgba(6,9,20,0.6);">
-      <div style="max-width:1400px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
-        <div class="nav-logo" style="font-size:1.75rem;">方Gal</div>
-        <div style="display:flex; gap:2rem; font-size:0.82rem; color:#334155; flex-wrap:wrap; justify-content:center;">
-          <a href="#" style="color:#334155; text-decoration:none; transition:color 0.2s;"
-             onmouseover="this.style.color='var(--pk)'" onmouseout="this.style.color='#334155'">关于我们</a>
-          <a href="#" style="color:#334155; text-decoration:none; transition:color 0.2s;"
-             onmouseover="this.style.color='var(--pk)'" onmouseout="this.style.color='#334155'">投稿申请</a>
-          <a href="#" style="color:#334155; text-decoration:none; transition:color 0.2s;"
-             onmouseover="this.style.color='var(--pk)'" onmouseout="this.style.color='#334155'">免责声明</a>
-          <a href="#" style="color:#334155; text-decoration:none; transition:color 0.2s;"
-             onmouseover="this.style.color='var(--pk)'" onmouseout="this.style.color='#334155'">友情链接</a>
+<script type="text/x-template" id="view-list">
+    <div class="container mx-auto px-4 md:px-6 py-6 animate-fade-in flex flex-col lg:flex-row gap-6">
+        
+        <button @click="showMobileFilter = !showMobileFilter" class="lg:hidden glass py-2 rounded-lg text-center font-medium border-primary/30 text-primary">
+            <i class="fa-solid fa-filter mr-2"></i> 筛选与排序
+        </button>
+
+        <aside :class="['w-full lg:w-64 flex-shrink-0 lg:block', showMobileFilter ? 'block' : 'hidden']">
+            <div class="glass-card rounded-2xl p-5 sticky top-24">
+                <div class="mb-6 relative">
+                    <input type="text" v-model="searchQuery" placeholder="在列表内搜索..." 
+                           class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 pl-9 pr-3 text-sm focus:outline-none focus:border-primary/50 text-white">
+                    <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-500"></i>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-sm font-bold text-slate-400 mb-3 uppercase tracking-wider">排序方式</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button v-for="opt in sortOptions" :key="opt.value" @click="sortBy = opt.value"
+                                :class="['px-3 py-1.5 rounded-md text-xs font-medium transition-colors border', sortBy === opt.value ? 'bg-primary/20 text-primary border-primary/50' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700']">
+                            {{ opt.label }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-sm font-bold text-slate-400 mb-3 uppercase tracking-wider">属性</h3>
+                    <div class="flex flex-col gap-2">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <div class="relative flex items-center justify-center w-5 h-5 rounded border border-slate-600 bg-slate-800 group-hover:border-primary/50">
+                                <input type="checkbox" v-model="filterChinese" class="peer opacity-0 absolute inset-0 cursor-pointer">
+                                <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity z-10"></i>
+                                <div class="absolute inset-0 bg-primary rounded opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                            </div>
+                            <span class="text-sm text-slate-300 group-hover:text-white transition-colors">官方/民间汉化</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <div class="relative flex items-center justify-center w-5 h-5 rounded border border-slate-600 bg-slate-800 group-hover:border-primary/50">
+                                <input type="checkbox" v-model="filterAndroid" class="peer opacity-0 absolute inset-0 cursor-pointer">
+                                <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity z-10"></i>
+                                <div class="absolute inset-0 bg-primary rounded opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                            </div>
+                            <span class="text-sm text-slate-300 group-hover:text-white transition-colors">支持安卓运行</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">类型标签</h3>
+                        <button v-if="selectedTags.length" @click="selectedTags = []" class="text-xs text-primary hover:underline">清空</button>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 max-h-[300px] overflow-y-auto no-scrollbar pb-2">
+                        <button v-for="tag in allTags" :key="tag" @click="toggleTag(tag)"
+                                :class="['px-2.5 py-1 rounded text-xs border transition-all duration-200', selectedTags.includes(tag) ? 'bg-secondary border-secondary text-white shadow-[0_0_8px_rgba(168,85,247,0.5)]' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-secondary/50 hover:text-slate-200']">
+                            {{ tag }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 min-h-[500px]">
+            <div class="mb-4 flex justify-between items-center bg-slate-800/40 p-3 rounded-lg border border-slate-700/50">
+                <span class="text-sm text-slate-400">共找到 <span class="text-primary font-bold">{{ filteredGames.length }}</span> 个结果</span>
+            </div>
+
+            <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div v-for="i in 10" :key="i" class="skeleton rounded-xl aspect-[3/4]"></div>
+            </div>
+            
+            <div v-else-if="filteredGames.length === 0" class="flex flex-col items-center justify-center py-20 text-slate-500 glass-card rounded-2xl">
+                <i class="fa-solid fa-ghost text-6xl mb-4 opacity-50"></i>
+                <p>没有找到符合条件的游戏</p>
+                <button @click="resetFilters" class="mt-4 px-4 py-2 border border-primary text-primary rounded-full hover:bg-primary hover:text-white transition-colors">重置筛选</button>
+            </div>
+
+            <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 animate-slide-up">
+                <game-card v-for="game in filteredGames" :key="game.id" :game="game" />
+            </div>
         </div>
-        <div style="font-size:0.75rem; color:#1e293b; text-align:center; line-height:1.6;">
-          本站内容仅供学习交流，请支持正版。所有游戏版权归原作者所有。<br>
-          Powered by <span style="color:rgba(255,110,180,0.5);">FangGal</span> · Built with ♥
+    </div>
+</script>
+
+<script type="text/x-template" id="view-detail">
+    <div v-if="loading" class="container mx-auto px-4 py-10"><div class="skeleton h-96 w-full rounded-2xl"></div></div>
+    <div v-else-if="!game" class="container mx-auto px-4 py-20 text-center"><h1 class="text-2xl">404 - 游戏未找到</h1></div>
+    <div v-else class="animate-fade-in relative pb-20">
+        
+        <div class="absolute top-0 left-0 w-full h-[500px] overflow-hidden -z-10">
+            <img :src="game.bannerBg || game.cover" class="w-full h-full object-cover opacity-30 blur-2xl scale-110" alt="bg">
+            <div class="absolute inset-0 bg-gradient-to-b from-dark/40 via-dark/80 to-dark"></div>
         </div>
-      </div>
-    </footer>
 
-  </main>
+        <div class="container mx-auto px-4 md:px-6 pt-10">
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="w-full md:w-64 lg:w-80 flex-shrink-0 animate-slide-up">
+                    <div class="rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-700/50 bg-slate-800 relative group">
+                        <img :src="game.cover" class="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-500" :alt="game.title">
+                        <div v-if="game.isChinese" class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">汉化版</div>
+                    </div>
+                    
+                    <div class="mt-6 flex flex-col gap-3">
+                        <a href="#downloads" class="w-full bg-gradient-primary text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform text-center">
+                            <i class="fa-solid fa-download"></i> 获取资源
+                        </a>
+                        <div class="flex gap-3">
+                            <button class="flex-1 glass py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-regular fa-heart"></i> 收藏
+                            </button>
+                            <button class="flex-1 glass py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-share-nodes"></i> 分享
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-</div>
+                <div class="flex-1 text-slate-200 mt-2 md:mt-10 animate-slide-up" style="animation-delay: 0.1s;">
+                    <h1 class="text-3xl md:text-5xl font-black text-white leading-tight mb-4 text-shadow">{{ game.title }}</h1>
+                    
+                    <div class="flex flex-wrap gap-4 items-center mb-6 text-sm">
+                        <div class="flex items-center gap-1 bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full border border-yellow-500/30">
+                            <i class="fa-solid fa-star"></i> <span class="font-bold">9.{{ game.id % 10 }}</span> <span class="text-xs text-yellow-500/80">(245 评价)</span>
+                        </div>
+                        <span class="text-slate-400"><i class="fa-solid fa-building mr-1"></i> 未知社团/公司</span>
+                        <span class="text-slate-400"><i class="fa-solid fa-calendar mr-1"></i> 2024-05-04</span>
+                    </div>
+
+                    <div class="mb-6 flex flex-wrap gap-2">
+                        <span v-for="tag in game.tags" :key="tag" class="bg-slate-800/80 border border-slate-700 text-slate-300 px-3 py-1 rounded-lg text-sm hover:border-primary/50 transition-colors cursor-pointer">
+                            {{ tag }}
+                        </span>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-2xl mb-8 border-l-4 border-l-primary">
+                        <h3 class="text-lg font-bold text-white mb-2">作品简介</h3>
+                        <p class="text-slate-300 leading-relaxed text-sm md:text-base whitespace-pre-line">{{ game.description || '暂无详细介绍...' }}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-400 mb-3 uppercase">支持平台</h3>
+                        <div class="flex gap-4">
+                            <div v-for="p in groupedPlatforms" :key="p.type" class="flex flex-col items-center justify-center w-16 h-16 rounded-xl glass border border-slate-700/50 group hover:border-primary/50 transition-colors">
+                                <i v-if="p.type === 'PC'" class="fa-brands fa-windows text-2xl text-blue-400 group-hover:text-blue-300"></i>
+                                <i v-else-if="p.type === 'Android'" class="fa-brands fa-android text-2xl text-green-400 group-hover:text-green-300"></i>
+                                <i v-else class="fa-solid fa-gamepad text-2xl text-purple-400"></i>
+                                <span class="text-[10px] mt-1 text-slate-400 font-bold">{{ p.type }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-12">
+                    
+                    <section v-if="game.previewImages && game.previewImages.length">
+                        <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2"><i class="fa-solid fa-images text-secondary"></i> 游戏预览</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div v-for="(img, idx) in game.previewImages" :key="idx" 
+                                 class="rounded-xl overflow-hidden glass-card aspect-video cursor-pointer hover:ring-2 ring-primary/50 transition-all">
+                                <img :src="img" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" alt="Preview">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <div class="flex justify-between items-end mb-6 border-b border-slate-700/50 pb-2">
+                            <h2 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-comments text-blue-400"></i> 玩家评论 <span class="text-sm font-normal text-slate-400">(模拟)</span></h2>
+                        </div>
+                        
+                        <div class="glass-card rounded-2xl p-4 md:p-6 space-y-6">
+                            <div class="flex gap-4">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex-shrink-0"></div>
+                                <div class="flex-1">
+                                    <textarea placeholder="分享你的游玩感受..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-primary/50 resize-none" rows="2"></textarea>
+                                    <div class="flex justify-end mt-2">
+                                        <button class="bg-primary hover:bg-primary/80 text-white px-5 py-1.5 rounded-full text-sm font-medium transition-colors">发送</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div v-for="i in 3" :key="i" class="flex gap-4 border-t border-slate-700/50 pt-4">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0 flex items-center justify-center text-white font-bold"><i class="fa-solid fa-user"></i></div>
+                                    <div>
+                                        <div class="flex items-baseline gap-2 mb-1">
+                                            <span class="font-bold text-sm text-slate-200">User_{{ 1024 + i*7 }}</span>
+                                            <span class="text-xs text-slate-500">2天前</span>
+                                        </div>
+                                        <p class="text-slate-300 text-sm leading-relaxed">这个界面的设计参考了 touchgal 和 inarigal，确实很有那种现代资源站的味道了。下载部分也做得很清楚！</p>
+                                        <div class="flex gap-4 mt-2 text-slate-500 text-xs">
+                                            <button class="hover:text-primary transition-colors"><i class="fa-solid fa-thumbs-up"></i> {{ 10 * i }}</button>
+                                            <button class="hover:text-white transition-colors"><i class="fa-solid fa-reply"></i> 回复</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="lg:col-span-1 space-y-6" id="downloads">
+                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2"><i class="fa-solid fa-box-archive text-green-400"></i> 下载地址</h2>
+                    
+                    <div class="space-y-4 sticky top-24">
+                        <template v-for="(dlData, key) in game.downloads" :key="key">
+                            <div v-if="dlData && dlData.url" class="glass-card p-4 rounded-xl border border-slate-700/50 hover:border-primary/30 transition-colors group">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-xl text-slate-300 group-hover:text-primary transition-colors">
+                                        <i v-if="key === 'PC'" class="fa-brands fa-windows"></i>
+                                        <i v-else-if="key === 'android_direct'" class="fa-brands fa-android"></i>
+                                        <i v-else class="fa-solid fa-mobile-screen"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-slate-200 uppercase">{{ key === 'android_direct' ? '直装版 (APK)' : key }}</h4>
+                                        <p class="text-[10px] text-slate-500">{{ dlData.source || '百度网盘 / 夸克' }}</p>
+                                    </div>
+                                </div>
+                                <div v-if="dlData.instructions" class="text-xs text-slate-400 bg-slate-900/50 p-2 rounded mb-3 border border-slate-800">
+                                    {{ dlData.instructions }}
+                                </div>
+                                <a :href="dlData.url" target="_blank" class="block w-full bg-slate-700 hover:bg-primary text-white text-center py-2 rounded-lg text-sm font-medium transition-colors">
+                                    前往下载
+                                </a>
+                            </div>
+                        </template>
+                        
+                        <div v-if="!hasAnyDownload" class="glass p-6 rounded-xl text-center text-slate-500">
+                            <i class="fa-solid fa-link-slash text-3xl mb-2 opacity-50"></i>
+                            <p class="text-sm">暂无可用下载链接</p>
+                        </div>
+                        
+                        <div class="text-xs text-slate-500 bg-red-900/10 border border-red-900/30 p-3 rounded-xl mt-4">
+                            <i class="fa-solid fa-triangle-exclamation text-red-500/80 mr-1"></i>
+                            本站所有资源均来自网络收集，仅供学习交流使用。请在下载后24小时内删除。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 
 <script>
-const { createApp, ref, computed, onMounted, onUnmounted, watch, nextTick } = Vue;
+    const { createApp, ref, computed, onMounted, onUnmounted, watch } = Vue;
+    const { createRouter, createWebHashHistory, useRoute, useRouter } = VueRouter;
 
-// ============================================================
-// FAKE COMMENT DATA
-// ============================================================
-const FAKE_COMMENTS = [
-  { id:1, name:'ましろ', avatar:'ま', date:'2025-12-15', stars:5, text:'剧情感人至深，催泪成分满满。推荐给所有喜欢ADV游戏的玩家，文字量很大但值得花时间。' },
-  { id:2, name:'Kagura_玩家', avatar:'K', date:'2025-12-10', stars:4, text:'画面精美，配音一流。某些章节节奏稍显拖沓，但整体体验非常好，最终章让我哭了好久。' },
-  { id:3, name:'星夜てつや', avatar:'星', date:'2025-11-28', stars:5, text:'汉化质量出乎意料地高，用词准确，语感自然。比某些官方中文化还要流畅，感谢汉化组！' },
-  { id:4, name:'旅行者_2077', avatar:'旅', date:'2025-11-20', stars:3, text:'游戏本身不错，但安卓版兼容性有点问题，在我的设备上偶尔闪退。PC版完美运行推荐。' },
-  { id:5, name:'aoba_crystal', avatar:'A', date:'2025-11-05', stars:5, text:'OP曲真的太好听了，BGM质量整体都很高。视觉演出和分支剧情设计得很有层次感，二周目值得一玩。' },
-];
-
-// ============================================================
-// TAG COLOR MAP
-// ============================================================
-const TAG_COLORS = {
-  '汉化':  { bg:'rgba(255,110,180,0.15)', color:'#ff6eb4', border:'rgba(255,110,180,0.3)' },
-  '生肉':  { bg:'rgba(251,191,36,0.15)',  color:'#fbbf24', border:'rgba(251,191,36,0.3)' },
-  '恋爱':  { bg:'rgba(244,114,182,0.15)', color:'#f472b6', border:'rgba(244,114,182,0.3)' },
-  '校园':  { bg:'rgba(96,165,250,0.15)',  color:'#60a5fa', border:'rgba(96,165,250,0.3)' },
-  '奇幻':  { bg:'rgba(167,139,250,0.15)', color:'#a78bfa', border:'rgba(167,139,250,0.3)' },
-  '魔法':  { bg:'rgba(196,181,253,0.15)', color:'#c4b5fd', border:'rgba(196,181,253,0.3)' },
-  'NTR':   { bg:'rgba(239,68,68,0.15)',   color:'#f87171', border:'rgba(239,68,68,0.3)' },
-  '后宫':  { bg:'rgba(251,146,60,0.15)',  color:'#fb923c', border:'rgba(251,146,60,0.3)' },
-  '催泪':  { bg:'rgba(56,189,248,0.15)',  color:'#38bdf8', border:'rgba(56,189,248,0.3)' },
-  '治愈':  { bg:'rgba(52,211,153,0.15)',  color:'#34d399', border:'rgba(52,211,153,0.3)' },
-  '悬疑':  { bg:'rgba(148,163,184,0.15)', color:'#94a3b8', border:'rgba(148,163,184,0.3)' },
-  '科幻':  { bg:'rgba(92,224,230,0.15)',  color:'#5ce0e6', border:'rgba(92,224,230,0.3)' },
-  '历史':  { bg:'rgba(180,130,80,0.15)',  color:'#c8955c', border:'rgba(180,130,80,0.3)' },
-  '战争':  { bg:'rgba(239,68,68,0.15)',   color:'#ef4444', border:'rgba(239,68,68,0.3)' },
-  '同人':  { bg:'rgba(236,72,153,0.15)',  color:'#ec4899', border:'rgba(236,72,153,0.3)' },
-  '百合':  { bg:'rgba(244,114,182,0.15)', color:'#f9a8d4', border:'rgba(244,114,182,0.3)' },
-  '耽美':  { bg:'rgba(124,58,237,0.15)',  color:'#8b5cf6', border:'rgba(124,58,237,0.3)' },
-  '人妻':  { bg:'rgba(251,146,60,0.15)',  color:'#fb923c', border:'rgba(251,146,60,0.3)' },
-  '萝莉':  { bg:'rgba(252,211,77,0.15)',  color:'#fcd34d', border:'rgba(252,211,77,0.3)' },
-  '纯爱':  { bg:'rgba(254,205,211,0.15)', color:'#fda4af', border:'rgba(254,205,211,0.3)' },
-  '冒险':  { bg:'rgba(52,211,153,0.15)',  color:'#34d399', border:'rgba(52,211,153,0.3)' },
-  '推理':  { bg:'rgba(148,163,184,0.15)', color:'#94a3b8', border:'rgba(148,163,184,0.3)' },
-  '音乐':  { bg:'rgba(167,139,250,0.15)', color:'#a78bfa', border:'rgba(167,139,250,0.3)' },
-  'R18':   { bg:'rgba(239,68,68,0.12)',   color:'#ef4444', border:'rgba(239,68,68,0.25)' },
-  'PC':    { bg:'rgba(59,130,246,0.15)',  color:'#60a5fa', border:'rgba(59,130,246,0.3)' },
-  'Android':{ bg:'rgba(52,211,153,0.15)',color:'#34d399', border:'rgba(52,211,153,0.3)' },
-};
-const DEFAULT_TAG = { bg:'rgba(100,116,139,0.15)', color:'#94a3b8', border:'rgba(100,116,139,0.25)' };
-
-// ============================================================
-// DOWNLOAD HELPERS
-// ============================================================
-function dlLabel(key) {
-  return { PC:'PC 版下载', krkr:'Android (KrKr)', Ty:'Android (Tyrono)', ONS:'Android (ONScripter)', android_direct:'Android 直装' }[key] || key;
-}
-function dlIcon(key) {
-  const map = { PC:'fab fa-windows', krkr:'fab fa-android', Ty:'fab fa-android', ONS:'fab fa-android', android_direct:'fab fa-android' };
-  return map[key] || 'fas fa-download';
-}
-
-// ============================================================
-// API FETCH
-// ============================================================
-async function fetchAllGames() {
-  const endpoints = [
-    'https://galgame-api.fanggal.workers.dev',
-    'https://galgame-api.fanggal.workers.dev/games',
-    'https://galgame-api.fanggal.workers.dev/api/games',
-    'https://galgame-api.fanggal.workers.dev/api',
-  ];
-  for (const url of endpoints) {
-    try {
-      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
-      if (data?.games && Array.isArray(data.games)) return data.games;
-      if (data?.data && Array.isArray(data.data)) return data.data;
-      if (data?.list && Array.isArray(data.list)) return data.list;
-    } catch(e) { /* try next */ }
-  }
-  return null;
-}
-
-// ============================================================
-// PARTICLE SYSTEM
-// ============================================================
-function initParticles() {
-  const canvas = document.getElementById('bg-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let W = canvas.width = window.innerWidth;
-  let H = canvas.height = window.innerHeight;
-  window.addEventListener('resize', () => {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  });
-
-  const particles = Array.from({length: 60}, () => ({
-    x: Math.random() * W,
-    y: Math.random() * H,
-    r: Math.random() * 2 + 0.5,
-    vx: (Math.random() - 0.5) * 0.3,
-    vy: -(Math.random() * 0.4 + 0.1),
-    alpha: Math.random() * 0.4 + 0.1,
-    hue: Math.random() > 0.5 ? 320 : 280,
-  }));
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    for (const p of particles) {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${p.hue}, 100%, 75%, ${p.alpha})`;
-      ctx.fill();
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
-      if (p.x < -10) p.x = W + 10;
-      if (p.x > W + 10) p.x = -10;
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
-
-// ============================================================
-// VUE APP
-// ============================================================
-const app = createApp({
-  setup() {
-    // STATE
-    const games = ref([]);
-    const loading = ref(true);
-    const page = ref('home');
-    const currentGameId = ref(null);
-    const searchQuery = ref('');
-    const searchOpen = ref(false);
-    const searchInput = ref(null);
-
-    // NAV
-    const navScrolled = ref(false);
-    const navHidden = ref(false);
-    const showScrollTop = ref(false);
-    let lastScrollY = 0;
-
-    // BANNER
-    const bannerIndex = ref(0);
-    let bannerTimer = null;
-
-    // LIST FILTERS
-    const listSearch = ref('');
-    const langFilter = ref('all');
-    const platformFilter = ref([]);
-    const tagFilters = ref([]);
-    const sortBy = ref('latest');
-
-    // MODALS
-    const lightbox = ref({ open: false, src: '' });
-    const downloadModal = ref({ open: false, title: '', downloads: {} });
-
-    // COMPUTED
-    const featuredGames = computed(() => {
-      const f = games.value.filter(g => g.featured);
-      return f.length > 0 ? f : games.value.slice(0, 5);
-    });
-
-    const latestGames = computed(() => [...games.value].reverse());
-    const hotGames = computed(() => [...games.value].slice(0, 10));
-
-    const currentGame = computed(() =>
-      currentGameId.value !== null ? games.value.find(g => g.id === currentGameId.value) || null : null
-    );
-
-    const fakeComments = computed(() => {
-      if (!currentGameId.value) return [];
-      return FAKE_COMMENTS.slice(0, 3 + (currentGameId.value % 3));
-    });
-
-    const relatedGames = computed(() => {
-      if (!currentGame.value) return [];
-      const tags = currentGame.value.tags;
-      return games.value
-        .filter(g => g.id !== currentGameId.value && g.tags.some(t => tags.includes(t)))
-        .slice(0, 6);
-    });
-
-    const allTags = computed(() => {
-      const tagSet = new Set();
-      games.value.forEach(g => g.tags?.forEach(t => tagSet.add(t)));
-      return [...tagSet].sort();
-    });
-
-    const popularTags = computed(() => allTags.value.slice(0, 16));
-
-    const searchResults = computed(() => {
-      if (!searchQuery.value.trim()) return [];
-      const q = searchQuery.value.toLowerCase();
-      return games.value.filter(g =>
-        g.title?.toLowerCase().includes(q) ||
-        g.tags?.some(t => t.toLowerCase().includes(q)) ||
-        g.description?.toLowerCase().includes(q)
-      );
-    });
-
-    const filteredGames = computed(() => {
-      let list = [...games.value];
-
-      if (listSearch.value.trim()) {
-        const q = listSearch.value.toLowerCase();
-        list = list.filter(g =>
-          g.title?.toLowerCase().includes(q) ||
-          g.tags?.some(t => t.toLowerCase().includes(q))
-        );
-      }
-      if (langFilter.value === 'cn') list = list.filter(g => g.isChinese);
-      if (langFilter.value === 'raw') list = list.filter(g => !g.isChinese);
-
-      if (platformFilter.value.length > 0) {
-        list = list.filter(g =>
-          platformFilter.value.every(p => hasPlatform(g, p))
-        );
-      }
-      if (tagFilters.value.length > 0) {
-        list = list.filter(g =>
-          tagFilters.value.every(t => g.tags?.includes(t))
-        );
-      }
-
-      if (sortBy.value === 'name') list.sort((a, b) => (a.title || '').localeCompare(b.title || '', 'zh'));
-      else if (sortBy.value === 'id') list.sort((a, b) => a.id - b.id);
-      else list = [...list].reverse(); // latest = reverse insertion order
-
-      return list;
-    });
-
-    const hasAnyDownload = computed(() =>
-      Object.values(downloadModal.value.downloads || {}).some(v => v && v.url)
-    );
-
-    // METHODS
-    function hasPlatform(game, type) {
-      return game.platforms?.some(p => p.type === type) || false;
-    }
-
-    function hasDownloads(game) {
-      return game.downloads && Object.values(game.downloads).some(v => v && v.url);
-    }
-
-    function tagStyle(tag) {
-      const c = TAG_COLORS[tag] || DEFAULT_TAG;
-      return `background:${c.bg}; color:${c.color}; border:1px solid ${c.border};`;
-    }
-
-    function rankClass(idx) {
-      if (idx === 0) return 'top1';
-      if (idx === 1) return 'top2';
-      if (idx === 2) return 'top3';
-      return 'other';
-    }
-
-    function navigate(target) {
-      page.value = target;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Update hash
-      if (target === 'home') history.pushState({}, '', '#/');
-      else if (target === 'list') history.pushState({}, '', '#/list');
-    }
-
-    function openDetail(id) {
-      currentGameId.value = id;
-      page.value = 'detail';
-      history.pushState({}, '', `#/detail/${id}`);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function openSearch() {
-      searchOpen.value = true;
-      nextTick(() => searchInput.value?.focus());
-    }
-
-    function closeSearch() {
-      searchOpen.value = false;
-      searchQuery.value = '';
-    }
-
-    function openDownload(game) {
-      downloadModal.value = {
-        open: true,
-        title: game.title,
-        downloads: game.downloads || {}
-      };
-    }
-
-    function openLightbox(src) {
-      lightbox.value = { open: true, src };
-    }
-
-    function toggleFilter(arr, val) {
-      const idx = arr.indexOf(val);
-      if (idx === -1) arr.push(val);
-      else arr.splice(idx, 1);
-    }
-
-    function clearFilters() {
-      tagFilters.value = [];
-      langFilter.value = 'all';
-      platformFilter.value = [];
-      listSearch.value = '';
-    }
-
-    function randomGame() {
-      if (games.value.length === 0) return;
-      const g = games.value[Math.floor(Math.random() * games.value.length)];
-      openDetail(g.id);
-    }
-
-    function scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function startBannerTimer() {
-      clearInterval(bannerTimer);
-      bannerTimer = setInterval(() => {
-        if (featuredGames.value.length > 0) {
-          bannerIndex.value = (bannerIndex.value + 1) % featuredGames.value.length;
+    // --- Mock Data Generator (Fallback if API fails) ---
+    const generateMockData = () => {
+        const types = ['恋爱', '校园', '奇幻', 'NTR', '纯爱', '猎奇', '剧情', '治愈'];
+        const arr = [];
+        for(let i=1; i<=20; i++) {
+            const isChinese = Math.random() > 0.3;
+            const hasAndroid = Math.random() > 0.5;
+            arr.push({
+                id: i,
+                title: `幻奏夜话~The Illusionary Serenade~ Vol.${i}`,
+                cover: `https://picsum.photos/seed/gal${i}/400/600`,
+                bannerBg: i <= 3 ? `https://picsum.photos/seed/bg${i}/1200/500` : null,
+                previewImages: [`https://picsum.photos/seed/p1${i}/800/450`, `https://picsum.photos/seed/p2${i}/800/450`],
+                tags: [types[i%types.length], types[(i+1)%types.length], isChinese ? '官方中文' : '生肉'],
+                platforms: [{type: 'PC'}, hasAndroid ? {type: 'Android', sub: 'krkr'} : null].filter(Boolean),
+                isChinese: isChinese,
+                description: `这是一个关于爱与魔法的故事，发生在一个虚构的现代都市中。玩家将扮演男主角，与几位性格迥异的女主角展开一段段扣人心弦的故事。\n\n本作品包含丰富的剧情分支和精美的CG，音乐由知名社团制作。`,
+                featured: i <= 3,
+                downloads: {
+                    PC: { url: '#', source: '百度网盘', instructions: '解压即玩' },
+                    krkr: hasAndroid ? { url: '#', source: '夸克网盘', instructions: '需要使用模拟器' } : { url: null },
+                    Ty: { url: null, source: null, instructions: null },
+                    ONS: { url: null, source: null, instructions: null },
+                    android_direct: { url: null, source: null, instructions: null }
+                }
+            });
         }
-      }, 5000);
-    }
-
-    // SCROLL HANDLER
-    function onScroll() {
-      const y = window.scrollY;
-      navScrolled.value = y > 20;
-      navHidden.value = y > lastScrollY + 80 && y > 200;
-      if (y < lastScrollY - 10) navHidden.value = false;
-      showScrollTop.value = y > 400;
-      lastScrollY = y;
-    }
-
-    // KEYBOARD SHORTCUTS
-    function onKeydown(e) {
-      if (e.key === 'Escape') {
-        if (lightbox.value.open) lightbox.value.open = false;
-        else if (downloadModal.value.open) downloadModal.value.open = false;
-        else if (searchOpen.value) closeSearch();
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        openSearch();
-      }
-    }
-
-    // HASH ROUTER
-    function parseHash() {
-      const hash = location.hash || '#/';
-      if (hash.startsWith('#/detail/')) {
-        const id = parseInt(hash.split('/').pop());
-        if (!isNaN(id)) {
-          currentGameId.value = id;
-          page.value = 'detail';
-        }
-      } else if (hash === '#/list') {
-        page.value = 'list';
-      } else {
-        page.value = 'home';
-      }
-    }
-
-    // LIFECYCLE
-    onMounted(async () => {
-      initParticles();
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('keydown', onKeydown);
-      window.addEventListener('popstate', parseHash);
-      parseHash();
-      startBannerTimer();
-
-      // Fetch data
-      loading.value = true;
-      try {
-        const data = await fetchAllGames();
-        if (data) {
-          games.value = data;
-        } else {
-          // Use empty array — user has their own backend
-          games.value = [];
-        }
-      } catch(e) {
-        console.error('Failed to fetch games:', e);
-        games.value = [];
-      } finally {
-        loading.value = false;
-      }
-    });
-
-    onUnmounted(() => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('keydown', onKeydown);
-      window.removeEventListener('popstate', parseHash);
-      clearInterval(bannerTimer);
-    });
-
-    return {
-      games, loading, page, currentGameId, currentGame,
-      searchQuery, searchOpen, searchInput,
-      navScrolled, navHidden, showScrollTop,
-      bannerIndex,
-      listSearch, langFilter, platformFilter, tagFilters, sortBy,
-      lightbox, downloadModal,
-      featuredGames, latestGames, hotGames,
-      fakeComments, relatedGames, allTags, popularTags,
-      searchResults, filteredGames, hasAnyDownload,
-      hasPlatform, hasDownloads, tagStyle, rankClass,
-      navigate, openDetail, openSearch, closeSearch,
-      openDownload, openLightbox,
-      toggleFilter, clearFilters, randomGame, scrollToTop,
-      dlLabel, dlIcon,
+        return arr;
     };
-  }
-});
 
-app.mount('#app');
+    // --- Global State ---
+    const globalGames = ref([]);
+    const globalLoading = ref(true);
 
-// ============================================================
-// EXTRA: Responsive hot grid
-// ============================================================
-function updateHotGrid() {
-  const el = document.querySelector('.hot-grid');
-  if (!el) return;
-  if (window.innerWidth < 900) {
-    el.style.gridTemplateColumns = '1fr';
-  } else {
-    el.style.gridTemplateColumns = '1fr 340px';
-  }
-}
-window.addEventListener('resize', updateHotGrid);
-document.addEventListener('DOMContentLoaded', updateHotGrid);
-setTimeout(updateHotGrid, 100);
+    // --- Fetch Logic ---
+    const fetchData = async () => {
+        globalLoading.value = true;
+        try {
+            // Attempt to fetch from real API
+            const res = await fetch('https://galgame-api.fanggal.workers.dev');
+            if(!res.ok) throw new Error('API Error');
+            const data = await res.json();
+            if(Array.isArray(data) && data.length > 0) {
+                globalGames.value = data;
+            } else {
+                globalGames.value = generateMockData();
+            }
+        } catch(e) {
+            console.log('Using mock data due to API error:', e);
+            globalGames.value = generateMockData();
+        } finally {
+            globalLoading.value = false;
+        }
+    };
+
+    // --- Components ---
+
+    const GameCard = {
+        template: '#game-card',
+        props: ['game'],
+        setup(props) {
+            const router = useRouter();
+            const hasPlatform = (type) => props.game.platforms && props.game.platforms.some(p => p.type === type);
+            const goToDetail = () => { router.push(`/game/${props.game.id}`); };
+            return { hasPlatform, goToDetail };
+        }
+    };
+
+    const ViewHome = {
+        template: '#view-home',
+        components: { GameCard },
+        setup() {
+            const loading = computed(() => globalLoading.value);
+            const bannerIndex = ref(0);
+            
+            const featuredGames = computed(() => {
+                const feats = globalGames.value.filter(g => g.featured);
+                return feats.length ? feats : globalGames.value.slice(0,3);
+            });
+            const currentBanner = computed(() => featuredGames.value[bannerIndex.value] || {});
+            
+            const latestGames = computed(() => [...globalGames.value].reverse().slice(0, 8));
+            const hotGames = computed(() => {
+                return [...globalGames.value].sort((a,b) => b.id - a.id).slice(2, 7); // Mock sorting
+            });
+
+            const nextBanner = () => { bannerIndex.value = (bannerIndex.value + 1) % featuredGames.value.length; };
+            const prevBanner = () => { bannerIndex.value = (bannerIndex.value - 1 + featuredGames.value.length) % featuredGames.value.length; };
+
+            let timer;
+            onMounted(() => { timer = setInterval(nextBanner, 5000); });
+            onUnmounted(() => { clearInterval(timer); });
+
+            return { loading, featuredGames, currentBanner, bannerIndex, latestGames, hotGames, nextBanner, prevBanner };
+        }
+    };
+
+    const ViewList = {
+        template: '#view-list',
+        components: { GameCard },
+        setup() {
+            const loading = computed(() => globalLoading.value);
+            const searchQuery = ref('');
+            const sortBy = ref('latest');
+            const filterChinese = ref(false);
+            const filterAndroid = ref(false);
+            const selectedTags = ref([]);
+            const showMobileFilter = ref(false);
+
+            const sortOptions = [
+                { label: '最新入库', value: 'latest' },
+                { label: '热度最高', value: 'hot' },
+                { label: '评分优先', value: 'rating' }
+            ];
+
+            const allTags = computed(() => {
+                const tags = new Set();
+                globalGames.value.forEach(g => { if(g.tags) g.tags.forEach(t => tags.add(t)); });
+                return Array.from(tags).slice(0, 20); // limit display
+            });
+
+            const toggleTag = (tag) => {
+                const idx = selectedTags.value.indexOf(tag);
+                if(idx > -1) selectedTags.value.splice(idx, 1);
+                else selectedTags.value.push(tag);
+            };
+
+            const resetFilters = () => {
+                searchQuery.value = ''; sortBy.value = 'latest'; 
+                filterChinese.value = false; filterAndroid.value = false; selectedTags.value = [];
+            };
+
+            const filteredGames = computed(() => {
+                let res = globalGames.value;
+                
+                if(searchQuery.value) {
+                    const q = searchQuery.value.toLowerCase();
+                    res = res.filter(g => g.title.toLowerCase().includes(q) || (g.tags && g.tags.some(t => t.toLowerCase().includes(q))));
+                }
+                if(filterChinese.value) res = res.filter(g => g.isChinese);
+                if(filterAndroid.value) res = res.filter(g => g.platforms && g.platforms.some(p => p.type === 'Android'));
+                if(selectedTags.value.length) {
+                    res = res.filter(g => g.tags && selectedTags.value.every(t => g.tags.includes(t)));
+                }
+
+                res = [...res]; // clone
+                if(sortBy.value === 'latest') res.sort((a,b) => b.id - a.id);
+                else if(sortBy.value === 'hot') res.sort(() => 0.5 - Math.random()); // mock
+                else if(sortBy.value === 'rating') res.sort((a,b) => (b.id%10) - (a.id%10)); // mock
+
+                return res;
+            });
+
+            return { 
+                loading, searchQuery, sortBy, filterChinese, filterAndroid, selectedTags, showMobileFilter,
+                sortOptions, allTags, toggleTag, resetFilters, filteredGames
+            };
+        }
+    };
+
+    const ViewDetail = {
+        template: '#view-detail',
+        setup() {
+            const route = useRoute();
+            const loading = computed(() => globalLoading.value);
+            const game = computed(() => globalGames.value.find(g => g.id == route.params.id));
+
+            const groupedPlatforms = computed(() => {
+                if(!game.value || !game.value.platforms) return [];
+                const map = {};
+                game.value.platforms.forEach(p => {
+                    if(!map[p.type]) map[p.type] = { type: p.type, subs: [] };
+                    if(p.sub) map[p.type].subs.push(p.sub);
+                });
+                return Object.values(map);
+            });
+
+            const hasAnyDownload = computed(() => {
+                if(!game.value || !game.value.downloads) return false;
+                return Object.values(game.value.downloads).some(d => d && d.url);
+            });
+
+            onMounted(() => { window.scrollTo({top:0, behavior:'smooth'}); });
+
+            return { loading, game, groupedPlatforms, hasAnyDownload };
+        }
+    };
+
+    // --- Router Setup ---
+    const router = createRouter({
+        history: createWebHashHistory(),
+        routes: [
+            { path: '/', component: ViewHome },
+            { path: '/list', component: ViewList },
+            { path: '/game/:id', component: ViewDetail }
+        ],
+        scrollBehavior(to, from, savedPosition) {
+            if (savedPosition) return savedPosition;
+            return { top: 0 };
+        }
+    });
+
+    // --- Main App ---
+    const app = createApp({
+        template: '#app-layout',
+        setup() {
+            const scrolled = ref(false);
+            const globalSearch = ref('');
+            const router = useRouter();
+
+            const handleScroll = () => { scrolled.value = window.scrollY > 20; };
+            
+            const handleSearch = () => {
+                if(globalSearch.value.trim()) {
+                    router.push({ path: '/list' });
+                    // Provide a slight delay for component mount if not on list page
+                    setTimeout(() => {
+                        const event = new CustomEvent('global-search', { detail: globalSearch.value });
+                        window.dispatchEvent(event);
+                        globalSearch.value = '';
+                    }, 100);
+                }
+            };
+
+            const randomGame = () => {
+                if(globalGames.value.length) {
+                    const rnd = globalGames.value[Math.floor(Math.random() * globalGames.value.length)];
+                    router.push(`/game/${rnd.id}`);
+                }
+            };
+
+            onMounted(() => {
+                window.addEventListener('scroll', handleScroll);
+                fetchData();
+            });
+            onUnmounted(() => window.removeEventListener('scroll', handleScroll));
+
+            return { scrolled, globalSearch, handleSearch, randomGame };
+        }
+    });
+
+    app.use(router);
+    app.mount('#app');
 </script>
 </body>
 </html>
