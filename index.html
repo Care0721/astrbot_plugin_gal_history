@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galfang · 佐久真纺</title>
+
+    <!-- 🔗 网站图标 (Favicon) 请替换 href 为你自己的图片链接 -->
+    <link rel="icon" type="image/png" href="https://github.com/Care0721/Fanggal/blob/master/Lain.png">
+
+    <!-- 📢 富媒体卡片 (Open Graph) 分享时显示 -->
+    <meta property="og:title" content="Galfang 佐久真纺">
+    <meta property="og:description" content="发现更多Galgame资源，纯粹、简洁、高速。">
+    <meta property="og:image" content="https://github.com/Care0721/Fanggal/blob/master/Lain.png">
+    <meta property="og:url" content="https://care0721.github.io/Fanggal">
+    <meta property="og:type" content="website">
+
     <style>
         :root {
             --bg: #f5f7fa;
@@ -105,7 +116,6 @@
         .preview-row { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
         .preview-row img { width:90px; height:66px; object-fit:cover; border-radius:6px; border:1px solid var(--border); cursor: pointer; transition: transform 0.2s; }
         .preview-row img:hover { transform: scale(1.05); border-color: var(--primary); }
-        /* 图片查看器 */
         .img-viewer-overlay { position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:0.2s; }
         .img-viewer-overlay.active { opacity:1; visibility:visible; }
         .img-viewer-content { max-width:90vw; max-height:90vh; position: relative; }
@@ -148,7 +158,7 @@
 
     <div id="appContainer">
         <nav class="nav-bar">
-            <div class="nav-logo" onclick="navigateTo('home')">●︿●</div>
+            <div class="nav-logo" onclick="navigateTo('home')">Galfang</div>
             <ul class="nav-links" id="navLinks">
                 <li><button onclick="navigateTo('home')" data-page="home" class="active">首页</button></li>
                 <li><button onclick="navigateTo('category')" data-page="category">分类浏览</button></li>
@@ -196,7 +206,7 @@
     <script>
         const API_BASE = 'https://galgame-api.fanggal.workers.dev';
         const userId = (() => { let id = localStorage.getItem('gl_userId'); if (!id) { id = 'u_' + Date.now() + Math.random().toString(36).slice(2,9); localStorage.setItem('gl_userId', id); } return id; })();
-        const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','猎奇','悬疑','青春','校园','恋爱','战斗','后宫','催泪'];
+        const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','猎奇','悬疑','青春','校园','恋爱','战斗','Key社','催泪'];
         let gamesData = [];
         let currentPage = 'home', currentFilter = 'all', bannerIndex = 0, bannerTimer, onlineSec = 0;
 
@@ -290,7 +300,6 @@
         }
         function setFilter(f) { currentFilter = f; renderCategory(); }
 
-        // ========== 图片查看器 ==========
         function openImageViewer(src) {
             const viewer = document.getElementById('imgViewer');
             document.getElementById('imgViewerImage').src = src;
