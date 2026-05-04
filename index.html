@@ -4,61 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galfang · 佐久真纺</title>
-
-    <!-- 网站图标 替换 href 为你的图片链接 -->
     <link rel="icon" type="image/png" href="https://github.com/Care0721/Fanggal/blob/master/Lain.png">
     <meta property="og:title" content="Galfang 佐久真诗">
     <meta property="og:description" content="发现更多Galgame资源，纯粹、简洁、高速。">
     <meta property="og:image" content="https://github.com/Care0721/Fanggal/blob/master/Lain.png">
     <meta property="og:url" content="https://care0721.github.io/Fanggal">
     <meta property="og:type" content="website">
-
-    <!-- Swiper 工业级轮播库 -->
+    <!-- Swiper -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
-
     <style>
         :root {
-            --bg: #f5f7fa;
-            --bg-card: rgba(255, 255, 255, 0.85);
-            --bg-nav: rgba(255, 255, 255, 0.7);
-            --bg-modal: rgba(255, 255, 255, 0.95);
-            --text: #1a2233;
-            --text-light: #5e6e82;
-            --border: rgba(30, 40, 60, 0.08);
-            --primary: #4b8bb4;
-            --accent-pink: #d47b8c;
-            --accent-green: #6ba589;
-            --shadow: 0 8px 24px rgba(30, 40, 60, 0.08);
-            --shadow-hover: 0 12px 30px rgba(75, 139, 180, 0.2);
-            --radius: 14px;
-            --radius-sm: 8px;
-            --transition: 0.2s cubic-bezier(0.2, 0, 0, 1);
+            --bg: #f5f7fa; --bg-card: rgba(255,255,255,0.85); --bg-nav: rgba(255,255,255,0.7);
+            --bg-modal: rgba(255,255,255,0.95); --text: #1a2233; --text-light: #5e6e82;
+            --border: rgba(30,40,60,0.08); --primary: #4b8bb4; --accent-pink: #d47b8c;
+            --accent-green: #6ba589; --shadow: 0 8px 24px rgba(30,40,60,0.06);
+            --shadow-hover: 0 12px 28px rgba(75,139,180,0.18);
+            --radius: 14px; --radius-sm: 8px;
+            --transition: 0.2s cubic-bezier(0.2,0,0,1);
         }
         body.dark {
-            --bg: #0e1118;
-            --bg-card: rgba(22, 26, 35, 0.85);
-            --bg-nav: rgba(14, 17, 24, 0.7);
-            --bg-modal: rgba(22, 26, 35, 0.95);
-            --text: #e1e6ee;
-            --text-light: #8a94a6;
-            --border: rgba(255, 255, 255, 0.06);
-            --primary: #6ba5cc;
-            --accent-pink: #e09eaa;
+            --bg: #0e1118; --bg-card: rgba(22,26,35,0.85); --bg-nav: rgba(14,17,24,0.7);
+            --bg-modal: rgba(22,26,35,0.95); --text: #e1e6ee; --text-light: #8a94a6;
+            --border: rgba(255,255,255,0.06); --primary: #6ba5cc; --accent-pink: #e09eaa;
             --accent-green: #7eb99a;
-            --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            --shadow-hover: 0 12px 30px rgba(107, 165, 204, 0.25);
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         html { scroll-behavior:smooth; font-size:16px; }
         body {
             background: var(--bg); color: var(--text);
-            font-family: 'SimSun', 'Songti SC', '宋体', serif;
-            min-height: 100vh; overflow-x: hidden; line-height: 1.6;
+            font-family: 'SimSun','Songti SC','宋体',serif;
+            min-height:100vh; overflow-x:hidden; line-height:1.6;
             transition: background 0.3s, color 0.3s;
             -webkit-font-smoothing: antialiased;
         }
-        button { cursor:pointer; font-family: inherit; transition: all var(--transition); }
+        button { cursor:pointer; font-family:inherit; transition: all var(--transition); }
         button:active { transform: scale(0.96); }
         #particleCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
         #bootScreen { position:fixed; inset:0; z-index:9999; background:#0e1118; display:flex; align-items:center; justify-content:center; flex-direction:column; transition: opacity 0.6s; }
@@ -69,7 +48,6 @@
         @keyframes bootIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
         #appContainer { position:relative; z-index:1; opacity:0; transition: opacity 0.5s; }
         #appContainer.visible { opacity:1; }
-        /* 导航栏 */
         .nav-bar { position:sticky; top:0; z-index:100; background:var(--bg-nav); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:0 20px; height:60px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow); }
         .nav-logo { font-size:1.4rem; font-weight:800; cursor:pointer; background:linear-gradient(135deg, var(--primary), var(--accent-pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
         .nav-links { display:flex; gap:4px; list-style:none; }
@@ -82,7 +60,6 @@
         .search-history { position:absolute; top:100%; left:0; right:0; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; margin-top:4px; max-height:200px; overflow-y:auto; list-style:none; display:none; z-index:150; }
         .search-history li { padding:8px 14px; cursor:pointer; font-size:0.85rem; }
         .search-history li:hover { background:rgba(75,139,180,0.1); }
-        /* 移动端菜单按钮 */
         .menu-toggle { display:none; background:transparent; border:none; color:var(--text); font-size:1.5rem; padding:4px; }
         @media (max-width:768px) {
             .nav-links { position:fixed; top:60px; left:0; right:0; background:var(--bg-nav); backdrop-filter:blur(20px); flex-direction:column; padding:16px; display:none; }
@@ -90,11 +67,8 @@
             .menu-toggle { display:block; }
             .search-box input { width:90px; }
         }
-
-        /* 主内容 */
         .main-content { padding:20px 24px; max-width:1300px; margin:0 auto; }
-        /* 轮播容器 */
-        .swiper-container { width:100%; height:auto; border-radius:var(--radius); overflow:hidden; margin-bottom:24px; box-shadow:var(--shadow); }
+        .swiper-container { width:100%; border-radius:var(--radius); overflow:hidden; margin-bottom:24px; box-shadow:var(--shadow); }
         .swiper-slide { position:relative; display:flex; align-items:flex-end; height:260px; background-size:cover; background-position:center; cursor:pointer; }
         .swiper-slide .slide-overlay { position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 60%); }
         .slide-info { position:relative; z-index:2; padding:24px; color:#fff; width:100%; }
@@ -102,15 +76,9 @@
         .slide-info p { font-size:0.9rem; opacity:0.9; }
         .swiper-pagination-bullet { background:#fff; opacity:0.5; }
         .swiper-pagination-bullet-active { opacity:1; background:var(--accent-pink); }
-        @media (max-width:768px) {
-            .swiper-slide { height:200px; }
-            .slide-info h2 { font-size:1.3rem; }
-        }
-
+        @media (max-width:768px) { .swiper-slide { height:200px; } .slide-info h2 { font-size:1.3rem; } }
         .game-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:18px; margin:16px 0; }
-        @media (max-width:480px) {
-            .game-grid { grid-template-columns:repeat(2, 1fr); gap:12px; }
-        }
+        @media (max-width:480px) { .game-grid { grid-template-columns:repeat(2, 1fr); gap:12px; } }
         .game-card { background:var(--bg-card); border-radius:var(--radius); overflow:hidden; cursor:pointer; border:1px solid var(--border); transition:0.25s ease; will-change:transform; }
         .game-card:hover { transform:translateY(-6px); border-color:var(--primary); box-shadow:var(--shadow-hover); }
         .card-cover { width:100%; aspect-ratio:3/4; object-fit:cover; display:block; transition:filter 0.2s; }
@@ -140,6 +108,11 @@
         .rating-stars { display:flex; gap:2px; }
         .rating-star { font-size:1.4rem; color:#ccc; cursor:pointer; transition:0.1s; }
         .rating-star.filled { color:#ffb347; }
+        .comment-section { margin-top:20px; border-top:1px solid var(--border); padding-top:16px; }
+        .comment-item { background:var(--bg-card); border-radius:8px; padding:12px; margin-bottom:8px; }
+        .comment-item .c-user { font-weight:700; color:var(--primary); }
+        .comment-item .c-time { font-size:0.75rem; color:var(--text-light); margin-left:8px; }
+        .comment-item .c-text { margin-top:4px; }
         .back-top { position:fixed; bottom:20px; right:20px; width:44px; height:44px; border-radius:50%; background:var(--primary); color:#fff; border:none; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition:0.2s; }
         .back-top:hover { transform:translateY(-2px); }
         @media (max-width:600px) {
@@ -181,7 +154,6 @@
 
         <div class="main-content">
             <div id="homeView">
-                <!-- 工业级推荐轮播 -->
                 <div class="swiper-container" id="featuredSwiper"></div>
                 <div id="homeTagCloud" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;"></div>
                 <h2 style="margin-bottom:16px;">站长推荐</h2>
@@ -203,17 +175,16 @@
             <div class="modal-body" id="modalBody"></div>
             <div id="likeSection" style="margin:16px 0;"></div>
             <div id="ratingSection" style="margin:16px 0;"></div>
-            <div id="commentSection"></div>
+            <div class="comment-section" id="commentSection"></div>
         </div>
     </div>
     <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // API 配置
         const API_BASE = 'https://galgame-api.fanggal.workers.dev';
         const userId = (() => { let id = localStorage.getItem('gl_userId'); if (!id) { id = 'u_' + Date.now(); localStorage.setItem('gl_userId', id); } return id; })();
-        const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','悬疑','青春','校园','恋爱','后宫','搞笑','催泪','全年龄','重口'];
-
+        const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','悬疑','青春','校园','恋爱','后宫','搞笑','催泪','全年龄'];
         let gamesData = [];
         let currentPage = 'home', currentFilter = 'all';
         let swiperInstance = null;
@@ -229,11 +200,10 @@
         function showHistory() {
             const list = document.getElementById('searchHistory');
             const history = getSearchHistory();
-            if (history.length === 0) { list.style.display = 'none'; return; }
+            if (!history.length) { list.style.display = 'none'; return; }
             list.innerHTML = history.map(h => `<li onclick="applySearch('${h}')">${h}</li>`).join('');
             list.style.display = 'block';
         }
-        function hideHistory() { setTimeout(() => document.getElementById('searchHistory').style.display = 'none', 200); }
         function applySearch(keyword) {
             document.getElementById('searchInput').value = keyword;
             document.getElementById('searchHistory').style.display = 'none';
@@ -270,7 +240,7 @@
             gamesData.forEach(g => { g.downloads = g.downloads || {}; g.previewImages = g.previewImages || []; });
         }
 
-        // 卡片组件
+        // 卡片
         function createCard(game) {
             let tags = '';
             game.platforms?.forEach(p => tags += `<span class="tag">${p.type==='PC'?'PC':p.sub||'安卓'}</span>`);
@@ -298,7 +268,6 @@
                 document.getElementById('featuredGrid').innerHTML = '<div style="text-align:center;padding:40px;">正在连接服务器...</div>';
                 return;
             }
-            // 工业级轮播
             const featured = gamesData.filter(g => g.featured);
             const swiperContainer = document.getElementById('featuredSwiper');
             if (featured.length && swiperContainer) {
@@ -311,7 +280,6 @@
                             </div>`).join('')}
                     </div>
                     <div class="swiper-pagination"></div>`;
-                // 初始化 Swiper
                 if (swiperInstance) swiperInstance.destroy();
                 swiperInstance = new Swiper('#featuredSwiper', {
                     slidesPerView: 1,
@@ -351,7 +319,7 @@
 
         function setFilter(f) { currentFilter = f; renderCategory(); }
 
-        // 详情与评分
+        // 详情与评分、评论
         async function openGameDetail(id) {
             const game = gamesData.find(g => g.id == id);
             if (!game) return;
@@ -384,8 +352,41 @@
             for (let i=1; i<=5; i++) stars += `<span class="rating-star ${i<=myRating?'filled':''}" onclick="submitRating(${id},${i})">★</span>`;
             document.getElementById('ratingSection').innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px;"><span>评分：</span><div class="rating-stars">${stars}</div><span style="color:var(--text-light);">(${avg.toFixed(1)} 分)</span></div>`;
+            // 评论
+            const comments = await fetch(`${API_BASE}/api/comments/${id}`).then(r=>r.json());
+            let commentHTML = comments.map(c => `
+                <div class="comment-item">
+                    <div><span class="c-user">${escHtml(c.name)}</span><span class="c-time">${new Date(c.time).toLocaleString()}</span></div>
+                    <div class="c-text">${escHtml(c.text)}</div>
+                </div>`).join('');
+            document.getElementById('commentSection').innerHTML = `
+                <h3 style="margin-bottom:12px;">💬 评论 (${comments.length})</h3>
+                <div id="commentsList">${commentHTML || '<div style="color:var(--text-light);">暂无评论</div>'}</div>
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <input id="cmName" placeholder="名字" style="flex:1; padding:8px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text);">
+                    <input id="cmText" placeholder="写下评论..." style="flex:2; padding:8px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text);">
+                    <button class="dl-btn" onclick="submitComment(${id})">发送</button>
+                </div>`;
             modal.classList.add('open');
             window.location.hash = `detail/${id}`;
+        }
+
+        function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        async function toggleLike(id) {
+            await fetch(`${API_BASE}/api/likes/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId}) });
+            openGameDetail(id);
+        }
+        async function submitRating(gameId, rating) {
+            await fetch(`${API_BASE}/api/ratings/${gameId}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId, rating}) });
+            openGameDetail(gameId);
+        }
+        async function submitComment(gameId) {
+            const name = document.getElementById('cmName').value.trim();
+            const text = document.getElementById('cmText').value.trim();
+            if (!name || !text) return;
+            await fetch(`${API_BASE}/api/comments/${gameId}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, text}) });
+            openGameDetail(gameId);
         }
 
         function confirmDownload(url, title, source, instructions) {
@@ -396,17 +397,47 @@
             document.body.appendChild(overlay);
         }
 
-        async function toggleLike(id) {
-            await fetch(`${API_BASE}/api/likes/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId}) });
-            openGameDetail(id);
-        }
-        async function submitRating(gameId, rating) {
-            await fetch(`${API_BASE}/api/ratings/${gameId}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId, rating}) });
-            openGameDetail(gameId);
-        }
         function closeModal() {
             document.getElementById('modalOverlay').classList.remove('open');
             window.location.hash = 'home';
+        }
+
+        // ========== 精工级雪花特效 ==========
+        function initSnowEffect() {
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const particleCount = window.innerWidth < 768 ? 40 : 70;
+            function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+            resize(); window.addEventListener('resize', resize);
+            // 雪花数组
+            for (let i=0; i<particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 3 + 1,
+                    speed: Math.random() * 0.8 + 0.3,
+                    opacity: Math.random() * 0.7 + 0.3,
+                    wind: Math.random() * 0.4 - 0.2,
+                });
+            }
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const isDark = document.body.classList.contains('dark');
+                for (let p of particles) {
+                    p.y += p.speed;
+                    p.x += p.wind;
+                    if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.x < 0) p.x = canvas.width;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${isDark ? '255,255,255' : '180,190,210'},${p.opacity})`;
+                    ctx.fill();
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
         }
 
         // 在线计时
@@ -424,8 +455,8 @@
             document.getElementById('bootScreen').classList.add('hidden');
             document.getElementById('appContainer').classList.add('visible');
             renderHome();
+            initSnowEffect(); // 雪花飘起来！
             document.addEventListener('click', e => { if (!e.target.closest('.search-area')) document.getElementById('searchHistory').style.display = 'none'; });
-            // 返回顶部按钮显示
             window.addEventListener('scroll', () => {
                 document.getElementById('backTop').style.display = window.scrollY > 400 ? 'flex' : 'none';
             });
