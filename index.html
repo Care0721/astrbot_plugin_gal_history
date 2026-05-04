@@ -13,33 +13,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         :root {
-            --bg: #f5f7fa;
-            --bg-card: rgba(255,255,255,0.85);
-            --bg-nav: rgba(255,255,255,0.7);
-            --bg-modal: rgba(255,255,255,0.95);
-            --text: #1a2233;
-            --text-light: #5e6e82;
-            --border: rgba(30,40,60,0.08);
-            --primary: #4b8bb4;
-            --accent-pink: #d47b8c;
-            --accent-green: #6ba589;
-            --shadow: 0 8px 24px rgba(30,40,60,0.06);
+            --bg: #f5f7fa; --bg-card: rgba(255,255,255,0.85); --bg-nav: rgba(255,255,255,0.7);
+            --bg-modal: rgba(255,255,255,0.95); --text: #1a2233; --text-light: #5e6e82;
+            --border: rgba(30,40,60,0.08); --primary: #4b8bb4; --accent-pink: #d47b8c;
+            --accent-green: #6ba589; --shadow: 0 8px 24px rgba(30,40,60,0.06);
             --shadow-hover: 0 12px 28px rgba(75,139,180,0.18);
-            --radius: 14px;
-            --radius-sm: 8px;
-            --transition: 0.2s cubic-bezier(0.2, 0, 0, 1);
-            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 14px; --radius-sm: 8px;
+            --transition: 0.2s cubic-bezier(0.2,0,0,1);
         }
         body.dark {
-            --bg: #0e1118;
-            --bg-card: rgba(22,26,35,0.85);
-            --bg-nav: rgba(14,17,24,0.7);
-            --bg-modal: rgba(22,26,35,0.95);
-            --text: #e1e6ee;
-            --text-light: #8a94a6;
-            --border: rgba(255,255,255,0.06);
-            --primary: #6ba5cc;
-            --accent-pink: #e09eaa;
+            --bg: #0e1118; --bg-card: rgba(22,26,35,0.85); --bg-nav: rgba(14,17,24,0.7);
+            --bg-modal: rgba(22,26,35,0.95); --text: #e1e6ee; --text-light: #8a94a6;
+            --border: rgba(255,255,255,0.06); --primary: #6ba5cc; --accent-pink: #e09eaa;
             --accent-green: #7eb99a;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -51,17 +36,14 @@
             transition: background 0.3s, color 0.3s;
             -webkit-font-smoothing: antialiased;
         }
-        /* 根除蓝色轮廓 */
         *:focus, *:focus-visible { outline: none; }
         button, input, textarea { outline: none; }
         button {
             cursor:pointer; font-family:inherit;
             transition: all var(--transition);
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
             -webkit-tap-highlight-color: transparent;
         }
-        /* 按钮点击微交互 */
         button::after {
             content: ''; position: absolute; inset:0; background: rgba(255,255,255,0.2);
             border-radius: inherit; opacity:0; transition: opacity 0.2s;
@@ -77,6 +59,7 @@
         @keyframes bootIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
         #appContainer { position:relative; z-index:1; opacity:0; transition: opacity 0.5s; }
         #appContainer.visible { opacity:1; }
+        /* 导航栏 */
         .nav-bar { position:sticky; top:0; z-index:100; background:var(--bg-nav); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:0 20px; height:60px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow); }
         .nav-logo { font-size:1.4rem; font-weight:800; cursor:pointer; background:linear-gradient(135deg, var(--primary), var(--accent-pink)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
         .nav-links { display:flex; gap:4px; list-style:none; }
@@ -85,16 +68,18 @@
         .theme-btn { background:transparent; border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
         .search-area { position:relative; }
         .search-box { display:flex; align-items:center; background:var(--bg-card); border:1px solid var(--border); border-radius:24px; padding:5px 12px; }
-        .search-box input { background:transparent; border:none; color:var(--text); outline:none; font-size:0.85rem; width:120px; font-family:inherit; }
+        .search-box input { background:transparent; border:none; color:var(--text); outline:none; font-size:0.85rem; width:130px; font-family:inherit; }
+        .search-clear { margin-left:4px; cursor:pointer; opacity:0.5; transition:0.2s; background:none; border:none; color:var(--text); font-size:1rem; }
+        .search-clear:hover { opacity:1; }
         .search-history { position:absolute; top:100%; left:0; right:0; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; margin-top:4px; max-height:200px; overflow-y:auto; list-style:none; display:none; z-index:150; }
-        .search-history li { padding:8px 14px; cursor:pointer; font-size:0.85rem; }
+        .search-history li { padding:8px 14px; cursor:pointer; font-size:0.85rem; color:var(--text); }
         .search-history li:hover { background:rgba(75,139,180,0.1); }
         .menu-toggle { display:none; background:transparent; border:none; color:var(--text); font-size:1.5rem; padding:4px; }
         @media (max-width:768px) {
-            .nav-links { position:fixed; top:60px; left:0; right:0; background:var(--bg-nav); backdrop-filter:blur(20px); flex-direction:column; padding:16px; display:none; }
+            .nav-links { position:fixed; top:60px; left:0; right:0; background:var(--bg-nav); backdrop-filter:blur(20px); flex-direction:column; padding:16px; display:none; z-index:110; }
             .nav-links.open { display:flex; }
             .menu-toggle { display:block; }
-            .search-box input { width:90px; }
+            .search-box input { width:100px; }
         }
         .main-content { padding:20px 24px; max-width:1300px; margin:0 auto; }
         .swiper-container { width:100%; border-radius:var(--radius); overflow:hidden; margin-bottom:24px; box-shadow:var(--shadow); }
@@ -134,9 +119,9 @@
         .preview-row { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
         .preview-row img { width:80px; height:60px; object-fit:cover; border-radius:6px; border:1px solid var(--border); cursor:pointer; transition: transform 0.2s ease; }
         .preview-row img:hover { transform: scale(1.05); border-color: var(--primary); }
-        .dl-btn { padding:8px 18px; border-radius:24px; border:1px solid var(--primary); background:rgba(75,139,180,0.1); color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem; margin:4px; transition: all var(--transition); }
+        .dl-btn { padding:8px 18px; border-radius:24px; border:1px solid var(--primary); background:rgba(75,139,180,0.1); color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem; margin:4px; transition: all var(--transition); display:inline-block; }
         .dl-btn:hover { background:var(--primary); color:#fff; }
-        .dl-btn:disabled { opacity:0.4; pointer-events:none; }
+        .dl-btn.disabled { opacity:0.4; pointer-events:none; }
         .like-btn { padding:6px 16px; border-radius:20px; border:1px solid var(--accent-pink); background:rgba(212,123,140,0.1); color:var(--accent-pink); cursor:pointer; transition: all var(--transition); }
         .like-btn.liked { background:var(--accent-pink); color:#fff; }
         .rating-stars { display:flex; gap:2px; }
@@ -147,21 +132,19 @@
         .comment-item .c-user { font-weight:700; color:var(--primary); }
         .comment-item .c-time { font-size:0.75rem; color:var(--text-light); margin-left:8px; }
         .comment-item .c-text { margin-top:4px; }
-        .back-top { position:fixed; bottom:20px; right:20px; width:44px; height:44px; border-radius:50%; background:var(--primary); color:#fff; border:none; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition:0.2s; }
+        .back-top { position:fixed; bottom:20px; right:20px; width:44px; height:44px; border-radius:50%; background:var(--primary); color:#fff; border:none; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.2); transition:0.2s; z-index:50; }
         .back-top:hover { transform:translateY(-2px); }
-        /* 图片查看器 (放大动画) */
         .img-viewer { position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition: opacity 0.3s; }
         .img-viewer.active { opacity:1; visibility:visible; }
         .img-viewer img { max-width:90vw; max-height:90vh; object-fit:contain; transform: scale(0.8); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
         .img-viewer.active img { transform: scale(1); }
         .img-viewer .close-viewer { position:absolute; top:20px; right:30px; color:#fff; font-size:2rem; background:transparent; border:none; cursor:pointer; }
+        .loading-spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.6s linear infinite; margin-right:6px; vertical-align:middle; }
+        @keyframes spin { to { transform:rotate(360deg); } }
         @media (max-width:600px) {
             .modal-body { flex-direction:column; align-items:center; }
             .modal-cover { width:140px; }
         }
-        /* 加载提示 */
-        .loading-spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.6s linear infinite; margin-right:6px; vertical-align:middle; }
-        @keyframes spin { to { transform:rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -187,7 +170,11 @@
             </ul>
             <div style="display:flex; align-items:center; gap:12px;">
                 <div class="search-area">
-                    <div class="search-box"><span style="margin-right:4px;">🔍</span><input type="text" id="searchInput" placeholder="搜索..." oninput="handleSearchInput(this.value)"></div>
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" id="searchInput" placeholder="搜索游戏...">
+                        <button class="search-clear" id="searchClear" style="display:none;">✕</button>
+                    </div>
                     <ul class="search-history" id="searchHistory"></ul>
                 </div>
                 <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">🌓</button>
@@ -201,6 +188,7 @@
                 <div id="homeTagCloud" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;"></div>
                 <h2 style="margin-bottom:16px;">站长推荐</h2>
                 <div class="game-grid" id="featuredGrid"></div>
+                <p id="searchStatus" style="text-align:center; margin-top:20px; color:var(--text-light); display:none;"></p>
                 <div style="text-align:center; margin-top:30px; color:var(--text-light);" id="onlineTimer">在线 00:00:00</div>
             </div>
             <div id="categoryView" style="display:none;">
@@ -224,7 +212,6 @@
         </div>
     </div>
 
-    <!-- 图片查看器 -->
     <div class="img-viewer" id="imgViewer" onclick="this.classList.remove('active')">
         <button class="close-viewer" onclick="document.getElementById('imgViewer').classList.remove('active')">&times;</button>
         <img id="imgViewerImg" src="" alt="预览大图">
@@ -235,44 +222,99 @@
     <script>
         const API_BASE = 'https://galgame-api.fanggal.workers.dev';
         const userId = (() => { let id = localStorage.getItem('gl_userId'); if (!id) { id = 'u_' + Date.now(); localStorage.setItem('gl_userId', id); } return id; })();
-        const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','悬疑','青春','校园','恋爱','催泪','搞笑','战斗','催泪','全年龄'];
+        const COMMON_TAGS = ['纯爱','剧情','奇幻','科幻','和风','治愈','悬疑','青春','校园','恋爱','后宫','催泪','战斗','萝莉','全年龄'];
         let gamesData = [];
         let currentPage = 'home', currentFilter = 'all';
         let swiperInstance = null;
+        let currentSearchTerm = '';
 
-        // 搜索历史
-        function getSearchHistory() { try { return JSON.parse(localStorage.getItem('searchHistory')||'[]'); } catch { return []; } }
-        function addSearchHistory(k) {
-            if (!k.trim()) return;
-            let h = getSearchHistory().filter(v => v !== k);
-            h.unshift(k); if (h.length > 10) h.pop();
-            localStorage.setItem('searchHistory', JSON.stringify(h));
+        // 搜索功能
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const searchHistory = document.getElementById('searchHistory');
+
+        function getSearchHistory() {
+            try { return JSON.parse(localStorage.getItem('searchHistory') || '[]'); } catch { return []; }
         }
-        function showHistory() {
-            const list = document.getElementById('searchHistory');
+        function addSearchHistory(keyword) {
+            if (!keyword.trim()) return;
+            let history = getSearchHistory().filter(h => h !== keyword);
+            history.unshift(keyword);
+            if (history.length > 10) history.pop();
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+        }
+        function renderSearchHistory() {
             const history = getSearchHistory();
-            if (!history.length) { list.style.display = 'none'; return; }
-            list.innerHTML = history.map(h => `<li onclick="applySearch('${h}')">${h}</li>`).join('');
-            list.style.display = 'block';
+            if (history.length === 0) {
+                searchHistory.style.display = 'none';
+                return;
+            }
+            searchHistory.innerHTML = history.map(h => `<li>${h}</li>`).join('');
+            searchHistory.style.display = 'block';
         }
-        function applySearch(keyword) {
-            document.getElementById('searchInput').value = keyword;
-            document.getElementById('searchHistory').style.display = 'none';
-            performSearch(keyword);
-        }
-        function handleSearchInput(value) {
-            if (value.trim()) showHistory(); else { document.getElementById('searchHistory').style.display = 'none'; performSearch(''); }
-        }
-        function performSearch(q) {
-            if (!q.trim()) { navigateTo('home'); return; }
-            addSearchHistory(q.trim());
-            const results = gamesData.filter(g => g.title.includes(q) || g.tags?.some(t=>t.includes(q)));
-            document.getElementById('homeView').style.display = 'block';
-            document.getElementById('categoryView').style.display = 'none';
-            document.getElementById('featuredGrid').innerHTML = results.length ? results.map(g => createCard(g)).join('') : '<div style="text-align:center;padding:40px;">未找到游戏</div>';
+        function performSearch(term) {
+            currentSearchTerm = term.trim();
+            if (!currentSearchTerm) {
+                // 恢复首页
+                document.getElementById('searchStatus').style.display = 'none';
+                if (currentPage === 'home') renderHome();
+                if (currentPage === 'category') renderCategory();
+                searchClear.style.display = 'none';
+                return;
+            }
+            searchClear.style.display = 'block';
+            addSearchHistory(currentSearchTerm);
+            const results = gamesData.filter(g =>
+                g.title.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
+                g.tags?.some(t => t.toLowerCase().includes(currentSearchTerm.toLowerCase())) ||
+                g.description?.toLowerCase().includes(currentSearchTerm.toLowerCase())
+            );
+            // 在当前页面显示搜索结果
+            if (currentPage === 'home' || currentPage === 'category') {
+                const gridId = currentPage === 'home' ? 'featuredGrid' : 'categoryGrid';
+                document.getElementById(gridId).innerHTML = results.length
+                    ? results.map(g => createCard(g)).join('')
+                    : '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-light);">没有找到匹配的游戏</div>';
+                document.getElementById('searchStatus').style.display = 'block';
+                document.getElementById('searchStatus').textContent = `搜索“${currentSearchTerm}”共找到 ${results.length} 个结果`;
+            }
         }
 
-        // 主题
+        searchInput.addEventListener('input', () => {
+            performSearch(searchInput.value);
+            if (!searchInput.value.trim()) {
+                searchHistory.style.display = 'none';
+                searchClear.style.display = 'none';
+            }
+        });
+        searchInput.addEventListener('focus', () => {
+            if (!searchInput.value.trim()) renderSearchHistory();
+        });
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                performSearch(searchInput.value);
+                searchHistory.style.display = 'none';
+            }
+        });
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            performSearch('');
+            searchHistory.style.display = 'none';
+        });
+        searchHistory.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI') {
+                searchInput.value = e.target.textContent;
+                searchClear.style.display = 'block';
+                performSearch(searchInput.value);
+                searchHistory.style.display = 'none';
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-area')) searchHistory.style.display = 'none';
+        });
+
+        // 其他功能
         function toggleTheme() {
             document.body.classList.toggle('dark');
             localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
@@ -284,14 +326,12 @@
             document.getElementById('themeToggle').textContent = saved === 'dark' ? '☀️' : '🌓';
         })();
 
-        // 数据加载
         async function fetchGames() {
             try { gamesData = await (await fetch(API_BASE + '/api/games')).json(); }
             catch { gamesData = []; }
             gamesData.forEach(g => { g.downloads = g.downloads || {}; g.previewImages = g.previewImages || []; });
         }
 
-        // 卡片
         function createCard(game) {
             let tags = '';
             game.platforms?.forEach(p => tags += `<span class="tag">${p.type==='PC'?'PC':p.sub||'安卓'}</span>`);
@@ -302,15 +342,20 @@
             </div>`;
         }
 
-        // 导航
         function navigateTo(page) {
             currentPage = page;
             document.getElementById('homeView').style.display = page === 'home' ? 'block' : 'none';
             document.getElementById('categoryView').style.display = page === 'category' ? 'block' : 'none';
             document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
             document.querySelector(`.nav-links button[data-page="${page}"]`)?.classList.add('active');
-            if (page === 'home') renderHome();
-            if (page === 'category') renderCategory();
+            if (page === 'home') {
+                renderHome();
+                if (currentSearchTerm) performSearch(currentSearchTerm);
+            }
+            if (page === 'category') {
+                renderCategory();
+                if (currentSearchTerm) performSearch(currentSearchTerm);
+            }
             window.location.hash = page;
         }
 
@@ -339,7 +384,13 @@
                     speed: 600, grabCursor: true, touchRatio: 1.5,
                 });
             }
-            document.getElementById('featuredGrid').innerHTML = gamesData.slice(0, 8).map(g => createCard(g)).join('');
+            const grid = document.getElementById('featuredGrid');
+            if (!currentSearchTerm) {
+                grid.innerHTML = gamesData.slice(0, 8).map(g => createCard(g)).join('');
+                document.getElementById('searchStatus').style.display = 'none';
+            } else {
+                performSearch(currentSearchTerm);
+            }
             document.getElementById('homeTagCloud').innerHTML = COMMON_TAGS.map(t => `<span class="tag" onclick="goToTag('${t}')">${t}</span>`).join('');
         }
 
@@ -355,8 +406,12 @@
             }
             const grid = document.getElementById('categoryGrid');
             const noRes = document.getElementById('noResults');
-            if (filtered.length === 0) { grid.innerHTML = ''; noRes.style.display = 'block'; }
-            else { noRes.style.display = 'none'; grid.innerHTML = filtered.map(g => createCard(g)).join(''); }
+            if (!currentSearchTerm) {
+                if (filtered.length === 0) { grid.innerHTML = ''; noRes.style.display = 'block'; }
+                else { noRes.style.display = 'none'; grid.innerHTML = filtered.map(g => createCard(g)).join(''); }
+            } else {
+                performSearch(currentSearchTerm);
+            }
             const filters = ['all','PC','Android','krkr','Ty','ONS','android_direct','chinese',...COMMON_TAGS];
             document.getElementById('filterSection').innerHTML = filters.map(ft => {
                 const label = ft==='android_direct'?'安卓直装':ft==='chinese'?'汉化':ft;
@@ -366,11 +421,9 @@
 
         function setFilter(f) { currentFilter = f; renderCategory(); }
 
-        // 游戏详情 (带加载动画)
         async function openGameDetail(id) {
             const modal = document.getElementById('modalOverlay');
             modal.classList.add('open');
-            // 显示加载状态
             document.getElementById('modalBody').innerHTML = '<div style="text-align:center; padding:40px;"><span class="loading-spinner"></span> 加载游戏中...</div>';
             document.getElementById('likeSection').innerHTML = '';
             document.getElementById('ratingSection').innerHTML = '';
@@ -379,7 +432,6 @@
 
             const game = gamesData.find(g => g.id == id);
             if (!game) return;
-            // 渲染内容
             document.getElementById('modalBody').innerHTML = `
                 <div class="modal-cover"><img src="${game.cover}" onerror="this.style.background='#e0e0e0'"></div>
                 <div class="modal-info">
@@ -392,19 +444,20 @@
                         </div>` : ''}
                     <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;">
                         ${['PC','krkr','Ty','ONS','android_direct'].map(k => {
-                            const dl = game.downloads?.[k] || {};
                             const has = game.platforms?.some(p => (k==='PC'?p.type==='PC':p.sub===k));
-                            if (!has) return `<button class="dl-btn" disabled>${k} (无资源)</button>`;
-                            const url = dl.url;
-                            return url ? `<button class="dl-btn" onclick="confirmDownload('${url}','${game.title}','${dl.source||''}','${dl.instructions||''}')">${k==='android_direct'?'安卓直装':k} | ${dl.source||''}</button>` : `<button class="dl-btn" disabled>${k} (待添加)</button>`;
+                            const dl = game.downloads?.[k] || {};
+                            const url = dl.url || '';
+                            const source = dl.source || '';
+                            const instructions = dl.instructions || '';
+                            if (!has) return `<button class="dl-btn disabled">${k} (无资源)</button>`;
+                            if (url) return `<button class="dl-btn" data-url="${url}" data-title="${game.title}" data-source="${source}" data-instructions="${instructions}" onclick="confirmDownload(this)">${k==='android_direct'?'安卓直装':k} | ${source}</button>`;
+                            return `<button class="dl-btn disabled">${k} (待添加)</button>`;
                         }).join('')}
                     </div>
                 </div>`;
-            // 点赞
             const likeRes = await fetch(`${API_BASE}/api/likes/${id}?userId=${userId}`).then(r=>r.json());
             document.getElementById('likeSection').innerHTML = `
                 <button class="like-btn ${likeRes.liked?'liked':''}" onclick="toggleLike(${id})">❤️ ${likeRes.liked?'已赞':'点赞'}</button><span style="margin-left:8px;">${likeRes.count} 人赞过</span>`;
-            // 评分
             const ratRes = await fetch(`${API_BASE}/api/ratings/${id}?userId=${userId}`).then(r=>r.json());
             const avg = ratRes.average || 0;
             const my = ratRes.myRating || 0;
@@ -412,7 +465,6 @@
             for (let i=1; i<=5; i++) stars += `<span class="rating-star ${i<=my?'filled':''}" onclick="submitRating(${id},${i})">★</span>`;
             document.getElementById('ratingSection').innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px;"><span>评分：</span><div class="rating-stars">${stars}</div><span style="color:var(--text-light);">(${avg.toFixed(1)} 分)</span></div>`;
-            // 评论
             const commRes = await fetch(`${API_BASE}/api/comments/${id}`).then(r=>r.json());
             const comments = commRes || [];
             document.getElementById('commentSection').innerHTML = `
@@ -447,15 +499,18 @@
             openGameDetail(gameId);
         }
 
-        // 图片放大查看器 (精工动画)
         function openImageViewer(src) {
             const viewer = document.getElementById('imgViewer');
             document.getElementById('imgViewerImg').src = src;
             viewer.classList.add('active');
         }
 
-        // 下载确认 (带取消动画)
-        function confirmDownload(url, title, source, instructions) {
+        function confirmDownload(btn) {
+            const url = btn.dataset.url;
+            const title = btn.dataset.title;
+            const source = btn.dataset.source || '未知';
+            const instructions = btn.dataset.instructions || '';
+            if (!url) return;
             const overlay = document.createElement('div');
             overlay.className = 'modal-overlay';
             overlay.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;transition: opacity 0.3s;';
@@ -463,27 +518,25 @@
                 <div class="modal-dialog" style="max-width:400px; transform: translateY(20px); transition: transform 0.3s ease; background: var(--bg-modal);">
                     <h3>确认下载</h3>
                     <p>游戏：${title}</p>
-                    <p>来源：${source||'未知'}</p>
+                    <p>来源：${source}</p>
                     ${instructions ? `<p style="white-space:pre-wrap;">说明：${instructions}</p>` : ''}
                     <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
-                        <button class="cancel-btn" style="padding:8px 20px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text);">取消</button>
-                        <button class="confirm-btn" style="padding:8px 24px; border-radius:20px; background:var(--primary); color:#fff; border:none;">确认下载</button>
+                        <button class="cancel-dl-btn" style="padding:8px 20px; border-radius:20px; border:1px solid var(--border); background:transparent; color:var(--text);">取消</button>
+                        <button class="confirm-dl-btn" style="padding:8px 24px; border-radius:20px; background:var(--primary); color:#fff; border:none;">确认下载</button>
                     </div>
                 </div>`;
             document.body.appendChild(overlay);
-            // 动画入场
             requestAnimationFrame(() => {
                 overlay.style.opacity = '1';
                 overlay.querySelector('.modal-dialog').style.transform = 'translateY(0)';
             });
-            // 取消按钮 (丝滑关闭)
             const closeDialog = () => {
                 overlay.style.opacity = '0';
                 overlay.querySelector('.modal-dialog').style.transform = 'translateY(20px)';
                 setTimeout(() => overlay.remove(), 300);
             };
-            overlay.querySelector('.cancel-btn').addEventListener('click', closeDialog);
-            overlay.querySelector('.confirm-btn').addEventListener('click', () => {
+            overlay.querySelector('.cancel-dl-btn').addEventListener('click', closeDialog);
+            overlay.querySelector('.confirm-dl-btn').addEventListener('click', () => {
                 window.open(url, '_blank');
                 closeDialog();
             });
@@ -493,8 +546,7 @@
         }
 
         function closeModal() {
-            const modal = document.getElementById('modalOverlay');
-            modal.classList.remove('open');
+            document.getElementById('modalOverlay').classList.remove('open');
             window.location.hash = 'home';
         }
 
@@ -529,7 +581,6 @@
             draw();
         }
 
-        // 在线计时
         setInterval(() => {
             window.onlineSec = (window.onlineSec||0) + 1;
             const sec = window.onlineSec;
@@ -544,13 +595,9 @@
             document.getElementById('appContainer').classList.add('visible');
             renderHome();
             initSnow();
-            document.addEventListener('click', e => {
-                if (!e.target.closest('.search-area')) document.getElementById('searchHistory').style.display = 'none';
-            });
             window.addEventListener('scroll', () => {
                 document.getElementById('backTop').style.display = window.scrollY > 400 ? 'flex' : 'none';
             });
-            // 路由处理
             window.addEventListener('hashchange', () => {
                 const hash = window.location.hash.slice(1);
                 if (hash.startsWith('detail/')) {
