@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAVI · 佐久真纺</title>
+    <title>NAVI · Gal</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Care0721/Fanggal/master/Lain.png">
-    <meta property="og:title" content="NAVI 佐久真诗">
+    <meta property="og:title" content="NAVI Gal">
     <meta property="og:description" content="发现更多Galgame资源，纯粹、简洁、高速。">
     <meta property="og:image" content="https://raw.githubusercontent.com/Care0721/Fanggal/master/Lain.png">
     <meta property="og:url" content="https://care0721.github.io/Fanggal">
@@ -140,6 +140,13 @@
         .tag.hot { background: rgba(196,139,149,0.08); color: var(--pink); }
         .card-reads { font-size: 0.7rem; color: var(--text-light); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
 
+        /* 分类折叠 */
+        .category-toggle-section { margin-bottom: 24px; }
+        .category-grid { display: none; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 14px; margin-bottom: 32px; }
+        .category-grid.expanded { display: grid; }
+        .category-item { background: var(--card); border-radius: var(--radius-sm); padding: 20px 10px; text-align: center; border: 1px solid var(--border); cursor: pointer; transition: all var(--transition); }
+        .category-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
         .filter-wrapper { margin-bottom: 24px; }
         .filter-toggle { display: none; margin-bottom: 12px; }
         .filter-section { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -151,19 +158,24 @@
         .filter-btn { padding: 8px 18px; border-radius: 22px; border: 1px solid var(--border); background: var(--card); color: var(--text-light); cursor: pointer; font-size: 0.8rem; transition: all var(--transition); font-weight: 400; }
         .filter-btn.active { background: rgba(79,109,138,0.1); color: var(--primary); border-color: var(--primary); }
 
+        /* 固定宽度详情 */
         .modal-overlay { position: fixed; inset:0; z-index:200; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity:0; visibility:hidden; transition:0.25s; }
         .modal-overlay.open { opacity:1; visibility:visible; }
         .modal-dialog { background: var(--card); border-radius: var(--radius); padding: 28px; max-width: 800px; width: 92%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.1); transform: scale(0.96); transition: transform var(--transition); }
         .modal-overlay.open .modal-dialog { transform: scale(1); }
-        .modal-body { display: flex; gap: 24px; flex-wrap: wrap; }
+        .modal-body { display: flex; gap: 24px; flex-wrap: nowrap; }
+        .modal-cover { flex: 0 0 180px; }
         .modal-cover img { width: 180px; border-radius: var(--radius-sm); }
-        @media (max-width:600px) { .modal-body { flex-direction: column; align-items: center; } .modal-cover img { width: 140px; } }
+        .modal-info { flex: 1; min-width: 0; }
+        @media (max-width:600px) { .modal-body { flex-direction: column; } .modal-cover { flex: 0 0 auto; } .modal-cover img { width: 140px; } }
         .preview-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0; }
         .preview-row img { width: 80px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: transform var(--transition); border: 1px solid var(--border); }
         .preview-row img:hover { transform: scale(1.04); border-color: var(--primary); }
         .rating-star { font-size: 1.4rem; color: #d0d0d6; cursor: pointer; transition: 0.15s; }
         .rating-star.filled { color: #f0b050; }
         .comment-item { background: rgba(0,0,0,0.01); border-radius: 12px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .reply-item { margin-left: 24px; border-left: 2px solid var(--border); padding-left: 14px; margin-top: 8px; }
+        .reply-input { display: flex; gap: 8px; margin-top: 6px; }
         .back-top { position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: #fff; border: none; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-hover); cursor: pointer; z-index:30; transition: transform 0.2s; }
         .back-top:hover { transform: translateY(-2px); }
         .img-viewer { position: fixed; inset:0; z-index:300; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; opacity:0; visibility:hidden; transition:0.3s; }
@@ -173,9 +185,6 @@
 
         .skeleton { background: linear-gradient(90deg, var(--card) 25%, rgba(0,0,0,0.03) 50%, var(--card) 75%); background-size: 200% 100%; animation: shimmer 1.8s infinite; border-radius: var(--radius); }
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-        .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 14px; margin-bottom: 32px; }
-        .category-item { background: var(--card); border-radius: var(--radius-sm); padding: 20px 10px; text-align: center; border: 1px solid var(--border); cursor: pointer; transition: all var(--transition); }
-        .category-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
     </style>
 </head>
 <body>
@@ -185,6 +194,7 @@
             <ul class="nav-links" id="navLinks">
                 <li><button class="btn active" onclick="navigateTo('home')" data-page="home">首页</button></li>
                 <li><button class="btn" onclick="navigateTo('category')" data-page="category">分类浏览</button></li>
+                <li><button class="btn" onclick="toggleCategory()">分类</button></li>
                 <li><button class="btn green" onclick="randomGame()">随机推荐</button></li>
             </ul>
             <div style="display:flex; gap:14px; align-items:center;">
@@ -214,16 +224,18 @@
                 <div class="swiper-container" id="featuredSwiper"></div>
                 <div class="hero" style="margin-top:0;">
                     <h1>欢迎 光临</h1>
-                    <p>まだあなたを愛しています。</p>
+                    <p>まだ愛してる</p>
                     <div class="hero-btns">
                         <button class="btn primary" onclick="navigateTo('category')">浏览分类</button>
+                        <button class="btn" onclick="toggleCategory()">分类入口</button>
                         <button class="btn pink" onclick="randomGame()">随机推荐</button>
                     </div>
                 </div>
+                <div class="category-toggle-section">
+                    <div class="category-grid" id="categoryEntries"></div>
+                </div>
                 <div class="section-title">今日推荐</div>
                 <div class="scroll-cards" id="dailyScroll"></div>
-                <div class="section-title">分类入口</div>
-                <div class="category-grid" id="categoryEntries"></div>
                 <div class="section-title">精选推荐</div>
                 <div class="game-grid" id="featuredGrid">
                     <div class="skeleton" style="aspect-ratio:3/4;"></div>
@@ -273,6 +285,12 @@
             let gamesData = [];
             let currentPage = 'home', currentFilter = 'all';
             let swiperInstance = null;
+
+            // 分类折叠
+            window.toggleCategory = function() {
+                const grid = document.getElementById('categoryEntries');
+                grid.classList.toggle('expanded');
+            };
 
             function createCard(game) {
                 let tags = (game.tags||[]).slice(0,3).map(t => `<span class="tag">${t}</span>`).join('');
@@ -353,6 +371,7 @@
                 }).join('');
             }
 
+            // 搜索界面
             const searchOverlay = document.getElementById('searchOverlay');
             const searchViewInput = document.getElementById('searchViewInput');
             window.openSearchView = () => { searchOverlay.classList.add('active'); document.body.style.overflow='hidden'; setTimeout(()=>searchViewInput.focus(),100); };
@@ -372,6 +391,7 @@
             });
             document.getElementById('searchViewClear').addEventListener('click', ()=> { searchViewInput.value=''; searchViewInput.dispatchEvent(new Event('input')); });
 
+            // 详情弹窗
             window.openGameDetail = async function(id) {
                 const game = gamesData.find(g => g.id == id); if (!game) return;
                 if (searchOverlay.classList.contains('active')) closeSearchView();
@@ -388,7 +408,7 @@
                 const reads = readsRes.count || 0;
                 document.getElementById('modalBody').innerHTML = `
                     <div class="modal-cover"><img src="${game.cover}" onerror="this.style.background='var(--card)'"></div>
-                    <div style="flex:1;">
+                    <div class="modal-info">
                         <h2 style="font-weight:400;">${game.title}</h2>
                         <div class="card-tags">${(game.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
                         <p style="margin-top:14px;">${game.description||''}</p>
@@ -407,16 +427,56 @@
                 let stars = ''; for (let i=1;i<=5;i++) stars += `<span class="rating-star ${i<=ratingRes.myRating?'filled':''}" onclick="submitRating(${id},${i})">★</span>`;
                 document.getElementById('ratingSection').innerHTML = `<span style="color:var(--text-light);">评分 · </span><span style="display:inline-flex; gap:4px;">${stars}</span><span style="margin-left:6px;color:var(--text-light);">${ratingRes.average?.toFixed(1)||'—'} 分</span>`;
                 document.getElementById('readsSection').innerHTML = `<span style="color:var(--text-light);">👁️ ${reads} 人看过</span>`;
-                document.getElementById('commentSection').innerHTML = `
+                document.getElementById('commentSection').innerHTML = buildCommentsHTML(comments, id);
+                window.location.hash = `detail/${id}`;
+            };
+
+            function buildCommentsHTML(comments, gameId) {
+                const topLevel = comments.filter(c => !c.parent);
+                const replies = comments.filter(c => c.parent);
+                function renderComment(c) {
+                    const children = replies.filter(r => r.parent === c.id);
+                    let html = `<div class="comment-item">
+                        <b>${escapeHtml(c.name)}</b> <small style="color:var(--text-light);">${new Date(c.time).toLocaleString()}</small>
+                        <p style="margin-top:4px;">${escapeHtml(c.text)}</p>
+                        <button class="btn" style="padding:4px 14px; font-size:0.75rem; margin-top:6px;" onclick="toggleReplyInput('${c.id}')">回复</button>
+                        <div class="reply-input" id="reply-${c.id}" style="display:none;">
+                            <input id="replyName-${c.id}" placeholder="名字" style="flex:1; padding:6px; border-radius:16px; border:1px solid var(--border);">
+                            <input id="replyText-${c.id}" placeholder="回复…" style="flex:2; padding:6px; border-radius:16px; border:1px solid var(--border);">
+                            <button class="btn primary" style="padding:6px 14px;" onclick="submitReply('${gameId}', '${c.id}')">发送</button>
+                        </div>
+                    </div>`;
+                    if (children.length) {
+                        html += `<div class="reply-list">${children.map(renderComment).join('')}</div>`;
+                    }
+                    return html;
+                }
+                return `
                     <h3 style="font-weight:400; margin-bottom:12px;">评论 · ${comments.length}</h3>
-                    ${comments.map(c => `<div class="comment-item"><b>${escapeHtml(c.name)}</b> <small style="color:var(--text-light);">${new Date(c.time).toLocaleString()}</small><p style="margin-top:6px;">${escapeHtml(c.text)}</p></div>`).join('')}
+                    ${topLevel.map(renderComment).join('')}
                     <div style="display:flex; gap:8px; margin-top:14px;">
                         <input id="cmName" placeholder="名字" style="flex:1; padding:10px; border-radius:24px; border:1px solid var(--border); background:var(--card); color:var(--text);">
                         <input id="cmText" placeholder="写下评论…" style="flex:2; padding:10px; border-radius:24px; border:1px solid var(--border); background:var(--card); color:var(--text);">
-                        <button class="btn primary" onclick="submitComment(${id})">发送</button>
+                        <button class="btn primary" onclick="submitComment(${gameId})">发送</button>
                     </div>`;
-                window.location.hash = `detail/${id}`;
+            }
+
+            window.toggleReplyInput = function(commentId) {
+                const el = document.getElementById('reply-' + commentId);
+                if (el) el.style.display = el.style.display === 'none' ? 'flex' : 'none';
             };
+            window.submitReply = async function(gameId, parentId) {
+                const name = document.getElementById('replyName-' + parentId).value.trim();
+                const text = document.getElementById('replyText-' + parentId).value.trim();
+                if (!name || !text) return;
+                await fetch(`${API_BASE}/api/comments/${gameId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, text, parent: parentId })
+                });
+                openGameDetail(gameId);
+            };
+
             function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
             window.openImageViewer = (src) => { const v=document.getElementById('imgViewer'); document.getElementById('imgViewerImg').src=src; v.classList.add('active'); };
             window.confirmDownload = (btn) => {
